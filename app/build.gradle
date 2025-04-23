@@ -1,0 +1,54 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace 'com.muqing.kctab'
+    compileSdk 35
+    signingConfigs {
+        debug {
+            storeFile file('../../muqing.jks')  // 你的debug密钥库路径
+            storePassword 'muqing153'
+            keyAlias 'muqing'
+            keyPassword 'muqing153'
+        }
+    }
+    defaultConfig {
+        applicationId "com.muqing.kctab"
+        minSdk 29
+        targetSdk 35
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation project(':AndroidMuqing')
+    implementation libs.activity
+    //导入Okhttp3
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("androidx.palette:palette:1.0.0")
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.annotation
+    implementation libs.constraintlayout
+    implementation libs.lifecycle.livedata.ktx
+    implementation libs.lifecycle.viewmodel.ktx
+}
