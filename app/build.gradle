@@ -39,7 +39,8 @@ android {
 }
 
 dependencies {
-    implementation project(':AndroidMuqing')
+//    implementation project(':AndroidMuqing')
+    implementation(project(':mylibrary'))
     implementation libs.activity
     //导入Okhttp3
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
