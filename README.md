@@ -14,3 +14,14 @@
 <img alt="img.png" src="image/img.png" width="256" height="160"/>
 <img alt="img.png" src="image/img3.png" width="256" height="160"/>
 <img alt="img.png" src="image/img4.png" width="256" height="160"/>
+
+### 后续的改进
+1. 多端同步更新离线课表
+2. 上课/签到提醒
+3. 水课标记
+4. 2D教室
+
+
+## 贡献者
+<!-- readme: collaborators,contributors -start -->
+<!-- readme: collaborators,contributors -end -->
