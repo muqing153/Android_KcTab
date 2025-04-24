@@ -1,14 +1,10 @@
 package com.muqing.kctab.Activity;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -21,18 +17,14 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.muqing.AppCompatActivity;
 import com.muqing.Dialog.DialogEditText;
 import com.muqing.gj;
-import com.muqing.kctab.Adapter.ZhouAdapter;
 import com.muqing.kctab.LoginApi;
-import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.ActivityLoginBinding;
 import com.muqing.kctab.zhouDialog;
 import com.muqing.wj;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
@@ -142,19 +134,17 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         Intent intent = getIntent();
         if (intent.getStringExtra("sync") != null) {
             binding.syncButton.setEnabled(true);
+            binding.syncButton.setText(intent.getStringExtra("sync"));
         }
 
-        binding.other4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("*/*");
+        binding.other4.setOnClickListener(view -> {
+            Intent intent1 = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent1.addCategory(Intent.CATEGORY_OPENABLE);
+            intent1.setType("*/*");
 
-                // 可选：限制选择单个文件
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
-                fhkczip.launch(new String[]{"*/*"});
-            }
+            // 可选：限制选择单个文件
+            intent1.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+            fhkczip.launch(new String[]{"*/*"});
         });
     }
 

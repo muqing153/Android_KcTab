@@ -6,20 +6,26 @@ import android.content.SharedPreferences;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.material.color.DynamicColors;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.muqing.AppCompatActivity;
 import com.muqing.wj;
 
 public class main extends Application {
+    private static Application application;
+    public static Application getApplication() {
+        return application;
+    }
     @Override
     public void onCreate() {
         super.onCreate();
+        application = this;
         wj.data = wj.data(this);
 
         SharedPreferences sharedPreferences = getSharedPreferences("theme", MODE_PRIVATE);
         int mods = sharedPreferences.getInt("mods", 0);
         setThemeMode(mods);
         //是否大于Android12+=
-        boolean isAndroid12 = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S;
-        if (isAndroid12) {
+        if (sharedPreferences.getBoolean("dynamic", false) && DynamicColors.isDynamicColorAvailable()) {
             DynamicColors.applyToActivitiesIfAvailable(this);
         }
     }

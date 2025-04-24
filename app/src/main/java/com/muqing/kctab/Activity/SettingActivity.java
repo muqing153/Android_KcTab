@@ -1,6 +1,5 @@
 package com.muqing.kctab.Activity;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -8,22 +7,21 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.color.DynamicColors;
+import com.google.android.material.color.DynamicColorsOptions;
 import com.muqing.AppCompatActivity;
 import com.muqing.kctab.Adapter.ThemeAdapter;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.ActivitySettingBinding;
 import com.muqing.kctab.main;
 
-import java.sql.Array;
 import java.util.ArrayList;
 
 public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
@@ -68,13 +66,23 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
             });
             popupMenu.show();
         });
+
+        //动态颜色Debug
+        if (DynamicColors.isDynamicColorAvailable()) {
+            binding.themeDynamic.setEnabled(true);
+            binding.themeDynamic.setClickable(sharedPreferences.getBoolean("dynamic", false));
+            binding.themeDynamic.setOnCheckedChangeListener((compoundButton, b) -> sharedPreferences.edit().putBoolean("dynamic", b).apply());
+        }else {
+            binding.themeDynamic.setEnabled(false);
+            binding.themeDynamic.setChecked(false);
+            binding.themeDynamic.setText("动态颜色(你目前的系统不支持此选项)");
+        }
     }
 
     @Override
     public void setOnApplyWindowInsetsListener(Insets systemBars, View v) {
 //        binding.toolbar.setPadding(0, systemBars.top, 0, 0);
 //        super.setOnApplyWindowInsetsListener(systemBars, v);
-
     }
 
     @Override

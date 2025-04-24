@@ -6,6 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -50,6 +51,17 @@ public class gj {
 
     public static void llq(Context context, String str, Class<?> llq) {
         context.startActivity(new Intent(context, llq).putExtra("url", str));
+    }
+
+    /**
+     * 打开系统默认浏览器
+     * @param context
+     * @param str
+     */
+    public static void llq(Context context, String str) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(str));
+        context.startActivity(intent);
     }
 
     public static void fx(Context context, String str) {

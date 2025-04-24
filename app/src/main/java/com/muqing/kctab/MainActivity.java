@@ -9,8 +9,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,8 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -107,6 +103,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             Login();
             return;
         }
+        new GXThread(this);
         LoadUI();
     }
 
@@ -339,7 +336,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.sync) {
             Intent intent = new Intent(this, LoginActivity.class);
-            intent.putExtra("sync", "ALL");
+            intent.putExtra("sync", benzhou == 0 ? "ALL" : String.valueOf(benzhou));
             SyncKc.launch(intent);
         }
         return super.onOptionsItemSelected(item);

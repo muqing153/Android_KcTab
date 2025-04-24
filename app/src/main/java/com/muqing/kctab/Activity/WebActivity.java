@@ -56,8 +56,13 @@ public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
         // 启用 JavaScript
         WebSettings webSettings = binding.web.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        CookieManager.getInstance().setAcceptThirdPartyCookies(binding.web, true);
+
 // 禁用缓存
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+//        binding.web.clearCache(true);
+//        binding.web.clearHistory();
+
         if (url != null) {
             binding.web.loadUrl(url);
         }
@@ -81,6 +86,17 @@ public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
                         "document.querySelectorAll('.login .log-input > div > input[data-v-4f122882]').forEach(el => {" +
                                 "  el.style.backgroundColor = '" + hexColor + "';" +
                                 "});", null);
+                CookieManager cookieManager = CookieManager.getInstance();
+                String cookies = cookieManager.getCookie(url);
+
+                if (cookies != null) {
+                    String[] cookieArray = cookies.split(";");
+                    for (String cookie : cookieArray) {
+                        Log.d("Cookie", "Cookie: " + cookie.trim());
+                    }
+                } else {
+                    Log.d("Cookies", "没有 Cookies");
+                }
 
             }
 

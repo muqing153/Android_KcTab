@@ -45,17 +45,27 @@
                     android:id="@+id/theme_system"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="6dp"
                     android:background="?attr/selectableItemBackground"
-                    android:paddingVertical="16dp"
                     android:drawableEnd="@drawable/chevron_right_24px"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="16dp"
                     android:text="跟随系统"
                     tools:ignore="UseCompatTextViewDrawableXml" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/theme_dynamic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="16dp"
+                    android:text="动态颜色(重启后生效)" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_theme"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     tools:itemCount="1"
                     tools:listitem="@layout/item_theme" />
             </LinearLayout>

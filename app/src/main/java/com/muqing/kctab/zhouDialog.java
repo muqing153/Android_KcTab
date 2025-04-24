@@ -43,7 +43,6 @@ public abstract class zhouDialog extends BottomSheetDialog {
     }
 
     public void LoadAdapter() {
-
         ArrayList<String> objects = new ArrayList<>();
         for (int i = 0; i < MainActivity.TabList.size(); i++) {
             objects.add(String.valueOf(i + 1));
