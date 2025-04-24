@@ -4,6 +4,7 @@
     style="@style/Widget.Material3.CardView.Elevated"
     android:layout_width="60dp"
     android:layout_height="wrap_content"
+    app:cardBackgroundColor="@macro/m3_comp_elevated_card_container_color"
     app:cardUseCompatPadding="true">
 
     <TextView

@@ -38,28 +38,28 @@
                 android:layout_marginBottom="16dp"
                 app:cardUseCompatPadding="true">
 
-<!--                <com.google.android.material.tabs.TabLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content">-->
+                <!--                <com.google.android.material.tabs.TabLayout-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content">-->
 
-<!--                    <com.google.android.material.tabs.TabItem-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="本地" />-->
+                <!--                    <com.google.android.material.tabs.TabItem-->
+                <!--                        android:layout_width="wrap_content"-->
+                <!--                        android:layout_height="wrap_content"-->
+                <!--                        android:text="本地" />-->
 
-<!--                    <com.google.android.material.tabs.TabItem-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:saveEnabled="false"-->
-<!--                        android:text="流量" />-->
-<!--                </com.google.android.material.tabs.TabLayout>-->
-                <Button
+                <!--                    <com.google.android.material.tabs.TabItem-->
+                <!--                        android:layout_width="wrap_content"-->
+                <!--                        android:layout_height="wrap_content"-->
+                <!--                        android:saveEnabled="false"-->
+                <!--                        android:text="流量" />-->
+                <!--                </com.google.android.material.tabs.TabLayout>-->
+                <TextView
                     android:id="@+id/syncButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ALL"
                     android:enabled="false"
-                    style="@style/Widget.Material3.Button.TextButton"/>
+                    android:text="ALL" />
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -72,8 +72,8 @@
                     android:id="@+id/account"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:hint="学号" />
+                    android:hint="学号"
+                    android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -112,7 +112,7 @@
 
             </LinearLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <FrameLayout
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -121,20 +121,16 @@
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:layout_gravity="center_vertical" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:background="?android:attr/colorBackground"
                     android:paddingHorizontal="9dp"
-                    android:text="其他登陆方式"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    android:text="其他登陆方式" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -169,6 +165,48 @@
                     android:text="Token"
                     app:icon="@drawable/edit_24px" />
             </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal">
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="?android:attr/colorBackground"
+                    android:paddingHorizontal="9dp"
+                    android:text="数据导入方式" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/other4"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="3dp"
+                    android:text=".kczip" />
+
+                <Button
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="3dp"
+                    android:text=".json" />
+            </LinearLayout>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -177,8 +215,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
-        android:gravity="center_horizontal"
         android:layout_margin="3dp"
+        android:gravity="center_horizontal"
         android:text="获取到的Token不会保存到本地或者网络\n那玩意甚至没用一会就过期了"
         android:textColor="?android:attr/textColorSecondaryInverse" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -35,6 +36,11 @@ import java.util.List;
 import java.util.Map;
 
 public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
+
+    @Override
+    public void setOnApplyWindowInsetsListener(Insets systemBars, View v) {
+//        super.setOnApplyWindowInsetsListener(systemBars, v);
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override

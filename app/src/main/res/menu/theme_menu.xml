@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_theme"
+        android:title="跟随系统" />
+    <item
+        android:id="@+id/menu_light"
+        android:title="浅色" />
+
+    <item
+        android:id="@+id/menu_dark"
+        android:title="深色" />
+
+
+</menu>

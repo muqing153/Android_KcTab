@@ -7,7 +7,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +31,7 @@ import com.google.gson.Gson;
 import com.muqing.AppCompatActivity;
 import com.muqing.gj;
 import com.muqing.kctab.Activity.LoginActivity;
+import com.muqing.kctab.Activity.SettingActivity;
 import com.muqing.kctab.Adapter.GridAdapter;
 import com.muqing.kctab.databinding.ActivityMainBinding;
 import com.muqing.wj;
@@ -38,6 +42,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.regex.Matcher;
@@ -162,33 +168,45 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
 
     GridAdapter adapter;
 
+    Timer timer = new Timer();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (timer != null) {
+            timer.cancel();      // 停止任务队列
+            timer.purge();       // 清除已取消的任务
+            timer = null;
+        }
+    }
+
     public void UI() {
         adapter = new GridAdapter(this, new ArrayList<>());
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.execute(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    LocalTime now = LocalTime.now();
-                    LocalDate today = LocalDate.now();
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-                    Time = now.format(formatter);
-                    // 获取当前星期几（1=星期一，7=星期日）
-                    Week = today.getDayOfWeek().getValue();
-                    // 在主线程更新 UI
-                    runOnUiThread(() -> {
-                        try {
-                            adapter.Load(binding.recyclerview);
-                        } catch (Exception e) {
-                            gj.sc(e);
-                        }
-                    });
-
-                    Thread.sleep(1000); // 1秒后继续执行
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt(); // 结束循环
-                }
+//        if (!isTimerRunning) {
+//            isTimerRunning = true;
+//            handler.post(timerRunnable);
+//        }
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+//                gj.sc("每秒执行一次任务");
+                LocalTime now = LocalTime.now();
+                LocalDate today = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                Time = now.format(formatter);
+                // 获取当前星期几（1=星期一，7=星期日）
+                Week = today.getDayOfWeek().getValue();
+                // 在主线程更新 UI
+                runOnUiThread(() -> {
+                    try {
+                        adapter.Load(binding.recyclerview);
+                    } catch (Exception e) {
+                        gj.sc(e);
+                    }
+                });
             }
-        });
+        };
+        timer.schedule(task, 0, 1000); // 立即开始，每隔1秒执行
+
         Log.i(TAG, "UI: 执行UI构建：" + curriculum);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 8); // 列
         binding.recyclerview.setLayoutManager(layoutManager);
@@ -318,7 +336,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             jietuActivity.start(this, fullRecyclerViewBitmap);
             adapter.isjt = false;
         } else if (id == R.id.settings) {
-            Toast.makeText(this, "设置", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.sync) {
             Intent intent = new Intent(this, LoginActivity.class);
             intent.putExtra("sync", "ALL");
@@ -341,7 +359,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
                     }
                     if (sycn.equals("ALL")) {
                         load = KcApi.Load(token);
-                    }else {
+                    } else {
                         try {
                             File file = new File(wj.data, "TabList");
                             String s = KcApi.GetCurriculum(sycn, "");
@@ -371,14 +389,19 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     });
 
     private AlertDialog LoadIng() {
-        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
-        dialogBuilder.setView(R.layout.load_dialog);
-        AlertDialog show = dialogBuilder.show();
+        MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(this);
+        dialog.setView(R.layout.load_dialog);
+        AlertDialog show = dialog.show();
         show.setCanceledOnTouchOutside(false);
         show.setCancelable(false);
+        if (show.getWindow() != null) {
+            show.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
         return show;
     }
+
     int viewWidth, viewHeight;
+
     public Bitmap getFullRecyclerViewBitmap(View view, Bitmap background) {
         if (viewWidth == 0 || viewHeight == 0) {
             gj.sc("避免创建空 Bitmap");

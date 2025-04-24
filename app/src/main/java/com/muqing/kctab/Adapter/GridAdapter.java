@@ -48,8 +48,8 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
         viewBinding.title.setText(data.title);
         if (position < 8) {
             viewBinding.message.setVisibility(View.GONE);
-//            viewBinding.getRoot().setCardBackgroundColor(ColorThis);
         } else {
+            viewBinding.getRoot().setCardBackgroundColor(ColorThis);
             viewBinding.message.setVisibility(View.VISIBLE);
             viewBinding.message.setText(data.message);
         }
