@@ -1,5 +1,6 @@
 package com.muqing.kctab.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -29,26 +30,25 @@ public class ZhouAdapter extends BaseAdapter<ZhouItemBinding, String> {
         return ZhouItemBinding.inflate(inflater, parent, false);
     }
 
-    int danposition = 0;
     public boolean gaoliang = true;
+
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onBindView(String data, ZhouItemBinding viewBinding, ViewHolder<ZhouItemBinding> viewHolder, int position) {
         viewBinding.title.setText(data);
         if (gaoliang && Integer.parseInt(data) == MainActivity.curriculum.data.get(0).week) {
             viewBinding.getRoot().setEnabled(false);
             viewBinding.getRoot().setCardBackgroundColor(ColorWhen);
-            danposition = position;
         } else {
             viewBinding.getRoot().setCardBackgroundColor(ColorThis);
             viewBinding.getRoot().setEnabled(true);
         }
         viewBinding.getRoot().setOnClickListener(view -> {
             onclick(position);
+            notifyDataSetChanged();
         });
     }
 
     public void onclick(int position) {
-        notifyItemChanged(danposition);
-        notifyItemChanged(position);
     }
 }

@@ -44,6 +44,7 @@ public class YourKczipOpenActivity extends AppCompatActivity<ActivityYourkczipBi
                     wj.data = wj.data(this);
                 }
                 File outputDir = new File(wj.data, "TabList");
+                wj.sc(outputDir);
                 if (!outputDir.exists()) outputDir.mkdirs();
                 InputStream inputStream = getContentResolver().openInputStream(data);
                 unzipFromUri(this, inputStream, outputDir);

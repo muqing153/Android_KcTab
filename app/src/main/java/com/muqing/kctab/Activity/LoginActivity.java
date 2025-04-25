@@ -33,7 +33,6 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         return ActivityLoginBinding.inflate(layoutInflater);
     }
 
-    private boolean login = false;
 
     ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
@@ -134,7 +133,6 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             zhouDialog.zhouAdapter.dataList.add(0, "ALL");
         });
         Intent intent = getIntent();
-        login = intent.getBooleanExtra("login", false);
         if (intent.getStringExtra("sync") != null) {
             binding.syncButton.setEnabled(true);
             binding.syncButton.setText(intent.getStringExtra("sync"));
@@ -174,7 +172,6 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
     private void EndToken(String token) {
         Intent resultIntent = new Intent();
         resultIntent.putExtra("token", token);
-        resultIntent.putExtra("login", login);
         resultIntent.putExtra("sync", binding.syncButton.getText().toString());
         setResult(RESULT_OK, resultIntent);
         finish();
@@ -193,8 +190,4 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
 
     }
 
-    @Override
-    public void BackPressed() {
-        EndToken(null);
-    }
 }

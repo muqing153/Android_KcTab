@@ -65,8 +65,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
 
     private void Login() {
         Intent intent = new Intent(this, LoginActivity.class);
-        intent.putExtra("login", true);
-        SyncKc.launch(intent);
+        LoginStart.launch(intent);
     }
 
     final File fileTabList = new File(wj.data, "TabList");
@@ -86,8 +85,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         File[] list = fileTabList.listFiles();
         TabList.clear();
         if (list != null) {
-            for (File s :
-                    list) {
+            for (File s : list) {
                 TabList.add(s.getAbsolutePath());
             }
         }
@@ -204,12 +202,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         }
     }
 
-    final ScheduleItem[] schedule = {new ScheduleItem("第 1 节", "08:20-09:05", "09:15-10:00"),
-            new ScheduleItem("第 2 节", "10:10-11:40", "10:30-12:00"),
-            new ScheduleItem("第 3 节", "13:30-14:15", "14:25-15:10"),
-            new ScheduleItem("第 4 节", "15:20-16:05", "16:15-17:00"),
-            new ScheduleItem("第 5 节", "18:30-19:15", "19:25-20:10")
-    };
+    final ScheduleItem[] schedule = {new ScheduleItem("第 1 节", "08:20-09:05", "09:15-10:00"), new ScheduleItem("第 2 节", "10:10-11:40", "10:30-12:00"), new ScheduleItem("第 3 节", "13:30-14:15", "14:25-15:10"), new ScheduleItem("第 4 节", "15:20-16:05", "16:15-17:00"), new ScheduleItem("第 5 节", "18:30-19:15", "19:25-20:10")};
 
     public void LoadTab() {
         adapter.dataList.clear();
@@ -239,11 +232,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             for (int k = 0; k < 7; k++, j++) {
                 int finalRic_i = ric_i;
                 int finalI = k + 1;
-                Curriculum.Course result = dataItem.courses.stream()
-                        .filter(c -> c.classTime.endsWith(String.format("%s%s", ric[finalRic_i], ric[finalRic_i + 1])) &&
-                                c.weekDay == finalI)
-                        .findFirst()
-                        .orElse(null);
+                Curriculum.Course result = dataItem.courses.stream().filter(c -> c.classTime.endsWith(String.format("%s%s", ric[finalRic_i], ric[finalRic_i + 1])) && c.weekDay == finalI).findFirst().orElse(null);
 //                gj.sc(result);
                 if (result == null) {
                     result = new Curriculum.Course();
@@ -313,51 +302,77 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();
             if (data != null) {
-                if (data.getBooleanExtra("login", false)) {
-                    finish();
-                    return;
-                }
-
-                String sycn = data.getStringExtra("sync");
-                String token = data.getStringExtra("token");
-                AlertDialog alertDialog = LoadIng();
-                new Thread(() -> {
-                    boolean load = false;
-                    if (sycn == null) {
-                        return;
+                new LoadKc(data) {
+                    @Override
+                    public void error() {
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "同步更新失败", Toast.LENGTH_SHORT).show());
                     }
-                    if (sycn.equals("ALL")) {
-                        load = KcApi.Load(token);
-                    } else if (sycn.equals("kczip")) {
-                        load = true;
-                    } else {
-                        try {
-                            File file = new File(wj.data, "TabList");
-                            String s = KcApi.GetCurriculum(sycn, "");
-                            Curriculum curriculum = new Gson().fromJson(s, Curriculum.class);
-                            curriculum.data.get(0).week = Integer.parseInt(sycn);
-                            int length = curriculum.data.get(0).date.size();
-                            String zc = curriculum.data.get(0).date.get(length - 1).mxrq;
-                            wj.xrwb(new File(file, zc + ".txt"), new Gson().toJson(curriculum));
-                            load = true;
-                        } catch (Exception e) {
-                            gj.sc(e);
-                        }
-                    }
-                    if (load) {
-                        runOnUiThread(() -> {
-                            LoadUI();
-                            alertDialog.dismiss();
-                        });
-                    } else {
-                        runOnUiThread(() -> {
-                            Toast.makeText(MainActivity.this, "同步更新失败", Toast.LENGTH_SHORT).show();
-                        });
-                    }
-                }).start();
+                };
             }
         }
     });
+    ActivityResultLauncher<Intent> LoginStart = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_OK) {
+            Intent data = result.getData();
+            if (data != null) {
+                new LoadKc(data) {
+                    @Override
+                    public void error() {
+                        Login();
+                    }
+                };
+                return;
+            }
+        }
+        finish();
+    });
+
+    public abstract class LoadKc extends Thread {
+        public Intent data;
+        AlertDialog alertDialog;
+
+        public LoadKc(Intent data) {
+            this.data = data;
+            alertDialog = LoadIng();
+            start();
+        }
+
+        @Override
+        public void run() {
+            String sycn = data.getStringExtra("sync");
+            String token = data.getStringExtra("token");
+            boolean load = false;
+            if (sycn == null) {
+                return;
+            }
+            if (sycn.equals("ALL")) {
+                load = KcApi.Load(token);
+            } else if (sycn.equals("kczip")) {
+                load = true;
+            } else {
+                try {
+                    File file = new File(wj.data, "TabList");
+                    String s = KcApi.GetCurriculum(sycn, "");
+                    Curriculum curriculum = new Gson().fromJson(s, Curriculum.class);
+                    curriculum.data.get(0).week = Integer.parseInt(sycn);
+                    int length = curriculum.data.get(0).date.size();
+                    String zc = curriculum.data.get(0).date.get(length - 1).mxrq;
+                    wj.xrwb(new File(file, zc + ".txt"), new Gson().toJson(curriculum));
+                    load = true;
+                } catch (Exception e) {
+                    gj.sc(e);
+                }
+            }
+            if (load) {
+                runOnUiThread(MainActivity.this::LoadUI);
+            } else {
+                error();
+            }
+            runOnUiThread(() -> alertDialog.dismiss());
+        }
+
+        public abstract void error();
+    }
 
     private AlertDialog LoadIng() {
         MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(this);
@@ -380,10 +395,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         }
         Bitmap bitmap = Bitmap.createBitmap(viewWidth, viewHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        TypedArray array = getTheme().obtainStyledAttributes(new int[]{
-                android.R.attr.colorBackground,
-                android.R.attr.textColorPrimary,
-        });
+        TypedArray array = getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorBackground, android.R.attr.textColorPrimary,});
         int backgroundColor = array.getColor(0, 0xFFF5F5F5);
         canvas.drawColor(backgroundColor);
         view.draw(canvas);
