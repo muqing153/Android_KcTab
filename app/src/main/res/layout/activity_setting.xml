@@ -46,7 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/chevron_right_24px"
-                    app:title="跟随系统"/>
+                    app:title="跟随系统" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/theme_dynamic"
@@ -70,7 +70,6 @@
                 style="@style/TextAppearance.Material3.BodyLarge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
                 android:text="课表" />
 
             <LinearLayout
@@ -79,16 +78,38 @@
                 android:orientation="vertical">
 
                 <com.muqing.ViewUI.SettingTextView
+                    android:id="@+id/kb_daochu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/chevron_right_24px"
                     app:title="导出课表" />
+
                 <com.muqing.ViewUI.SettingTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/chevron_right_24px"
-                    app:title="整理课表课程"/>
+                    app:message="不可用"
+                    app:title="整理课表课程" />
             </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="其他" />
+
+            <com.muqing.ViewUI.SettingTextView
+                android:id="@+id/qt_jcgx"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/chevron_right_24px"
+                app:title="检查更新" />
+
+            <com.muqing.ViewUI.SettingTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/chevron_right_24px"
+                app:message="不可用"
+                app:title="关于" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

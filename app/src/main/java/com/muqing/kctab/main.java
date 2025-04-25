@@ -1,8 +1,12 @@
 package com.muqing.kctab;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.material.color.DynamicColors;
@@ -42,5 +46,18 @@ public class main extends Application {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);// 强制深色
                 break;
         }
+    }
+
+
+    public static AlertDialog LoadIng(Context context) {
+        MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(context);
+        dialog.setView(R.layout.load_dialog);
+        AlertDialog show = dialog.show();
+        show.setCanceledOnTouchOutside(false);
+        show.setCancelable(false);
+        if (show.getWindow() != null) {
+            show.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+        return show;
     }
 }

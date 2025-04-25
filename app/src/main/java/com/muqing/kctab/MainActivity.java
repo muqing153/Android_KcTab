@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     public static String Time;//当前时间xx:xx 当前日期 1234567
     public static int Week;
     public static int benzhou = 0;
-    public static int backgroundColor = 0xFFF5F5F5, textColor = 0xFF000000;
     public static Curriculum curriculum = null;
     public static List<String> TabList = new ArrayList<>();
 
@@ -60,37 +59,14 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
 
     @Override
     public void setOnApplyWindowInsetsListener(Insets systemBars, View v) {
-//        super.setOnApplyWindowInsetsListener(systemBars, v);
-        binding.appbar.setPadding(0, systemBars.top, 0, 0);
+//        binding.appbar.setPadding(0, systemBars.top, 0, 0);
     }
 
-    ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK) {
-            Intent data = result.getData();
-            if (data != null) {
-                String token = data.getStringExtra("token");
-                AlertDialog alertDialog = LoadIng();
-                new Thread(() -> {
-                    boolean load = KcApi.Load(token);
-                    if (load) {
-                        runOnUiThread(this::LoadUI);
-                    } else {
-                        runOnUiThread(() -> {
-                            Toast.makeText(MainActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
-                            Login();
-                        });
-                    }
-                    runOnUiThread(alertDialog::dismiss);
-                }).start();
-
-                return;
-            }
-        }
-        finish();
-    });
 
     private void Login() {
-        activityResultLauncher.launch(new Intent(this, LoginActivity.class));
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra("login", true);
+        SyncKc.launch(intent);
     }
 
     final File fileTabList = new File(wj.data, "TabList");
@@ -98,7 +74,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         if (!fileTabList.isDirectory()) {
             Login();
             return;
@@ -116,15 +91,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
                 TabList.add(s.getAbsolutePath());
             }
         }
-        setContentView();
-        setSupportActionBar(binding.toolbar);
-        TypedArray array = getTheme().obtainStyledAttributes(new int[]{
-                android.R.attr.colorBackground,
-                android.R.attr.textColorPrimary,
-        });
-        backgroundColor = array.getColor(0, 0xFFF5F5F5);
-        textColor = array.getColor(1, 0xFF000000);
-        array.recycle();
         new LoadToken().start();
 
     }
@@ -166,6 +132,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     GridAdapter adapter;
 
     Timer timer = new Timer();
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -178,10 +145,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
 
     public void UI() {
         adapter = new GridAdapter(this, new ArrayList<>());
-//        if (!isTimerRunning) {
-//            isTimerRunning = true;
-//            handler.post(timerRunnable);
-//        }
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -204,6 +167,10 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         };
         timer.schedule(task, 0, 1000); // 立即开始，每隔1秒执行
 
+        if (binding == null) {
+            setContentView();
+            setSupportActionBar(binding.toolbar);
+        }
         Log.i(TAG, "UI: 执行UI构建：" + curriculum);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 8); // 列
         binding.recyclerview.setLayoutManager(layoutManager);
@@ -346,6 +313,11 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();
             if (data != null) {
+                if (data.getBooleanExtra("login", false)) {
+                    finish();
+                    return;
+                }
+
                 String sycn = data.getStringExtra("sync");
                 String token = data.getStringExtra("token");
                 AlertDialog alertDialog = LoadIng();
@@ -356,6 +328,8 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
                     }
                     if (sycn.equals("ALL")) {
                         load = KcApi.Load(token);
+                    } else if (sycn.equals("kczip")) {
+                        load = true;
                     } else {
                         try {
                             File file = new File(wj.data, "TabList");
@@ -406,6 +380,11 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         }
         Bitmap bitmap = Bitmap.createBitmap(viewWidth, viewHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
+        TypedArray array = getTheme().obtainStyledAttributes(new int[]{
+                android.R.attr.colorBackground,
+                android.R.attr.textColorPrimary,
+        });
+        int backgroundColor = array.getColor(0, 0xFFF5F5F5);
         canvas.drawColor(backgroundColor);
         view.draw(canvas);
         // **绘制背景图片**
@@ -434,7 +413,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             // 绘制背景图
             canvas.drawBitmap(background, src, dst, path);
         }
-
+        array.recycle();
         return bitmap;
     }
 

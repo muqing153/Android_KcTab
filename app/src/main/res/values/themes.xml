@@ -4,6 +4,9 @@
 
         <!--        设置沉浸式状态栏-->
         <item name="android:statusBarColor">?android:attr/colorBackground</item>
+        <!--        设置沉浸式导航栏-->
+        <item name="android:navigationBarColor">?android:attr/colorBackground</item>
+
         <item name="colorPrimary">@color/md_theme_primary</item>
         <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_primaryContainer</item>

@@ -84,11 +84,7 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
         if (item.getItemId() == android.R.id.home) {
             finish();
         } else if (item.getItemId() == 0) {
-            //将图片保存到本地
-            item.setEnabled(false);
-//            new wj.xiangce().saveImageToGallery(this, bitmap);
             shareBitmap(bitmap);
-            finish();
         }
         return super.onOptionsItemSelected(item);
     }

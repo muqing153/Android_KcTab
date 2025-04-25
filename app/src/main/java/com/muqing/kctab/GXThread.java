@@ -16,7 +16,14 @@ public class GXThread extends Thread {
     public GXThread(Activity activity) {
         this.activity = activity;
         start();
+    }
 
+    Runnable runnable;
+
+    public GXThread(Activity activity, Runnable runnable) {
+        this.activity = activity;
+        this.runnable = runnable;
+        start();
     }
 
     @Override
@@ -41,11 +48,12 @@ public class GXThread extends Thread {
                                 gj.llq(activity, "https://muqingcandy.top");
                             })
                             .show());
+                } else if (runnable != null) {
+                    activity.runOnUiThread(runnable);
                 }
             }
         } catch (Exception e) {
             gj.sc(this.getClass().getName() + " " + e.getMessage());
         }
-
     }
 }

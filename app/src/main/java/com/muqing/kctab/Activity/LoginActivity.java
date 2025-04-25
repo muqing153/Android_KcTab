@@ -1,4 +1,5 @@
 package com.muqing.kctab.Activity;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -6,10 +7,12 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.muqing.AppCompatActivity;
 import com.muqing.Dialog.DialogEditText;
@@ -19,14 +22,18 @@ import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.ActivityLoginBinding;
 import com.muqing.kctab.zhouDialog;
 import com.muqing.wj;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.Objects;
+
 public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
     @Override
     protected ActivityLoginBinding getViewBindingObject(LayoutInflater layoutInflater) {
         return ActivityLoginBinding.inflate(layoutInflater);
     }
+
+    private boolean login = false;
 
     ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
@@ -127,6 +134,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             zhouDialog.zhouAdapter.dataList.add(0, "ALL");
         });
         Intent intent = getIntent();
+        login = intent.getBooleanExtra("login", false);
         if (intent.getStringExtra("sync") != null) {
             binding.syncButton.setEnabled(true);
             binding.syncButton.setText(intent.getStringExtra("sync"));
@@ -146,25 +154,16 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
     ActivityResultLauncher<String[]> fhkczip = registerForActivityResult(new ActivityResultContracts.OpenDocument(),
             uri -> {
                 if (uri != null) {
-//                    // 获取文件路径或内容
-//                    String filePath = null;
-//                    String[] projection = {MediaStore.Files.FileColumns.DATA};
-//                    Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-//                    if (cursor != null && cursor.moveToFirst()) {
-//                        int columnIndex = cursor.getColumnIndexOrThrow(projection[0]);
-//                        filePath = cursor.getString(columnIndex);
-//                        cursor.close();
-//                    }
-//                    gj.sc(filePath);
-                    // 或者直接使用ContentResolver打开输入流
                     try {
                         InputStream inputStream = getContentResolver().openInputStream(uri);
                         gj.sc("成功获取文件流"); // 你的回调方法
                         File outputDir = new File(wj.data, "TabList");
+                        wj.sc(outputDir);
                         if (!outputDir.exists()) outputDir.mkdirs();
                         boolean b = YourKczipOpenActivity.unzipFromUri(LoginActivity.this, inputStream, outputDir);
                         if (b) {
-                            finish();
+                            binding.syncButton.setText("kczip");
+                            EndToken(null);
                         }
                     } catch (Exception e) {
                         gj.sc("文件读取失败: " + e.getMessage());
@@ -175,6 +174,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
     private void EndToken(String token) {
         Intent resultIntent = new Intent();
         resultIntent.putExtra("token", token);
+        resultIntent.putExtra("login", login);
         resultIntent.putExtra("sync", binding.syncButton.getText().toString());
         setResult(RESULT_OK, resultIntent);
         finish();
@@ -191,5 +191,10 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         }
         return show;
 
+    }
+
+    @Override
+    public void BackPressed() {
+        EndToken(null);
     }
 }
