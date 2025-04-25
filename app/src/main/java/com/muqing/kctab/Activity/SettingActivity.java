@@ -8,15 +8,14 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CompoundButton;
 
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.graphics.Insets;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.color.DynamicColors;
-import com.google.android.material.color.DynamicColorsOptions;
 import com.muqing.AppCompatActivity;
+import com.muqing.gj;
 import com.muqing.kctab.Adapter.ThemeAdapter;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.ActivitySettingBinding;
@@ -47,7 +46,7 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
         binding.recyclerTheme.setAdapter(themeAdapter);
 
         String[] theme = new String[]{"跟随系统", "浅色", "深色"};
-        binding.themeSystem.setText(theme[code]);
+        binding.themeSystem.setTitle(theme[code]);
         binding.themeSystem.setOnClickListener(view -> {
             PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
             popupMenu.setGravity(Gravity.CENTER);
@@ -60,6 +59,7 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
                 } else if (itemId == R.id.menu_dark) {
                     position = 2;
                 }
+                binding.themeSystem.setTitle(theme[position]);
                 main.setThemeMode(position);
                 sharedPreferences.edit().putInt("mods", position).apply();
                 return true;
@@ -70,7 +70,7 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
         //动态颜色Debug
         if (DynamicColors.isDynamicColorAvailable()) {
             binding.themeDynamic.setEnabled(true);
-            binding.themeDynamic.setClickable(sharedPreferences.getBoolean("dynamic", false));
+            binding.themeDynamic.setChecked(sharedPreferences.getBoolean("dynamic", false));
             binding.themeDynamic.setOnCheckedChangeListener((compoundButton, b) -> sharedPreferences.edit().putBoolean("dynamic", b).apply());
         }else {
             binding.themeDynamic.setEnabled(false);

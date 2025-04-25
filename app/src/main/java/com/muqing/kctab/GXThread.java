@@ -23,7 +23,9 @@ public class GXThread extends Thread {
     public void run() {
 
         try {
-            String hq = wl.hq("https://muqingcandy.top/yiyoubiao.json", "");
+            String hq = wl.hq("http://muqingcandy.top/yiyoubiao.json", "");
+            gj.sc(hq);
+
             if (hq != null) {
                 JSONObject jsonObject = new JSONObject(hq);
                 String nickname = jsonObject.getString("name");

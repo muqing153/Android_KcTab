@@ -41,16 +41,12 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
+                <com.muqing.ViewUI.SettingTextView
                     android:id="@+id/theme_system"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:drawableEnd="@drawable/chevron_right_24px"
-                    android:paddingHorizontal="6dp"
-                    android:paddingVertical="16dp"
-                    android:text="跟随系统"
-                    tools:ignore="UseCompatTextViewDrawableXml" />
+                    app:icon="@drawable/chevron_right_24px"
+                    app:title="跟随系统"/>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/theme_dynamic"
@@ -82,29 +78,16 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
+                <com.muqing.ViewUI.SettingTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:drawableEnd="@drawable/chevron_right_24px"
-                    android:focusable="true"
-                    android:paddingHorizontal="6dp"
-                    android:paddingVertical="16dp"
-                    android:text="导出课表"
-                    tools:ignore="UseCompatTextViewDrawableXml" />
-
-                <TextView
+                    app:icon="@drawable/chevron_right_24px"
+                    app:title="导出课表" />
+                <com.muqing.ViewUI.SettingTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:drawableEnd="@drawable/chevron_right_24px"
-                    android:focusable="true"
-                    android:paddingHorizontal="6dp"
-                    android:paddingVertical="16dp"
-                    android:text="整理课表课程"
-                    tools:ignore="UseCompatTextViewDrawableXml" />
+                    app:icon="@drawable/chevron_right_24px"
+                    app:title="整理课表课程"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

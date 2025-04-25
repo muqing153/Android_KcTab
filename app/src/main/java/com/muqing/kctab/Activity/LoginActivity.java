@@ -1,5 +1,4 @@
 package com.muqing.kctab.Activity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -7,12 +6,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.muqing.AppCompatActivity;
 import com.muqing.Dialog.DialogEditText;
@@ -22,11 +19,9 @@ import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.ActivityLoginBinding;
 import com.muqing.kctab.zhouDialog;
 import com.muqing.wj;
-
 import java.io.File;
 import java.io.InputStream;
 import java.util.Objects;
-
 public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
     @Override
     protected ActivityLoginBinding getViewBindingObject(LayoutInflater layoutInflater) {
@@ -171,7 +166,6 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                         if (b) {
                             finish();
                         }
-                        // 处理输入流...
                     } catch (Exception e) {
                         gj.sc("文件读取失败: " + e.getMessage());
                     }

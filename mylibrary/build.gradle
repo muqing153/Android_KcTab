@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.library'
+    alias(libs.plugins.jetbrains.kotlin.android)
 }
 
 android {
@@ -10,6 +11,9 @@ android {
     defaultConfig {
         minSdk 24
         targetSdk 35
+        vectorDrawables {
+            useSupportLibrary true
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -17,6 +21,18 @@ android {
     }
     buildFeatures {
         viewBinding true
+        compose true
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.5.1'
+    }
+    packaging {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 package com.muqing.kctab;
 
 
+import android.annotation.SuppressLint;
 import android.text.TextUtils;
 
 import com.muqing.gj;
@@ -80,7 +81,7 @@ public class LoginApi {
         String key = "qzkj1kjghd=876&*"; // 16字节密钥
         SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
 
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        @SuppressLint("GetInstance") Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
         // JS 中加密的是 JSON.stringify(input)，即："Muqing153@"
