@@ -28,28 +28,31 @@ public class GXThread extends Thread {
 
     @Override
     public void run() {
-
         try {
-            String hq = wl.hq("http://muqingcandy.top/yiyoubiao.json", "");
+            String versionName = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
+            String hq = wl.post("https://muqingcandy.top/php/GetKCTabBB.php", new Object[][]{
+                    {"version", versionName}
+            });
             gj.sc(hq);
-
             if (hq != null) {
                 JSONObject jsonObject = new JSONObject(hq);
-                String nickname = jsonObject.getString("name");
-                String message = jsonObject.getString("message");
-                String version = jsonObject.getString("version");
-                //获取本地版本versionName
-                String versionName = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
-                if (!version.equals(versionName)) {
-                    activity.runOnUiThread(() -> new MaterialAlertDialogBuilder(activity)
-                            .setTitle(nickname)
-                            .setMessage(message + "\n" + versionName + "->" + version)
-                            .setPositiveButton("确定", (dialogInterface, i) -> {
-                                gj.llq(activity, "https://muqingcandy.top");
-                            })
-                            .show());
-                } else if (runnable != null) {
-                    activity.runOnUiThread(runnable);
+                if (jsonObject.getInt("code") == 200) {
+
+                    String nickname = jsonObject.getString("name");
+                    String message = jsonObject.getString("message");
+                    String version = jsonObject.getString("version");
+                    //获取本地版本versionName
+                    if (!version.equals(versionName)) {
+                        activity.runOnUiThread(() -> new MaterialAlertDialogBuilder(activity)
+                                .setTitle(nickname)
+                                .setMessage(message + "\n" + versionName + "->" + version)
+                                .setPositiveButton("确定", (dialogInterface, i) -> {
+                                    gj.llq(activity, "https://muqingcandy.top");
+                                })
+                                .show());
+                    } else if (runnable != null) {
+                        activity.runOnUiThread(runnable);
+                    }
                 }
             }
         } catch (Exception e) {

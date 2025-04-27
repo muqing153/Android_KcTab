@@ -59,11 +59,6 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
                 ShowKc(course);
             }
         });
-//        if (position == 1) {
-//            viewHolder.itemView.post(() -> {
-//                Log.i(TAG, "onBindView: " + MainActivity.ItemXY[0] + " " + MainActivity.ItemXY[1]);
-//            });
-//        }
     }
 
     private void ShowKc(Curriculum.Course course) {
@@ -109,6 +104,13 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
             }
             return;
         }
+        if (MainActivity.curriculum == null) {
+            return;
+        }
+        if (MainActivity.curriculum.data.get(0).week != MainActivity.benzhou) {
+            //不是本周的课程不高亮
+            return;
+        }
         int weekDay = MainActivity.Week;
         String time = MainActivity.Time;
         for (int x = 1, y = weekDay + 8; x < 6; y += 8, x++) {
@@ -119,7 +121,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
                     // 生成 1~7 之间的随机星期
 //                time是否在Start和End之间
                     if (time.compareTo(kcLei.data.startTime) >= 0 && time.compareTo(kcLei.data.endTime) <= 0 && Objects.equals(kcLei.data.weekDay, weekDay)) {
-                        View viewByPosition = recyclerView.getLayoutManager().findViewByPosition(y);
+                        View viewByPosition = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(y);
                         if (viewByPosition != null) {
                             if (ItemBinding != null && ItemBinding.getRoot() != viewByPosition) {
                                 ItemBinding.getRoot().setCardBackgroundColor(ColorThis);
@@ -137,7 +139,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
 
 
                     if (kcLei.data.startTime.compareTo(time) > 0 && Objects.equals(kcLei.data.weekDay, weekDay)) {
-                        View viewByPosition = recyclerView.getLayoutManager().findViewByPosition(y);
+                        View viewByPosition = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(y);
                         if (viewByPosition != null) {
                             if (NextItemBinding != null && NextItemBinding.getRoot() != viewByPosition) {
                                 NextItemBinding.getRoot().setCardBackgroundColor(ColorThis);
