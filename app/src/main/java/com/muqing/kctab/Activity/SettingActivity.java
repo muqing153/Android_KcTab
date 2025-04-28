@@ -2,6 +2,7 @@ package com.muqing.kctab.Activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -102,6 +103,12 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
         });
 
 
+        try {
+            binding.qtJcgx.setMessage("当前版本：" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            gj.sc(e);
+            binding.qtJcgx.setMessage("获取版本失败");
+        }
         binding.qtJcgx.setOnClickListener(view -> {
             view.setEnabled(false);
             new GXThread(SettingActivity.this, () -> Toast.makeText(SettingActivity.this, "你已经是最新版本！", Toast.LENGTH_SHORT).show()) {
@@ -110,8 +117,15 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
                     super.run();
                     runOnUiThread(() -> view.setEnabled(true));
                 }
+
+                @Override
+                public void error(String msg) {
+                    runOnUiThread(() -> Toast.makeText(SettingActivity.this, msg, Toast.LENGTH_SHORT).show());
+                }
             };
         });
+
+        binding.qtAbout.setOnClickListener(view -> startActivity(new Intent(SettingActivity.this, activity_about_software.class)));
     }
 
     private final ActivityResultLauncher<Intent> createZipLauncher = registerForActivityResult(
@@ -122,7 +136,7 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
                     File sourceFolder = new File(wj.data, "TabList");
                     if (uri != null) {
                         try (OutputStream os = getContentResolver().openOutputStream(uri);
-                            ZipOutputStream zos = new ZipOutputStream(os)) {
+                             ZipOutputStream zos = new ZipOutputStream(os)) {
                             wj.zipFiles(sourceFolder, zos);
                             Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
@@ -132,6 +146,7 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
                 }
             }
     );
+
     @Override
     public void setOnApplyWindowInsetsListener(Insets systemBars, View v) {
 //        binding.toolbar.setPadding(0, systemBars.top, 0, 0);

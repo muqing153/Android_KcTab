@@ -12,6 +12,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.palette.graphics.Palette;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.muqing.AppCompatActivity;
@@ -20,11 +21,16 @@ import com.muqing.gj;
 import com.muqing.kctab.LoginApi;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.ActivityLoginBinding;
+import com.muqing.kctab.main;
 import com.muqing.kctab.zhouDialog;
 import com.muqing.wj;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
@@ -53,6 +59,8 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         super.onCreate(savedInstanceState);
         setContentView();
         setToolsBar(binding.toolbar);
+//        String XYIP = getLocalIpAddress();
+//        gj.sc(XYIP);
         SharedPreferences sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE);
         binding.account.setText(sharedPreferences.getString("account", ""));
         binding.password.setText(sharedPreferences.getString("password", ""));
@@ -188,6 +196,23 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         }
         return show;
 
+    }
+
+    public static String getLocalIpAddress() {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 
 }

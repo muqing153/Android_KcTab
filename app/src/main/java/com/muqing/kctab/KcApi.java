@@ -79,32 +79,52 @@ public class KcApi {
         return false;
     }
 
+    /**
+     * 获取当前周的课程表数据。
+     * 遍历 TabList 中的字符串，找到第一个日期在当前日期之后的项，
+     * 然后解析该项对应的课程表数据并返回。
+     *
+     * @return 课程表对象 Curriculum，如果未找到符合条件的数据则返回 null。
+     */
     @Nullable
     public static Curriculum GetCurriculum() {
-        //获取当前日期 yyyy-MM-dd
+        // 获取当前日期（格式为 yyyy-MM-dd）
         LocalDate currentDate = LocalDate.now();
+
+        // 正则表达式，用于匹配字符串中的日期格式
         Pattern pattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+        // 初始化周数计数器，从第1周开始
         int i = 1;
+        // 遍历 TabList 列表
         for (String s : MainActivity.TabList) {
+            // 在字符串中查找符合日期格式的部分
             Matcher matcher = pattern.matcher(s);
             if (matcher.find()) {
+                // 解析找到的日期字符串
                 String dateStr = matcher.group();
                 LocalDate date2 = LocalDate.parse(dateStr);
-                if (currentDate.isBefore(date2)) {
+                // 如果当前日期在找到的日期之前
+                if (currentDate.isBefore(date2) || currentDate.isEqual(date2)){
+                    // 使用 dqwb 方法处理字符串，获取对应的课程表 JSON
                     String dqwb = wj.dqwb(s);
+                    // 将 JSON 字符串反序列化为 Curriculum 对象
                     Curriculum curriculum = new Gson().fromJson(dqwb, Curriculum.class);
+                    // 将第一个数据项的 week 设置为当前周数
                     curriculum.data.get(0).week = i;
+                    // 如果当前本周 benzou 还未设置，赋值为当前周
                     if (MainActivity.benzhou == 0) {
                         MainActivity.benzhou = i;
                     }
+                    // 返回解析后的课程表对象
                     return curriculum;
                 }
             }
+            // 周数递增
             i++;
         }
+        // 如果遍历结束没有找到符合条件的数据，返回 null
         return null;
     }
-
     public static Curriculum GetCurriculumFile(String path) {
         int i = 1;
         for (String s :

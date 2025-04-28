@@ -9,6 +9,10 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
+<!--    ACCESS_NETWORK_STATE 是为了能读取当前网络状态-->
+<!--    CHANGE_NETWORK_STATE 是为了请求网络、切换绑定网络，比如你用 requestNetwork() 或 bindProcessToNetwork() 就必须要这个。-->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".main"
@@ -61,12 +65,12 @@
                     android:mimeType="application/octet-stream"
                     android:pathPattern=".*\\.kczip"
                     android:scheme="file" />
-                <data
-                    android:mimeType="application/octet-stream"
-                    android:scheme="content" />
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".Activity.activity_about_software"
+            android:exported="false" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.muqing.kctab.fileprovider"

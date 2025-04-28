@@ -1,11 +1,15 @@
 package com.muqing.kctab.Activity;
 
-import static com.muqing.kctab.MainActivity.TAG;
-
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
-import android.os.Build;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,23 +20,15 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.EditText;
 
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.RequiresApi;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.muqing.AppCompatActivity;
 import com.muqing.gj;
-import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.ActivityWebBinding;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.List;
 import java.util.Map;
 
 public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
@@ -47,6 +43,20 @@ public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView();
+
+        binding.swipe.setRefreshing(true);
+        if (ContextCompat.checkSelfPermission(WebActivity.this, Manifest.permission.CHANGE_NETWORK_STATE)
+                == PackageManager.PERMISSION_GRANTED) {
+            // 有权限，执行绑定
+            bindProcessToWifiNetwork(WebActivity.this);
+        } else {
+            // 没权限，可以提醒用户，或者跳过绑定
+            gj.sc("没有权限");
+
+        }
+        // 刷新完成后，记得取消动画
+        binding.swipe.setRefreshing(false);
+
         Intent intent = getIntent();
         if (intent == null) {
             finish();
@@ -103,7 +113,7 @@ public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 // ✅ 打印请求头
                 Map<String, String> headers = request.getRequestHeaders();
-                String url = request.getUrl().toString();
+//                String url = request.getUrl().toString();
 //                gj.sc("请求 URL: " + url);
                 for (Map.Entry<String, String> entry : headers.entrySet()) {
 //                    gj.sc(entry.getKey() + ": " + entry.getValue());
@@ -120,6 +130,14 @@ public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
         });
         binding.swipe.setOnRefreshListener(() -> {
             binding.web.reload();
+            if (ContextCompat.checkSelfPermission(WebActivity.this, Manifest.permission.CHANGE_NETWORK_STATE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                // 有权限，执行绑定
+                bindProcessToWifiNetwork(WebActivity.this);
+            } else {
+                // 没权限，可以提醒用户，或者跳过绑定
+                gj.sc("没有权限");
+            }
             binding.swipe.setRefreshing(false); // 结束刷新状态
         });
     }
@@ -132,6 +150,22 @@ public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
         resultIntent.putExtra("token", token);
         setResult(RESULT_OK, resultIntent);
         finish();
+    }
+
+    public void bindProcessToWifiNetwork(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null) return;
+
+        NetworkRequest.Builder builder = new NetworkRequest.Builder();
+        builder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI);
+
+        connectivityManager.requestNetwork(builder.build(), new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                // 绑定当前进程到这个网络
+                connectivityManager.bindProcessToNetwork(network);
+            }
+        });
     }
 
     @Override

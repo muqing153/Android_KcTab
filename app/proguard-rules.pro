@@ -20,7 +20,9 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-# Suppress warnings for missing SSL-related classes
+# 自定义 muqing 包的相关类
+-dontwarn com.muqing.**
+# 忽略 BouncyCastle, Conscrypt, 和 OpenJSSE 相关类缺失的警告
 -dontwarn org.bouncycastle.jsse.BCSSLParameters
 -dontwarn org.bouncycastle.jsse.BCSSLSocket
 -dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
@@ -30,7 +32,7 @@
 -dontwarn org.openjsse.javax.net.ssl.SSLParameters
 -dontwarn org.openjsse.javax.net.ssl.SSLSocket
 -dontwarn org.openjsse.net.ssl.OpenJSSE
-
+-dontwarn org.commonmark.ext.gfm.strikethrough.Strikethrough
 
 # Gson 通用配置
 -keep class com.muqing.kctab.** { *; }

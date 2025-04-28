@@ -16,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
@@ -169,6 +168,47 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             setContentView();
             setSupportActionBar(binding.toolbar);
         }
+/*
+        ScaleGestureDetector scaleGestureDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            private float scaleFactor = 1.0f;
+
+            @Override
+            public boolean onScale(@NonNull ScaleGestureDetector detector) {
+                // 缩放因子乘上检测到的缩放比例
+                scaleFactor *= detector.getScaleFactor();
+
+                // 限制缩放范围
+                scaleFactor = Math.max(0.5f, Math.min(scaleFactor, 2.0f));
+
+                // 获取当前 RecyclerView 的宽度
+                int newRecyclerViewWidth = (int) (binding.recyclerview.getWidth() * scaleFactor);
+
+                // 设置 RecyclerView 的宽度，考虑到缩放因子
+                ViewGroup.LayoutParams recyclerViewParams = binding.recyclerview.getLayoutParams();
+                recyclerViewParams.width = newRecyclerViewWidth;
+                binding.recyclerview.setLayoutParams(recyclerViewParams);
+
+                // 更新 RecyclerView 的缩放比例
+                binding.recyclerview.setScaleX(scaleFactor);
+                binding.recyclerview.setScaleY(scaleFactor);
+
+                // 更新 HorizontalScrollView 的宽度，和 RecyclerView 宽度一致
+                ViewGroup.LayoutParams horizontalParams = binding.horizontal.getLayoutParams();
+                horizontalParams.width = ;
+                binding.horizontal.setLayoutParams(horizontalParams);
+
+                // 设置 RecyclerView 缩放的原点为左上角 (0, 0)
+                binding.recyclerview.setPivotX(0);
+                binding.recyclerview.setPivotY(0);
+                return true;
+            }
+        });
+
+        binding.horizontal.setOnTouchListener((v, event) -> {
+            scaleGestureDetector.onTouchEvent(event);
+            return false;
+        });
+*/
         Log.i(TAG, "UI: 执行UI构建：" + curriculum);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 8); // 列
         binding.recyclerview.setLayoutManager(layoutManager);
@@ -178,14 +218,12 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         }
         //获取yyyy-MM-dd
         binding.time.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        binding.menuZhou.setOnClickListener(view -> {
-            new zhouDialog(MainActivity.this) {
-                @Override
-                public void click(int position) {
-                    MainActivity.curriculum = KcApi.GetCurriculumFile(TabList.get(position));
-                    LoadTab();
-                }
-            };
+        binding.menuZhou.setOnClickListener(view -> new zhouDialog(MainActivity.this) {
+            @Override
+            public void click(int position) {
+                MainActivity.curriculum = KcApi.GetCurriculumFile(TabList.get(position));
+                LoadTab();
+            }
         });
     }
 
@@ -292,7 +330,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.sync) {
             Intent intent = new Intent(this, LoginActivity.class);
-            intent.putExtra("sync", benzhou == 0 ? "ALL" : String.valueOf(benzhou));
+            intent.putExtra("sync", curriculum == null ? "ALL" : String.valueOf(curriculum.data.get(0).week));
             SyncKc.launch(intent);
         }
         return super.onOptionsItemSelected(item);

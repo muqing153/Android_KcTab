@@ -36,27 +36,35 @@ public class GXThread extends Thread {
             gj.sc(hq);
             if (hq != null) {
                 JSONObject jsonObject = new JSONObject(hq);
+                String message = jsonObject.getString("msg");
                 if (jsonObject.getInt("code") == 200) {
-
                     String nickname = jsonObject.getString("name");
-                    String message = jsonObject.getString("message");
                     String version = jsonObject.getString("version");
+                    String apk_url = jsonObject.getString("apk_url");
                     //获取本地版本versionName
                     if (!version.equals(versionName)) {
                         activity.runOnUiThread(() -> new MaterialAlertDialogBuilder(activity)
                                 .setTitle(nickname)
                                 .setMessage(message + "\n" + versionName + "->" + version)
                                 .setPositiveButton("确定", (dialogInterface, i) -> {
-                                    gj.llq(activity, "https://muqingcandy.top");
+                                    gj.llq(activity, apk_url);
                                 })
                                 .show());
                     } else if (runnable != null) {
                         activity.runOnUiThread(runnable);
                     }
+                    return;
                 }
+                throw new Exception(message);
             }
+            throw new Exception("网络连接失败");
         } catch (Exception e) {
             gj.sc(this.getClass().getName() + " " + e.getMessage());
+            error(e.getMessage());
         }
+    }
+
+    public void error(String msg) {
+
     }
 }

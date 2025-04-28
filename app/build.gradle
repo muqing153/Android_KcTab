@@ -18,8 +18,7 @@ android {
         minSdk 29
         targetSdk 35
         versionCode 1
-        versionName "1.2.1"
-
+        versionName "1.2.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -37,7 +36,6 @@ android {
         viewBinding true
     }
 }
-
 dependencies {
 //    implementation project(':AndroidMuqing')
     implementation(project(':mylibrary'))
@@ -46,4 +44,8 @@ dependencies {
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("androidx.palette:palette:1.0.0")
+    implementation 'io.noties.markwon:core:4.6.2'
+    implementation "io.noties.markwon:html:4.6.2"
+
+//    implementation "io.noties.markwon:image:4.6.2"
 }

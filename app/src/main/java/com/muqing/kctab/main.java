@@ -16,6 +16,9 @@ import com.muqing.wj;
 
 public class main extends Application {
     private static Application application;
+
+    //校园网IP
+    public static String XYIP = "10.200.30.200";
     public static Application getApplication() {
         return application;
     }

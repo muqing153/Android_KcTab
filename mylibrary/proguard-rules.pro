@@ -19,3 +19,14 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# 解决R8缺少类的警告
+-dontwarn com.muqing.AppCompatActivity
+-dontwarn com.muqing.BaseAdapter$ViewHolder
+-dontwarn com.muqing.BaseAdapter
+-dontwarn com.muqing.Dialog.BottomSheetDialog
+-dontwarn com.muqing.Dialog.DialogEditText
+-dontwarn com.muqing.ViewUI.SettingTextView
+-dontwarn com.muqing.gj
+-dontwarn com.muqing.wj
+-dontwarn com.muqing.wl

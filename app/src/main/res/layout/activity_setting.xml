@@ -105,10 +105,10 @@
                 app:title="检查更新" />
 
             <com.muqing.ViewUI.SettingTextView
+                android:id="@+id/qt_about"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/chevron_right_24px"
-                app:message="不可用"
                 app:title="关于" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

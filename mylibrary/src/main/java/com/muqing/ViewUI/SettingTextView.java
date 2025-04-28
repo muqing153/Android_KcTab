@@ -32,6 +32,7 @@ public class SettingTextView extends LinearLayout {
 
 
     ViewSeetingTextBinding binding;
+
     private void Init(Context context, AttributeSet attrs) {
         View inflate = LayoutInflater.from(context).inflate(R.layout.view_seeting_text, this);
         binding = ViewSeetingTextBinding.bind(inflate);
@@ -58,8 +59,14 @@ public class SettingTextView extends LinearLayout {
         }
 
     }
+
     public void setTitle(String title) {
         binding.title.setText(title);
+    }
+
+    public void setMessage(String message) {
+        binding.message.setVisibility(VISIBLE);
+        binding.message.setText(message);
     }
 
 }
