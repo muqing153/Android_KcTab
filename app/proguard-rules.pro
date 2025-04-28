@@ -34,6 +34,7 @@
 -dontwarn org.openjsse.net.ssl.OpenJSSE
 -dontwarn org.commonmark.ext.gfm.strikethrough.Strikethrough
 
+
 # Gson 通用配置
 -keep class com.muqing.kctab.** { *; }
 -keep class com.google.gson.** { *; }

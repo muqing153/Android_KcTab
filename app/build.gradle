@@ -23,6 +23,10 @@ android {
     }
 
     buildTypes {
+//        debug {
+//            minifyEnabled true
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -46,6 +50,5 @@ dependencies {
     implementation("androidx.palette:palette:1.0.0")
     implementation 'io.noties.markwon:core:4.6.2'
     implementation "io.noties.markwon:html:4.6.2"
-
 //    implementation "io.noties.markwon:image:4.6.2"
 }

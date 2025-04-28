@@ -7,5 +7,5 @@
 [Gitee](https://gitee.com/muqing15379/Android_KcTab)
 #### 贡献者✨
 <a href="https://github.com/muqing153/Android_KcTab/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=muqing153/Android_KcTab" alt="加载失败"/>
+    <img src="https://contrib.rocks/image?repo=muqing153/Android_KcTab" alt="GitHub"/>
 </a>
