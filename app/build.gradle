@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.jetbrains.kotlin.android)
 }
 
 android {
@@ -50,4 +51,7 @@ dependencies {
     implementation("androidx.palette:palette:1.0.0")
     implementation 'io.noties.markwon:core:4.6.2'
     implementation "io.noties.markwon:html:4.6.2"
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.constraintlayout
 }

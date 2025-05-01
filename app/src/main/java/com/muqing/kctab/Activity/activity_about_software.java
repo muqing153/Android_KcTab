@@ -83,6 +83,4 @@ public class activity_about_software extends AppCompatActivity<ActivityAboutSoft
     protected ActivityAboutSoftwareBinding getViewBindingObject(LayoutInflater layoutInflater) {
         return ActivityAboutSoftwareBinding.inflate(layoutInflater);
     }
-
-
 }

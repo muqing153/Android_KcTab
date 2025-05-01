@@ -1,18 +1,18 @@
 package com.muqing.kctab;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class KcLei {
     public String title;
-    public String message="";
+    public String message;
     public Curriculum.Course data = null;
 
-    public KcLei(String title){
+    public KcLei(String title) {
         this.title = title;
         init();
     }
-    public KcLei(){
+
+    public KcLei() {
         init();
     }
 
@@ -23,9 +23,12 @@ public class KcLei {
         }
         data = course;
         title = course.courseName;
-        message = course.classroomName;
+        if (title != null) {
+            message = course.getClassroomName();
+        }
     }
-    public void init(){
+
+    public void init() {
 
     }
 

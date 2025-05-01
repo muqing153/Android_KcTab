@@ -87,13 +87,13 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
             }
         }
         binding.classroom.setText(stringBuffer.toString());
-        binding.address.setText(course.classroomName);
+        binding.address.setText(course.getClassroomName());
         binding.time.setText(String.format(Locale.getDefault(), "%s-%s", course.startTime, course.endTime));
         bottomSheetDialog.show();
     }
 
     GridItemBinding ItemBinding, NextItemBinding;
-    public boolean isjt = false;
+    public boolean isjt = false;//是否处于截图状态 截图状态不高亮
 
     public void Load(RecyclerView recyclerView) throws Exception {
         if (isjt) {
@@ -105,18 +105,15 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
             }
             return;
         }
-//        if (MainActivity.curriculum == null) {
-//            return;
-//        }
-        gj.sc(zhou + " " + MainActivity.benzhou);
+//        gj.sc(zhou + " " + MainActivity.benzhou);
         if (zhou != MainActivity.benzhou) {
             //不是本周的课程不高亮
             return;
         }
         int weekDay = MainActivity.Week; // 获取当前星期
-        weekDay = 1;
+//        weekDay = 1;
         String time = MainActivity.Time; // 获取当前时间
-        time = "08:00";
+//        time = "08:00";
         for (int x = 1, y = weekDay + 8; x < 6; y += 8, x++) {
             KcLei kcLei = dataList.get(y);
             if (kcLei.data != null && kcLei.title != null) {
@@ -163,9 +160,9 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
             }
         }
         if (NextItemBinding == null && ItemBinding == null && weekDay + 1 != 8) {
-//            MainActivity.Week++;
-//            MainActivity.Time = "08:00";
-//            Load(recyclerView);
+            MainActivity.Week++;
+            MainActivity.Time = "08:00";
+            Load(recyclerView);
         }
     }
 

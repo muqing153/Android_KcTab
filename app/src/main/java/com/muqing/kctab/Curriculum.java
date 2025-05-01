@@ -1,4 +1,6 @@
 package com.muqing.kctab;
+import android.text.TextUtils;
+
 import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
@@ -80,6 +82,13 @@ public class Curriculum {
 
         @SerializedName("classroomName")
         public String classroomName;
+
+        public String getClassroomName() {
+            if (TextUtils.isEmpty(classroomName)) {
+                classroomName = "网课";
+            }
+            return classroomName;
+        }
 
         @SerializedName("khfs")
         public String khfs;

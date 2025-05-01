@@ -8,9 +8,8 @@
         android:maxSdkVersion="32" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
-    <!--    ACCESS_NETWORK_STATE 是为了能读取当前网络状态-->
-    <!--    CHANGE_NETWORK_STATE 是为了请求网络、切换绑定网络，比如你用 requestNetwork() 或 bindProcessToNetwork() 就必须要这个。-->
+        tools:ignore="ScopedStorage" /> <!-- ACCESS_NETWORK_STATE 是为了能读取当前网络状态 -->
+    <!-- CHANGE_NETWORK_STATE 是为了请求网络、切换绑定网络，比如你用 requestNetwork() 或 bindProcessToNetwork() 就必须要这个。 -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -27,6 +26,9 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".Activity.CourseOverviewActivity"
+            android:exported="false" />
         <activity
             android:name=".Activity.SettingActivity"
             android:exported="false" />
@@ -67,7 +69,6 @@
                 <data android:mimeType="application/octet-stream" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".Activity.activity_about_software"
             android:exported="false" />
@@ -81,7 +82,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
     </application>
 
 </manifest>
