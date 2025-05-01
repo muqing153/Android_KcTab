@@ -152,7 +152,6 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
                         }
                         break;
                     } else if (NextItemBinding != null) {
-
                         NextItemBinding.getRoot().setCardBackgroundColor(ColorThis);
                         NextItemBinding = null;
                     }
@@ -165,5 +164,4 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
             Load(recyclerView);
         }
     }
-
 }
