@@ -9,8 +9,8 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
-<!--    ACCESS_NETWORK_STATE 是为了能读取当前网络状态-->
-<!--    CHANGE_NETWORK_STATE 是为了请求网络、切换绑定网络，比如你用 requestNetwork() 或 bindProcessToNetwork() 就必须要这个。-->
+    <!--    ACCESS_NETWORK_STATE 是为了能读取当前网络状态-->
+    <!--    CHANGE_NETWORK_STATE 是为了请求网络、切换绑定网络，比如你用 requestNetwork() 或 bindProcessToNetwork() 就必须要这个。-->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -59,18 +59,19 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <!-- 支持打开 .kczip 文件 -->
-                <data
-                    android:host="*"
-                    android:mimeType="application/octet-stream"
-                    android:pathPattern=".*\\.kczip"
-                    android:scheme="file" />
+                <!-- 匹配 MIME 类型和后缀 -->
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.kczip" />
+                <data android:mimeType="application/octet-stream" />
             </intent-filter>
         </activity>
 
         <activity
             android:name=".Activity.activity_about_software"
             android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.muqing.kctab.fileprovider"

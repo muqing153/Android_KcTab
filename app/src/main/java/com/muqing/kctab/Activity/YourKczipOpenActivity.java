@@ -49,6 +49,8 @@ public class YourKczipOpenActivity extends AppCompatActivity<ActivityYourkczipBi
                 InputStream inputStream = getContentResolver().openInputStream(data);
                 unzipFromUri(this, inputStream, outputDir);
                 gj.sc(outputDir);
+                finishAndRemoveTask();
+
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(this, "无法读取文件", Toast.LENGTH_SHORT).show();

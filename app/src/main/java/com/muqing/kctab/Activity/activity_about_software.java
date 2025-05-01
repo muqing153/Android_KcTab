@@ -53,7 +53,6 @@ public class activity_about_software extends AppCompatActivity<ActivityAboutSoft
             }
 
             Markwon markwon = Markwon.builder(this)
-//                    .usePlugin(ImagesPlugin.create())  // 图片支持
                     .usePlugin(HtmlPlugin.create())    // HTML支持
                     .build();
             markwon.setMarkdown(binding.text1, stringBuilder.toString());

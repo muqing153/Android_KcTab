@@ -1,7 +1,6 @@
 package com.muqing.kctab;
 
 import static com.muqing.kctab.LoginApi.Token;
-import static com.muqing.kctab.MainActivity.TAG;
 
 import android.util.Log;
 
@@ -44,7 +43,7 @@ public class KcApi {
                 .build();
         Response response = client.newCall(request).execute();
         if (!response.isSuccessful()) {
-            Log.i(TAG, "GetCurriculum: 请求错误");
+            gj.sc("GetCurriculum: 请求错误");
             return null;
         }
         if (response.body() != null) {
@@ -52,7 +51,39 @@ public class KcApi {
         } else {
             return null;
         }
+    }
 
+
+    /**
+     * 获取当前周数
+     * @return
+     */
+    public static int getWeek() {
+        // 获取当前日期（格式为 yyyy-MM-dd）
+        LocalDate currentDate = LocalDate.now();
+        // 正则表达式，用于匹配字符串中的日期格式
+        Pattern pattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+        // 初始化周数计数器，从第1周开始
+        int i = 1;
+        // 遍历 TabList 列表
+        for (String s : MainActivity.TabList) {
+            // 在字符串中查找符合日期格式的部分
+            Matcher matcher = pattern.matcher(s);
+            if (matcher.find()) {
+                // 解析找到的日期字符串
+                String dateStr = matcher.group();
+                LocalDate date2 = LocalDate.parse(dateStr);
+                // 如果当前日期在找到的日期之前
+                if (currentDate.isBefore(date2) || currentDate.isEqual(date2)){
+                    // 返回解析后的课程表对象
+                    return i;
+                }
+            }
+            // 周数递增
+            i++;
+        }
+        // 如果遍历结束没有找到符合条件的数据，返回 null
+        return 0;
     }
 
     public static boolean Load(String Token) {

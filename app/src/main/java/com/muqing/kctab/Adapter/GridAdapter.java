@@ -28,6 +28,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
     public final int ColorWhen;
     //下节课的颜色高亮
     public final int ColorNext;
+    public int zhou = 0;
 
     public GridAdapter(Context context, List<KcLei> dataList) {
 
@@ -104,15 +105,18 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
             }
             return;
         }
-        if (MainActivity.curriculum == null) {
-            return;
-        }
-        if (MainActivity.curriculum.data.get(0).week != MainActivity.benzhou) {
+//        if (MainActivity.curriculum == null) {
+//            return;
+//        }
+        gj.sc(zhou + " " + MainActivity.benzhou);
+        if (zhou != MainActivity.benzhou) {
             //不是本周的课程不高亮
             return;
         }
-        int weekDay = MainActivity.Week;
-        String time = MainActivity.Time;
+        int weekDay = MainActivity.Week; // 获取当前星期
+        weekDay = 1;
+        String time = MainActivity.Time; // 获取当前时间
+        time = "08:00";
         for (int x = 1, y = weekDay + 8; x < 6; y += 8, x++) {
             KcLei kcLei = dataList.get(y);
             if (kcLei.data != null && kcLei.title != null) {
@@ -159,9 +163,9 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
             }
         }
         if (NextItemBinding == null && ItemBinding == null && weekDay + 1 != 8) {
-            MainActivity.Week++;
-            MainActivity.Time = "08:00";
-            Load(recyclerView);
+//            MainActivity.Week++;
+//            MainActivity.Time = "08:00";
+//            Load(recyclerView);
         }
     }
 

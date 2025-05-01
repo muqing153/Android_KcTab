@@ -31,12 +31,13 @@ public class ZhouAdapter extends BaseAdapter<ZhouItemBinding, String> {
     }
 
     public boolean gaoliang = true;
+    public int week = 0;
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onBindView(String data, ZhouItemBinding viewBinding, ViewHolder<ZhouItemBinding> viewHolder, int position) {
         viewBinding.title.setText(data);
-        if (gaoliang && Integer.parseInt(data) == MainActivity.curriculum.data.get(0).week) {
+        if (gaoliang && Integer.parseInt(data) == week) {
             viewBinding.getRoot().setEnabled(false);
             viewBinding.getRoot().setCardBackgroundColor(ColorWhen);
         } else {
@@ -44,6 +45,7 @@ public class ZhouAdapter extends BaseAdapter<ZhouItemBinding, String> {
             viewBinding.getRoot().setEnabled(true);
         }
         viewBinding.getRoot().setOnClickListener(view -> {
+            week = position + 1;
             onclick(position);
             notifyDataSetChanged();
         });

@@ -4,12 +4,9 @@ import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,16 +18,18 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.graphics.Insets;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.muqing.AppCompatActivity;
 import com.muqing.gj;
 import com.muqing.kctab.Activity.LoginActivity;
 import com.muqing.kctab.Activity.SettingActivity;
-import com.muqing.kctab.Adapter.GridAdapter;
+import com.muqing.kctab.Adapter.KeChengPageAdapter;
 import com.muqing.kctab.databinding.ActivityMainBinding;
+import com.muqing.kctab.databinding.FragmentKebiaoBinding;
+import com.muqing.kctab.fragment.kecheng;
 import com.muqing.wj;
 
 import java.io.File;
@@ -81,12 +80,29 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     }
 
     private void LoadUI() {
+        pageAdapter = new KeChengPageAdapter(this);
         File[] list = fileTabList.listFiles();
         TabList.clear();
         if (list != null) {
             for (File s : list) {
                 TabList.add(s.getAbsolutePath());
             }
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        Pattern pattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+        TabList.sort((f1, f2) -> {
+            LocalDate date1 = extractDate(f1, pattern, formatter);
+            LocalDate date2 = extractDate(f2, pattern, formatter);
+            if (date1 == null || date2 == null) return 0;
+            return date1.compareTo(date2);
+        });
+        int i = 1;
+        for (String s : TabList) {
+            String dqwb = wj.dqwb(s, "");
+            Curriculum c = new Gson().fromJson(dqwb, Curriculum.class);
+            c.data.get(0).week = i;
+            pageAdapter.addPage(new kecheng(c));
+            i++;
         }
         new LoadToken().start();
 
@@ -97,14 +113,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         @Override
         public void run() {
             try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                Pattern pattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
-                TabList.sort((f1, f2) -> {
-                    LocalDate date1 = extractDate(f1, pattern, formatter);
-                    LocalDate date2 = extractDate(f2, pattern, formatter);
-                    if (date1 == null || date2 == null) return 0;
-                    return date1.compareTo(date2);
-                });
                 curriculum = KcApi.GetCurriculum();
                 if (curriculum == null) {
                     throw new Exception("获取课表失败");
@@ -125,9 +133,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         return null;
     }
 
-
-    GridAdapter adapter;
-
     Timer timer = new Timer();
 
     @Override
@@ -140,8 +145,9 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         }
     }
 
+    public KeChengPageAdapter pageAdapter;
+
     public void UI() {
-        adapter = new GridAdapter(this, new ArrayList<>());
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -155,7 +161,9 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
                 // 在主线程更新 UI
                 runOnUiThread(() -> {
                     try {
-                        adapter.Load(binding.recyclerview);
+                        kecheng k = pageAdapter.data.get(binding.viewpage.getCurrentItem());
+                        k.adapter.Load(k.binding.recyclerview);
+//                        adapter.Load(binding.recyclerview);
                     } catch (Exception e) {
                         gj.sc(e);
                     }
@@ -163,10 +171,21 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             }
         };
         timer.schedule(task, 0, 1000); // 立即开始，每隔1秒执行
-
         if (binding == null) {
             setContentView();
             setSupportActionBar(binding.toolbar);
+            binding.viewpage.setAdapter(pageAdapter);
+            int week = KcApi.getWeek();
+            MainActivity.benzhou = week;
+            binding.viewpage.setCurrentItem(week - 1, false);
+            binding.menuZhou.setText(String.format("第 %s 周", week));
+            binding.viewpage.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                @Override
+                public void onPageSelected(int position) {
+                    super.onPageSelected(position);
+                    binding.menuZhou.setText(String.format("第 %s 周", position+1));
+                }
+            });
         }
 /*
         ScaleGestureDetector scaleGestureDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
@@ -209,21 +228,20 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             return false;
         });
 */
-        Log.i(TAG, "UI: 执行UI构建：" + curriculum);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 8); // 列
-        binding.recyclerview.setLayoutManager(layoutManager);
 
         if (curriculum != null) {
             LoadTab();
         }
         //获取yyyy-MM-dd
         binding.time.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        binding.menuZhou.setOnClickListener(view -> new zhouDialog(MainActivity.this) {
-            @Override
-            public void click(int position) {
-                MainActivity.curriculum = KcApi.GetCurriculumFile(TabList.get(position));
-                LoadTab();
-            }
+        binding.menuZhou.setOnClickListener(view -> {
+            zhouDialog zhouDialog = new zhouDialog(MainActivity.this) {
+                @Override
+                public void click(int position) {
+                    MainActivity.this.binding.viewpage.setCurrentItem(position, true);
+                }
+            };
+            zhouDialog.zhouAdapter.week = MainActivity.this.binding.viewpage.getCurrentItem() + 1;
         });
     }
 
@@ -240,65 +258,21 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         }
     }
 
-    final ScheduleItem[] schedule = {new ScheduleItem("第 1 节", "08:20-09:05", "09:15-10:00"), new ScheduleItem("第 2 节", "10:10-11:40", "10:30-12:00"), new ScheduleItem("第 3 节", "13:30-14:15", "14:25-15:10"), new ScheduleItem("第 4 节", "15:20-16:05", "16:15-17:00"), new ScheduleItem("第 5 节", "18:30-19:15", "19:25-20:10")};
+    public static final ScheduleItem[] schedule = {new ScheduleItem("第 1 节", "08:20-09:05", "09:15-10:00"), new ScheduleItem("第 2 节", "10:10-11:40", "10:30-12:00"), new ScheduleItem("第 3 节", "13:30-14:15", "14:25-15:10"), new ScheduleItem("第 4 节", "15:20-16:05", "16:15-17:00"), new ScheduleItem("第 5 节", "18:30-19:15", "19:25-20:10")};
 
     public void LoadTab() {
-        adapter.dataList.clear();
-        for (int row = 0; row < 6; row++) {
-            for (int col = 0; col < 8; col++) {
-                if (row == 0 && col == 0) {
-                    adapter.dataList.add(new KcLei("节/日期"));
-                    continue;
-                }
-                adapter.dataList.add(new KcLei("R" + (row + 1) + " C" + (col + 1)));
-            }
-        }
-        Curriculum.DataItem dataItem = curriculum.data.get(0);
-        for (int i = 0; i < dataItem.date.size(); i++) {
-            Curriculum.DateInfo dateInfo = dataItem.date.get(i);
-            adapter.dataList.set(i + 1, new KcLei(String.format("%s(%s)", dateInfo.xqmc, dateInfo.rq)));
-        }
-        for (int i = 0, j = 8; i < schedule.length; i++, j += 8) {
-            KcLei kcLei = new KcLei(schedule[i].session);
-            kcLei.message = schedule[i].time1 + "\n" + schedule[i].time2;
-            adapter.dataList.set(j, kcLei);
-        }
-        // 1. 遍历每个节次，创建行数据
-        String[] ric = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
-        int ric_i = 0;
-        for (int i = 0, j = 9; i < 5; i++) {
-            for (int k = 0; k < 7; k++, j++) {
-                int finalRic_i = ric_i;
-                int finalI = k + 1;
-                Curriculum.Course result = dataItem.courses.stream().filter(c -> c.classTime.endsWith(String.format("%s%s", ric[finalRic_i], ric[finalRic_i + 1])) && c.weekDay == finalI).findFirst().orElse(null);
-//                gj.sc(result);
-                if (result == null) {
-                    result = new Curriculum.Course();
-                    result.startTime = schedule[i].time1.split("-")[0];
-                    result.endTime = schedule[i].time2.split("-")[1];
-                    result.weekDay = k + 1;
+//        binding.recyclerview.setAdapter(adapter);
+//        binding.recyclerview.post(() -> {
+//            gj.sc("adapter.Load(binding.recyclerview)");
+//            try {
+//                adapter.Load(binding.recyclerview);
+//                gj.sc(ItemXY[0] + " " + ItemXY[1]);
+//                binding.horizontal.scrollTo(ItemXY[0], ItemXY[1]);
+//            } catch (Exception e) {
+//                gj.sc(e);
+//            }
+//        });
 
-                }
-                adapter.dataList.set(j, new KcLei(result));
-            }
-            j++;
-            ric_i += 2;
-        }
-        binding.recyclerview.setAdapter(adapter);
-        binding.recyclerview.post(() -> {
-            gj.sc("adapter.Load(binding.recyclerview)");
-            try {
-                adapter.Load(binding.recyclerview);
-                gj.sc(ItemXY[0] + " " + ItemXY[1]);
-                binding.horizontal.scrollTo(ItemXY[0], ItemXY[1]);
-            } catch (Exception e) {
-                gj.sc(e);
-            }
-        });
-
-        if (curriculum != null) {
-            binding.menuZhou.setText(String.format("第 %s 周", curriculum.data.get(0).week));
-        }
     }
 
     //    public static final String[] weeks = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"};
@@ -314,18 +288,21 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.share) {
-            adapter.isjt = true;
+            int currentItem = binding.viewpage.getCurrentItem();
+            kecheng kecheng = pageAdapter.data.get(currentItem);
+            kecheng.adapter.isjt = true;
+            RecyclerView recyclerView = kecheng.binding.recyclerview;
             try {
-                adapter.Load(binding.recyclerview);
+                kecheng.adapter.Load(kecheng.binding.recyclerview);
             } catch (Exception e) {
                 gj.sc(e);
             }
-            viewWidth = binding.recyclerview.getMeasuredWidth();
-            viewHeight = binding.recyclerview.getMeasuredHeight();
-            Bitmap fullRecyclerViewBitmap = getFullRecyclerViewBitmap(binding.recyclerview, null);
+            viewWidth = recyclerView.getMeasuredWidth();
+            viewHeight = recyclerView.getMeasuredHeight();
+            Bitmap fullRecyclerViewBitmap = getFullRecyclerViewBitmap(recyclerView, null);
             gj.sc(fullRecyclerViewBitmap);
             jietuActivity.start(this, fullRecyclerViewBitmap);
-            adapter.isjt = false;
+            kecheng.adapter.isjt = false;
         } else if (id == R.id.settings) {
             startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.sync) {
@@ -371,7 +348,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
 
         public LoadKc(Intent data) {
             this.data = data;
-            alertDialog = LoadIng();
+            alertDialog = main.LoadIng(MainActivity.this);
             start();
         }
 
@@ -412,17 +389,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         public abstract void error();
     }
 
-    private AlertDialog LoadIng() {
-        MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(this);
-        dialog.setView(R.layout.load_dialog);
-        AlertDialog show = dialog.show();
-        show.setCanceledOnTouchOutside(false);
-        show.setCancelable(false);
-        if (show.getWindow() != null) {
-            show.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-        return show;
-    }
 
     int viewWidth, viewHeight;
 
@@ -466,6 +432,4 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         array.recycle();
         return bitmap;
     }
-
-    public static final String TAG = "打印";
 }

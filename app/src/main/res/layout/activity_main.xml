@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    tools:openDrawer="end">
+    tools:context=".MainActivity">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -14,67 +13,44 @@
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appbar"
             android:layout_width="match_parent"
-            android:fitsSystemWindows="true"
             android:layout_height="wrap_content"
-            android:background="@null">
+            android:background="@null"
+            android:fitsSystemWindows="true">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
+
                     <TextView
                         android:id="@+id/menu_zhou"
+                        style="@style/TextAppearance.Material3.TitleLarge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="第%d周"
-                        style="@style/TextAppearance.Material3.TitleLarge" />
+                        android:text="第%d周" />
 
                     <TextView
                         android:id="@+id/time"
-                        android:layout_width="wrap_content"
                         style="@style/TextAppearance.Material3.BodyMedium"
-                        android:text="yyyy-mm-dd"
-                        android:layout_height="wrap_content" />
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="yyyy-mm-dd" />
                 </LinearLayout>
 
 
             </com.google.android.material.appbar.MaterialToolbar>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <FrameLayout
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewpage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
-
-            <HorizontalScrollView
-                android:id="@+id/horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scrollbars="none"
-                tools:ignore="UselessParent">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerview"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:overScrollMode="never"
-                    android:padding="9dp" />
-            </HorizontalScrollView>
-        </FrameLayout>
-
-
-        <ImageView
-            android:id="@+id/imagebackground"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0.1"
-            android:scaleType="centerCrop" />
-
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
 
 </androidx.drawerlayout.widget.DrawerLayout>
