@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Collections;
-import java.util.Objects;
 
 public class gj {
     private static final String TAG = "打印";

@@ -126,6 +126,8 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
         });
 
         binding.qtAbout.setOnClickListener(view -> startActivity(new Intent(SettingActivity.this, activity_about_software.class)));
+
+        binding.kbZhengli.setOnClickListener(view -> startActivity(new Intent(SettingActivity.this, CourseOverviewActivity.class)));
     }
 
     private final ActivityResultLauncher<Intent> createZipLauncher = registerForActivityResult(

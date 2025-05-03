@@ -95,6 +95,9 @@ public class Curriculum {
 
         @SerializedName("startTime")
         public String startTime;
+        public String Time;
+        public String Zhou;
+
 
         @SerializedName("endTIme")
         public String endTime;

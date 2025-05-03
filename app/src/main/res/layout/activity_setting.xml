@@ -85,10 +85,11 @@
                     app:title="导出课表" />
 
                 <com.muqing.ViewUI.SettingTextView
+                    android:id="@+id/kb_zhengli"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/chevron_right_24px"
-                    app:message="不可用"
+                    app:message="功能性测试"
                     app:title="整理课表课程" />
             </LinearLayout>
 

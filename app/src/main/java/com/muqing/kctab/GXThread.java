@@ -15,7 +15,7 @@ public class GXThread extends Thread {
 
     public GXThread(Activity activity) {
         this.activity = activity;
-//        start();
+        start();
     }
 
     Runnable runnable;
@@ -23,7 +23,7 @@ public class GXThread extends Thread {
     public GXThread(Activity activity, Runnable runnable) {
         this.activity = activity;
         this.runnable = runnable;
-//            start();
+        start();
     }
 
     @Override
