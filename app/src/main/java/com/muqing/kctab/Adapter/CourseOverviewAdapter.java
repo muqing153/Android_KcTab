@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.muqing.BaseAdapter;
 import com.muqing.gj;
 import com.muqing.kctab.Curriculum;
+import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.ItemKechengBinding;
 
 import java.util.List;
@@ -47,15 +48,15 @@ public class CourseOverviewAdapter extends BaseAdapter<ItemKechengBinding, Curri
             }
             isDh = true;
             if (TopBind != null && TopBind == viewBinding) {
-                collapseHeight(TopBind.infoLin);
+                collapseHeight(TopBind);
                 TopBind = null;
                 return;
             }
             if (TopBind != null) {
-                collapseHeight(TopBind.infoLin);
+                collapseHeight(TopBind);
             }
             ThisBind = viewBinding;
-            expandHeight(ThisBind.infoLin);
+            expandHeight(ThisBind);
             //标记上一个
             TopBind = ThisBind;
         });
@@ -66,8 +67,9 @@ public class CourseOverviewAdapter extends BaseAdapter<ItemKechengBinding, Curri
      *
      * @param view
      */
-    public void expandHeight(final View view) {
-        view.setVisibility(View.VISIBLE);
+    public void expandHeight(final ItemKechengBinding view) {
+        view.infoLin.setVisibility(View.VISIBLE);
+        view.imageView.setImageResource(R.drawable.book_ribbon_24px);
         isDh = false;
     }
 
@@ -76,8 +78,9 @@ public class CourseOverviewAdapter extends BaseAdapter<ItemKechengBinding, Curri
      *
      * @param view
      */
-    public void collapseHeight(final View view) {
-        view.setVisibility(View.GONE);
+    public void collapseHeight(final ItemKechengBinding view) {
+        view.infoLin.setVisibility(View.GONE);
+        view.imageView.setImageResource(R.drawable.book_24px);
         isDh = false;
     }
 

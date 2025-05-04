@@ -48,7 +48,7 @@
                     app:icon="@drawable/chevron_right_24px"
                     app:title="跟随系统" />
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
+                <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/theme_dynamic"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

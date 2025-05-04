@@ -28,7 +28,6 @@ import com.muqing.kctab.Activity.LoginActivity;
 import com.muqing.kctab.Activity.SettingActivity;
 import com.muqing.kctab.Adapter.KeChengPageAdapter;
 import com.muqing.kctab.databinding.ActivityMainBinding;
-import com.muqing.kctab.databinding.FragmentKebiaoBinding;
 import com.muqing.kctab.fragment.kecheng;
 import com.muqing.wj;
 
@@ -47,7 +46,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     public static String Time;//当前时间xx:xx 当前日期 1234567
     public static int Week;
     public static int benzhou = 0;
-    public static Curriculum curriculum = null;
     public static List<String> TabList = new ArrayList<>();
 
     @Override
@@ -104,24 +102,8 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             pageAdapter.addPage(new kecheng(c));
             i++;
         }
-        new LoadToken().start();
+        UI();
 
-    }
-
-    private class LoadToken extends Thread {
-
-        @Override
-        public void run() {
-            try {
-                curriculum = KcApi.GetCurriculum();
-                if (curriculum == null) {
-                    throw new Exception("获取课表失败");
-                }
-                runOnUiThread(MainActivity.this::UI);
-            } catch (Exception e) {
-                gj.sc(e);
-            }
-        }
     }
 
     @Nullable
@@ -183,7 +165,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
                 @Override
                 public void onPageSelected(int position) {
                     super.onPageSelected(position);
-                    binding.menuZhou.setText(String.format("第 %s 周", position+1));
+                    binding.menuZhou.setText(String.format("第 %s 周", position + 1));
                 }
             });
         }
@@ -229,9 +211,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         });
 */
 
-        if (curriculum != null) {
-            LoadTab();
-        }
+        LoadTab();
         //获取yyyy-MM-dd
         binding.time.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         binding.menuZhou.setOnClickListener(view -> {
@@ -272,7 +252,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
 //                gj.sc(e);
 //            }
 //        });
-
     }
 
     //    public static final String[] weeks = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"};
@@ -307,7 +286,9 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.sync) {
             Intent intent = new Intent(this, LoginActivity.class);
-            intent.putExtra("sync", curriculum == null ? "ALL" : String.valueOf(curriculum.data.get(0).week));
+            int currentItem = binding.viewpage.getCurrentItem();
+            kecheng kecheng = pageAdapter.data.get(currentItem);
+            intent.putExtra("sync", kecheng.curriculum == null ? "ALL" : String.valueOf(kecheng.curriculum.data.get(0).week));
             SyncKc.launch(intent);
         }
         return super.onOptionsItemSelected(item);

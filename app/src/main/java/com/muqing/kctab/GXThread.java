@@ -1,7 +1,7 @@
 package com.muqing.kctab;
 
 import android.app.Activity;
-import android.content.DialogInterface;
+import android.content.pm.ApplicationInfo;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.muqing.gj;
@@ -28,6 +28,10 @@ public class GXThread extends Thread {
 
     @Override
     public void run() {
+        //检测是否Debug运行
+        if ((activity.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+            return;
+        }
         try {
             String versionName = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
             String hq = wl.post("https://muqingcandy.top/php/GetKCTabBB.php", new Object[][]{
@@ -46,9 +50,7 @@ public class GXThread extends Thread {
                         activity.runOnUiThread(() -> new MaterialAlertDialogBuilder(activity)
                                 .setTitle(nickname)
                                 .setMessage(message + "\n" + versionName + "->" + version)
-                                .setPositiveButton("确定", (dialogInterface, i) -> {
-                                    gj.llq(activity, apk_url);
-                                })
+                                .setPositiveButton("确定", (dialogInterface, i) -> gj.llq(activity, apk_url))
                                 .show());
                     } else if (runnable != null) {
                         activity.runOnUiThread(runnable);
