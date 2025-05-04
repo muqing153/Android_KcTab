@@ -43,10 +43,11 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
     public void setUI(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         GridLayoutManager layoutManager = new GridLayoutManager(this.getContext(), 8); // 列
         binding.recyclerview.setLayoutManager(layoutManager);
-
-        adapter = new GridAdapter(this.getContext(), GetKcLei(curriculum));
-        adapter.zhou = curriculum.data.get(0).week;
-        binding.recyclerview.setAdapter(adapter);
+        if (curriculum != null && curriculum.data != null) {
+            adapter = new GridAdapter(this.getContext(), GetKcLei(curriculum));
+            adapter.zhou = curriculum.data.get(0).week;
+            binding.recyclerview.setAdapter(adapter);
+        }
 
 
     }

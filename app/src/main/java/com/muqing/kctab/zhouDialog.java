@@ -37,8 +37,6 @@ public abstract class zhouDialog extends BottomSheetDialog {
         int itemWidthDp = 100;
         float density = context.getResources().getDisplayMetrics().density;
         int itemWidthPx = (int) (itemWidthDp * density + 0.5f);
-
-//        int screenWidthPx = context.getResources().getDisplayMetrics().widthPixels;
         binding.getRoot().post(() -> {
             int width = binding.getRoot().getWidth();
             int spanCount = Math.max(5, width / itemWidthPx);

@@ -12,7 +12,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.palette.graphics.Palette;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.muqing.AppCompatActivity;
@@ -21,7 +20,6 @@ import com.muqing.gj;
 import com.muqing.kctab.LoginApi;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.ActivityLoginBinding;
-import com.muqing.kctab.main;
 import com.muqing.kctab.zhouDialog;
 import com.muqing.wj;
 
@@ -58,7 +56,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView();
-        setToolsBar(binding.toolbar);
+        setBackToolsBar(binding.toolbar);
 //        String XYIP = getLocalIpAddress();
 //        gj.sc(XYIP);
         SharedPreferences sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE);
