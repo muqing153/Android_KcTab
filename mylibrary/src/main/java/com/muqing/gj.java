@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.res.TypedArray;
 import android.net.Uri;
 import android.util.DisplayMetrics;
@@ -22,9 +23,12 @@ import java.util.Collections;
 
 public class gj {
     private static final String TAG = "打印";
+    public static boolean Debug = true;
 
     public static void sc(Object objects) {
-        Log.i(TAG, "sc: " + objects);
+        if (Debug) {
+            Log.i(TAG, "sc: " + objects);
+        }
     }
 
 

@@ -54,7 +54,6 @@
                     android:layout_height="wrap_content"
                     android:enabled="false"
                     android:paddingHorizontal="6dp"
-                    android:paddingVertical="16dp"
                     android:text="动态颜色(重启后生效)" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -104,6 +103,12 @@
                 android:layout_height="wrap_content"
                 app:icon="@drawable/chevron_right_24px"
                 app:title="检查更新" />
+
+            <com.muqing.ViewUI.SettingSwitch
+                android:id="@+id/qt_jcgx_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="启动时自动检查更新" />
 
             <com.muqing.ViewUI.SettingTextView
                 android:id="@+id/qt_about"

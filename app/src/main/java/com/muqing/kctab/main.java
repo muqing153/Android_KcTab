@@ -3,6 +3,7 @@ package com.muqing.kctab;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.muqing.AppCompatActivity;
+import com.muqing.gj;
 import com.muqing.wj;
 
 public class main extends Application {
@@ -26,6 +28,7 @@ public class main extends Application {
     public void onCreate() {
         super.onCreate();
         application = this;
+        gj.Debug = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         wj.data = wj.data(this);
 
         SharedPreferences sharedPreferences = getSharedPreferences("theme", MODE_PRIVATE);

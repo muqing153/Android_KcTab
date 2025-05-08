@@ -1,6 +1,9 @@
 package com.muqing.kctab;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -11,14 +14,31 @@ import org.json.JSONObject;
 
 public class GXThread extends Thread {
 
-    Activity activity;
-
+    private final Activity activity;
+    /**
+     * 自动更新
+     *
+     * @param activity
+     */
     public GXThread(Activity activity) {
         this.activity = activity;
-        start();
+        SharedPreferences sp = activity.getSharedPreferences("setting", MODE_PRIVATE);
+        if (sp.getBoolean("jcgx", true)) {
+            long lastTime = System.currentTimeMillis(); // 获取当前时间
+            long jcgxTime = sp.getLong("jcgx_time", 0);
+            if (lastTime - jcgxTime > 3600000) {
+                // 大于一小时
+                gj.sc("超过一小时了");
+                sp.edit().putLong("jcgx_time", lastTime).apply();
+                start();
+            } else {
+                // 未超过一小时
+                gj.sc("未超过一小时");
+            }
+        }
     }
 
-    Runnable runnable;
+    private Runnable runnable;
 
     public GXThread(Activity activity, Runnable runnable) {
         this.activity = activity;
@@ -29,7 +49,7 @@ public class GXThread extends Thread {
     @Override
     public void run() {
         //检测是否Debug运行
-        if ((activity.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+        if (gj.Debug) {
             return;
         }
         try {

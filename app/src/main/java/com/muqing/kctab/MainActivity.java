@@ -18,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.graphics.Insets;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     }
 
     private void LoadUI() {
+        pageAdapter = null;
         pageAdapter = new KeChengPageAdapter(this);
         File[] list = fileTabList.listFiles();
         TabList.clear();
@@ -96,10 +98,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         });
         int i = 1;
         for (String s : TabList) {
-            String dqwb = wj.dqwb(s, "");
-            Curriculum c = new Gson().fromJson(dqwb, Curriculum.class);
-            c.data.get(0).week = i;
-            pageAdapter.addPage(new kecheng(c));
+            pageAdapter.addPage(kecheng.newInstance(s, i));
             i++;
         }
         UI();
@@ -115,7 +114,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         return null;
     }
 
-    Timer timer = new Timer();
+    private Timer timer = new Timer();
 
     @Override
     protected void onDestroy() {
@@ -143,75 +142,35 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
                 // 在主线程更新 UI
                 runOnUiThread(() -> {
                     try {
-                        kecheng k = pageAdapter.data.get(binding.viewpage.getCurrentItem());
-                        k.adapter.Load(k.binding.recyclerview);
-//                        adapter.Load(binding.recyclerview);
+                        int currentItem = binding.viewpage.getCurrentItem();
+                        Fragment fragment = getSupportFragmentManager().findFragmentByTag("f" + currentItem);
+                        if (fragment instanceof kecheng) {
+                            kecheng k = (kecheng) fragment;
+                            k.adapter.Load(k.binding.recyclerview);
+                        }
                     } catch (Exception e) {
-                        gj.sc(e);
+                        gj.sc("TimerTask " + e);
                     }
                 });
             }
         };
-        timer.schedule(task, 0, 1000); // 立即开始，每隔1秒执行
         if (binding == null) {
             setContentView();
             setSupportActionBar(binding.toolbar);
-            binding.viewpage.setAdapter(pageAdapter);
-            int week = KcApi.getWeek();
-            MainActivity.benzhou = week;
-            binding.viewpage.setCurrentItem(week - 1, false);
-            binding.menuZhou.setText(String.format("第 %s 周", week));
-            binding.viewpage.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-                @Override
-                public void onPageSelected(int position) {
-                    super.onPageSelected(position);
-                    binding.menuZhou.setText(String.format("第 %s 周", position + 1));
-                }
-            });
         }
-/*
-        ScaleGestureDetector scaleGestureDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
-            private float scaleFactor = 1.0f;
-
+        binding.viewpage.setAdapter(pageAdapter);
+        int week = KcApi.getWeek();
+        MainActivity.benzhou = week;
+        binding.viewpage.setCurrentItem(week - 1, false);
+        binding.menuZhou.setText(String.format("第%s周", week));
+        binding.viewpage.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
-            public boolean onScale(@NonNull ScaleGestureDetector detector) {
-                // 缩放因子乘上检测到的缩放比例
-                scaleFactor *= detector.getScaleFactor();
-
-                // 限制缩放范围
-                scaleFactor = Math.max(0.5f, Math.min(scaleFactor, 2.0f));
-
-                // 获取当前 RecyclerView 的宽度
-                int newRecyclerViewWidth = (int) (binding.recyclerview.getWidth() * scaleFactor);
-
-                // 设置 RecyclerView 的宽度，考虑到缩放因子
-                ViewGroup.LayoutParams recyclerViewParams = binding.recyclerview.getLayoutParams();
-                recyclerViewParams.width = newRecyclerViewWidth;
-                binding.recyclerview.setLayoutParams(recyclerViewParams);
-
-                // 更新 RecyclerView 的缩放比例
-                binding.recyclerview.setScaleX(scaleFactor);
-                binding.recyclerview.setScaleY(scaleFactor);
-
-                // 更新 HorizontalScrollView 的宽度，和 RecyclerView 宽度一致
-                ViewGroup.LayoutParams horizontalParams = binding.horizontal.getLayoutParams();
-                horizontalParams.width = ;
-                binding.horizontal.setLayoutParams(horizontalParams);
-
-                // 设置 RecyclerView 缩放的原点为左上角 (0, 0)
-                binding.recyclerview.setPivotX(0);
-                binding.recyclerview.setPivotY(0);
-                return true;
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                binding.menuZhou.setText(String.format("第%s周", position + 1));
             }
         });
-
-        binding.horizontal.setOnTouchListener((v, event) -> {
-            scaleGestureDetector.onTouchEvent(event);
-            return false;
-        });
-*/
-
-        LoadTab();
+        timer.schedule(task, 0, 1000); // 立即开始，每隔1秒执行
         //获取yyyy-MM-dd
         binding.time.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         binding.menuZhou.setOnClickListener(view -> {
@@ -240,28 +199,11 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
 
     public static final ScheduleItem[] schedule = {new ScheduleItem("第 1 节", "08:20-09:05", "09:15-10:00"), new ScheduleItem("第 2 节", "10:10-11:40", "10:30-12:00"), new ScheduleItem("第 3 节", "13:30-14:15", "14:25-15:10"), new ScheduleItem("第 4 节", "15:20-16:05", "16:15-17:00"), new ScheduleItem("第 5 节", "18:30-19:15", "19:25-20:10")};
 
-    public void LoadTab() {
-//        binding.recyclerview.setAdapter(adapter);
-//        binding.recyclerview.post(() -> {
-//            gj.sc("adapter.Load(binding.recyclerview)");
-//            try {
-//                adapter.Load(binding.recyclerview);
-//                gj.sc(ItemXY[0] + " " + ItemXY[1]);
-//                binding.horizontal.scrollTo(ItemXY[0], ItemXY[1]);
-//            } catch (Exception e) {
-//                gj.sc(e);
-//            }
-//        });
-    }
-
-    //    public static final String[] weeks = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"};
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
-
-    public static int[] ItemXY = new int[]{0, 0};
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -370,8 +312,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         public abstract void error();
     }
 
-
-    int viewWidth, viewHeight;
+    private int viewWidth, viewHeight;
 
     public Bitmap getFullRecyclerViewBitmap(View view, Bitmap background) {
         if (viewWidth == 0 || viewHeight == 0) {

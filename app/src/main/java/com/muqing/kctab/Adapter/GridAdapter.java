@@ -1,11 +1,15 @@
 package com.muqing.kctab.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.muqing.BaseAdapter;
@@ -14,6 +18,7 @@ import com.muqing.gj;
 import com.muqing.kctab.Curriculum;
 import com.muqing.kctab.KcLei;
 import com.muqing.kctab.MainActivity;
+import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.GridItemBinding;
 import com.muqing.kctab.databinding.KcinfoDialogBinding;
 
@@ -31,7 +36,6 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
     public int zhou = 0;
 
     public GridAdapter(Context context, List<KcLei> dataList) {
-
         super(context, dataList);
         ColorThis = gj.getThemeColor(context, com.google.android.material.R.attr.colorSurfaceContainerLow);
         ColorWhen = gj.getThemeColor(context, com.google.android.material.R.attr.colorPrimary);
@@ -45,7 +49,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
     }
 
     @Override
-    protected void onBindView(KcLei data, GridItemBinding viewBinding, BaseAdapter.ViewHolder<GridItemBinding> viewHolder, int position) {
+    protected void onBindView(KcLei data, GridItemBinding viewBinding, ViewHolder<GridItemBinding> viewHolder, int position) {
         viewBinding.title.setText(data.title);
         if (position < 8) {
             viewBinding.message.setVisibility(View.GONE);
@@ -60,14 +64,85 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
                 ShowKc(course);
             }
         });
+        viewBinding.getRoot().setOnLongClickListener(view -> ShowLong(data, view, position));
+    }
+
+    public static KcLei kcleishuju;
+
+    public boolean isjt = false;//是否处于截图状态 截图状态不高亮
+    public static int isjq = -1;//是否处于剪切状态 -1是无剪切 大于是记录上一个剪切的位置
+    public static GridAdapter jqadapter;//获取剪切的课表Adapter用于更新
+
+    @SuppressLint({"NonConstantResourceId"})
+    private boolean ShowLong(KcLei data, View view, int position) {
+//        PopupWindow popupWindow = new PopupWindow(view, 300, ViewGroup.LayoutParams.WRAP_CONTENT);
+//        popupWindow.setOutsideTouchable(true);
+//        popupWindow.setFocusable(true);
+//        popupWindow.showAsDropDown(view);
+        PopupMenu popupMenu = new PopupMenu(context, view);
+        popupMenu.getMenuInflater().inflate(R.menu.kc_menu, popupMenu.getMenu());
+        int size = 4;
+        //保证是否以及复制数据 并且复制的数据不能可data相同位置
+        if (kcleishuju == null || kcleishuju == data) {
+            MenuItem menuItem = popupMenu.getMenu().findItem(R.id.menu_zt);
+            size--;
+            menuItem.setVisible(false);
+        }
+        if (data.data == null || data.data.classroomName == null) {
+            popupMenu.getMenu().findItem(R.id.menu_fz).setVisible(false);
+            popupMenu.getMenu().findItem(R.id.menu_jq).setVisible(false);
+            popupMenu.getMenu().findItem(R.id.menu_sc).setVisible(false);
+            size -= 3;
+        }
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_fz:
+                    kcleishuju = data;
+                    jqadapter = null;
+                    isjq = -1;
+                    break;
+                case R.id.menu_jq:
+                    isjq = position;
+                    jqadapter = GridAdapter.this;
+                    kcleishuju = data;
+                    break;
+                case R.id.menu_sc:
+                    data.title = null;
+                    data.message = null;
+                    data.data = null;
+                    break;
+                case R.id.menu_zt:
+                    data.data = kcleishuju.data;
+                    data.message = kcleishuju.message;
+                    data.title = kcleishuju.title;
+                    if (isjq != -1 && jqadapter != null) {
+                        kcleishuju.title = null;
+                        kcleishuju.message = null;
+                        kcleishuju.data = null;
+                        jqadapter.notifyItemChanged(isjq);
+                        jqadapter = null;
+                        isjq = -1;
+                    }
+                    kcleishuju = null;
+                    break;
+                default:
+            }
+            notifyItemChanged(position);
+            return false;
+        });
+        if (size != 0) {
+            popupMenu.show();
+            return false;
+        }
+        return true;
     }
 
     private void ShowKc(Curriculum.Course course) {
-//        String format = String.format(Locale.getDefault(), "%s\n" +
-//                "老师:%s\n" +
-//                "班级:%s\n" +
-//                "地点:%s\n" +
-//                "时间:%s-%s", course.courseName, course.teacherName, course.ktmc, course.classroomName, course.startTime, course.endTime);
+/*        String format = String.format(Locale.getDefault(), "%s\n" +
+                "老师:%s\n" +
+                "班级:%s\n" +
+                "地点:%s\n" +
+                "时间:%s-%s", course.courseName, course.teacherName, course.ktmc, course.classroomName, course.startTime, course.endTime);*/
         KcinfoDialogBinding binding = KcinfoDialogBinding.inflate(LayoutInflater.from(context));
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
 
@@ -93,9 +168,10 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
     }
 
     GridItemBinding ItemBinding, NextItemBinding;
-    public boolean isjt = false;//是否处于截图状态 截图状态不高亮
 
-    public void Load(RecyclerView recyclerView) throws Exception {
+    public int[] ItemXY = new int[]{0, 0};
+
+    public void Load(RecyclerView recyclerView) {
         if (isjt) {
             if (ItemBinding != null) {
                 ItemBinding.getRoot().setCardBackgroundColor(ColorThis);
@@ -129,8 +205,8 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
                             }
                             ItemBinding = GridItemBinding.bind(viewByPosition);
                             ItemBinding.getRoot().setCardBackgroundColor(ColorWhen);
-                            ItemBinding.getRoot().getLocationInWindow(MainActivity.ItemXY);
-//                            gj.sc("ItemBinding:" + MainActivity.ItemXY[0] + " " + MainActivity.ItemXY[1]);
+                            ItemBinding.getRoot().getLocationInWindow(ItemXY);
+//                            gj.sc("ItemBinding:" + ItemXY[0] + " " + ItemXY[1]);
                             break;
                         }
                     } else if (ItemBinding != null) {
@@ -147,8 +223,8 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
                             }
                             NextItemBinding = GridItemBinding.bind(viewByPosition);
                             NextItemBinding.getRoot().setCardBackgroundColor(ColorNext);
-                            NextItemBinding.getRoot().getLocationInWindow(MainActivity.ItemXY);
-//                            gj.sc("NextItemBinding " + MainActivity.ItemXY[0] + " " + MainActivity.ItemXY[1]);
+                            NextItemBinding.getRoot().getLocationInWindow(ItemXY);
+//                            gj.sc("ItemBinding:" + ItemXY[0] + " " + ItemXY[1]);
                         }
                         break;
                     } else if (NextItemBinding != null) {

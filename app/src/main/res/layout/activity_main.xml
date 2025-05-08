@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -32,14 +31,14 @@
                         style="@style/TextAppearance.Material3.TitleLarge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="第%d周" />
+                        android:text="@string/dijizhou" />
 
                     <TextView
                         android:id="@+id/time"
                         style="@style/TextAppearance.Material3.BodyMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="yyyy-mm-dd" />
+                        android:text="@string/yyyy_mm_dd" />
                 </LinearLayout>
 
 
@@ -52,5 +51,4 @@
             android:layout_height="match_parent"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
 </androidx.drawerlayout.widget.DrawerLayout>

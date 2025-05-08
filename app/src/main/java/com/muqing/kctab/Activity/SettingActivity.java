@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -128,6 +129,13 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
         binding.qtAbout.setOnClickListener(view -> startActivity(new Intent(SettingActivity.this, activity_about_software.class)));
 
         binding.kbZhengli.setOnClickListener(view -> startActivity(new Intent(SettingActivity.this, CourseOverviewActivity.class)));
+
+
+        SharedPreferences SpSetting = getSharedPreferences("setting", MODE_PRIVATE);
+        binding.qtJcgxSwitch.setChecked(SpSetting.getBoolean("jcgx", true));
+        binding.qtJcgxSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
+            SpSetting.edit().putBoolean("jcgx", b).apply();
+        });
     }
 
     private final ActivityResultLauncher<Intent> createZipLauncher = registerForActivityResult(

@@ -11,4 +11,6 @@
     <string name="login_failed">"Login failed"</string>
     <string name="login">登陆</string>
     <string name="about">关于</string>
+    <string name="dijizhou">第%d周</string>
+    <string name="yyyy_mm_dd">yyyy-mm-dd</string>
 </resources>

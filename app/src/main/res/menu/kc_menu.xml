@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_fz"
+        android:title="复制" />
+    <item
+        android:id="@+id/menu_jq"
+        android:title="剪切" />
+    <item
+        android:id="@+id/menu_zt"
+        android:title="粘贴" />
+    <item
+        android:id="@+id/menu_sc"
+        android:title="删除" />
+
+
+</menu>

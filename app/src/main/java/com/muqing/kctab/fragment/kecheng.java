@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.google.gson.Gson;
 import com.muqing.Fragment;
 import com.muqing.gj;
 import com.muqing.kctab.Adapter.GridAdapter;
@@ -17,18 +18,36 @@ import com.muqing.kctab.Curriculum;
 import com.muqing.kctab.KcLei;
 import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.databinding.FragmentKebiaoBinding;
+import com.muqing.wj;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class kecheng extends Fragment<FragmentKebiaoBinding> {
     public Curriculum curriculum;
     public GridAdapter adapter;
+    private String FilePath;
+    private int zhou = 0;
 
-    public kecheng(Curriculum curriculum) {
-        this.curriculum = curriculum;
-
+    public static kecheng newInstance(String filePath, int zhou) {
+        kecheng fragment = new kecheng();
+        Bundle args = new Bundle();
+        args.putString("filePath", filePath);
+        args.putInt("zhou", zhou);
+        fragment.setArguments(args);
+        return fragment;
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            FilePath = getArguments().getString("filePath");
+            zhou = getArguments().getInt("zhou");
+        }
+    }
+
 
     public kecheng() {
     }
@@ -41,15 +60,26 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
 
     @Override
     public void setUI(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        gj.sc("启动Fragment UI " + binding);
         GridLayoutManager layoutManager = new GridLayoutManager(this.getContext(), 8); // 列
         binding.recyclerview.setLayoutManager(layoutManager);
+        if (FilePath != null) {
+//            gj.sc("启动Fragment UI 读取文件");
+            String dqwb = wj.dqwb(FilePath, "");
+            curriculum = new Gson().fromJson(dqwb, Curriculum.class);
+            curriculum.data.get(0).week = zhou;
+        }
+
         if (curriculum != null && curriculum.data != null) {
+//            gj.sc("启动Fragment UI 初始化表内容");
             adapter = new GridAdapter(this.getContext(), GetKcLei(curriculum));
             adapter.zhou = curriculum.data.get(0).week;
             binding.recyclerview.setAdapter(adapter);
+            binding.recyclerview.post(() -> {
+                adapter.Load(binding.recyclerview);
+                binding.horizontal.scrollTo(adapter.ItemXY[0], adapter.ItemXY[1]);
+            });
         }
-
-
     }
 
     private List<KcLei> GetKcLei(Curriculum curriculum) {
