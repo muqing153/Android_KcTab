@@ -60,7 +60,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
             viewBinding.message.setText(data.classroomName);
         }
         viewBinding.getRoot().setOnClickListener(v -> {
-            if (data.courseName != null) {
+            if (data.courseName != null && data.classTime != null) {
                 ShowKc(data);
             }
         });
