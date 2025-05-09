@@ -7,16 +7,15 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.muqing.BaseAdapter;
 import com.muqing.Dialog.BottomSheetDialog;
 import com.muqing.gj;
 import com.muqing.kctab.Curriculum;
-import com.muqing.kctab.KcLei;
 import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.GridItemBinding;
@@ -26,7 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
+public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course> {
 
     public final int ColorThis;
     //当前课的颜色高亮
@@ -35,7 +34,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
     public final int ColorNext;
     public int zhou = 0;
 
-    public GridAdapter(Context context, List<KcLei> dataList) {
+    public GridAdapter(Context context, List<Curriculum.Course> dataList) {
         super(context, dataList);
         ColorThis = gj.getThemeColor(context, com.google.android.material.R.attr.colorSurfaceContainerLow);
         ColorWhen = gj.getThemeColor(context, com.google.android.material.R.attr.colorPrimary);
@@ -49,32 +48,33 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
     }
 
     @Override
-    protected void onBindView(KcLei data, GridItemBinding viewBinding, ViewHolder<GridItemBinding> viewHolder, int position) {
-        viewBinding.title.setText(data.title);
+    protected void onBindView(Curriculum.Course data, GridItemBinding viewBinding, ViewHolder<GridItemBinding> viewHolder, int position) {
+        viewBinding.title.setText(data.courseName);
         if (position < 8) {
             viewBinding.message.setVisibility(View.GONE);
+            viewBinding.getRoot().getLayoutParams().height = 130;
         } else {
             viewBinding.getRoot().setCardBackgroundColor(ColorThis);
             viewBinding.message.setVisibility(View.VISIBLE);
-            viewBinding.message.setText(data.message);
+            viewBinding.message.setText(data.classroomName);
         }
         viewBinding.getRoot().setOnClickListener(v -> {
-            Curriculum.Course course = data.data;
-            if (course != null && course.courseName != null) {
-                ShowKc(course);
+            if (data.courseName != null) {
+                ShowKc(data);
             }
         });
         viewBinding.getRoot().setOnLongClickListener(view -> ShowLong(data, view, position));
     }
 
-    public static KcLei kcleishuju;
+    public static Curriculum.Course kcleishuju;
 
     public boolean isjt = false;//是否处于截图状态 截图状态不高亮
     public static int isjq = -1;//是否处于剪切状态 -1是无剪切 大于是记录上一个剪切的位置
     public static GridAdapter jqadapter;//获取剪切的课表Adapter用于更新
 
+
     @SuppressLint({"NonConstantResourceId"})
-    private boolean ShowLong(KcLei data, View view, int position) {
+    private boolean ShowLong(Curriculum.Course data, View view, int position) {
         if (position < 8) {
             return true;
         }
@@ -96,16 +96,17 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
             size--;
             menuItem.setVisible(false);
         }
-        if (data.data == null || data.data.classroomName == null) {
+        if (data.classroomName == null) {
             popupMenu.getMenu().findItem(R.id.menu_fz).setVisible(false);
             popupMenu.getMenu().findItem(R.id.menu_jq).setVisible(false);
             popupMenu.getMenu().findItem(R.id.menu_sc).setVisible(false);
             size -= 3;
         }
         popupMenu.setOnMenuItemClickListener(item -> {
+            Gson gson = new Gson();
             switch (item.getItemId()) {
                 case R.id.menu_fz:
-                    kcleishuju = data;
+                    kcleishuju = gson.fromJson(gson.toJson(data), Curriculum.Course.class);
                     jqadapter = null;
                     isjq = -1;
                     break;
@@ -115,21 +116,31 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
                     kcleishuju = data;
                     break;
                 case R.id.menu_sc:
-                    ShowLongDelete(data.data);
-                    data.title = null;
-                    data.message = null;
-                    data.data = null;
+                    dataList.set(position, new Curriculum.Course());
+                    ShowLongDelete(data);
+//                    data.title = null;
+//                    data.message = null;
+//                    data.data = null;
                     break;
                 case R.id.menu_zt:
-                    data.data = kcleishuju.data;
-                    data.message = kcleishuju.message;
-                    data.title = kcleishuju.title;
-                    ShowLongAdd(data.data);
+//                    data.data = kcleishuju.data;
+//                    data.message = kcleishuju.message;
+//                    data.title = kcleishuju.title;
+                    dataList.set(position, kcleishuju);
+                    int spanCount = 8; // 每行的列数
+                    int row = position / spanCount;   // 第几行（从0开始）
+                    int column = position % spanCount; // 第几列（从0开始）
+                    if (row > 1) {
+                        row += position / spanCount - 1;
+                    }
+                    dataList.get(position).classTime = String.format(Locale.CANADA, "%2d%02d%02d", column, row, row + 1);
+                    dataList.get(position).weekDay = column;
+                    ShowLongAdd(dataList.get(position));
                     if (isjq != -1 && jqadapter != null) {
-                        ShowLongDelete(kcleishuju.data);
-                        kcleishuju.title = null;
-                        kcleishuju.message = null;
-                        kcleishuju.data = null;
+//                        ShowLongDelete(kcleishuju.data);
+//                        kcleishuju.title = null;
+//                        kcleishuju.message = null;
+//                        kcleishuju.data = null;
                         jqadapter.notifyItemChanged(isjq);
                         jqadapter = null;
                         isjq = -1;
@@ -209,13 +220,13 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
         String time = MainActivity.Time; // 获取当前时间
 //        time = "08:00";
         for (int x = 1, y = weekDay + 8; x < 6; y += 8, x++) {
-            KcLei kcLei = dataList.get(y);
-            if (kcLei.data != null && kcLei.title != null) {
-                if (kcLei.data.startTime != null && kcLei.data.endTime != null) {
+            Curriculum.Course data = dataList.get(y);
+            if (data.courseName != null) {
+                if (data.startTime != null && data.endTime != null) {
                     // 格式化成 HH:mm
                     // 生成 1~7 之间的随机星期
 //                time是否在Start和End之间
-                    if (time.compareTo(kcLei.data.startTime) >= 0 && time.compareTo(kcLei.data.endTime) <= 0 && Objects.equals(kcLei.data.weekDay, weekDay)) {
+                    if (time.compareTo(data.startTime) >= 0 && time.compareTo(data.endTime) <= 0 && Objects.equals(data.weekDay, weekDay)) {
                         View viewByPosition = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(y);
                         if (viewByPosition != null) {
                             if (ItemBinding != null && ItemBinding.getRoot() != viewByPosition) {
@@ -233,7 +244,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
                     }
 
 
-                    if (kcLei.data.startTime.compareTo(time) > 0 && Objects.equals(kcLei.data.weekDay, weekDay)) {
+                    if (data.startTime.compareTo(time) > 0 && Objects.equals(data.weekDay, weekDay)) {
                         View viewByPosition = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(y);
                         if (viewByPosition != null) {
                             if (NextItemBinding != null && NextItemBinding.getRoot() != viewByPosition) {

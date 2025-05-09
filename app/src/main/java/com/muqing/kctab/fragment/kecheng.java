@@ -13,12 +13,10 @@ import com.muqing.Fragment;
 import com.muqing.gj;
 import com.muqing.kctab.Adapter.GridAdapter;
 import com.muqing.kctab.Curriculum;
-import com.muqing.kctab.KcLei;
 import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.databinding.FragmentKebiaoBinding;
 import com.muqing.wj;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,20 +78,20 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
             adapter = new GridAdapter(this.getContext(), GetKcLei(curriculum)) {
                 @Override
                 public void ShowLongDelete(Curriculum.Course course) {
-                    List<Curriculum.Course> courseList = curriculum.data.get(0).courses;
                     gj.sc("成功删除了一个数据com：" + course);
-                    courseList.remove(course);
+                    curriculum.data.get(0).courses.remove(course);
                     wj.xrwb(FilePath, new Gson().toJson(curriculum));
                 }
 
                 @Override
-                public void ShowLongAdd(Curriculum.Course course) {
-                    Gson gson = new Gson();
-                    course = gson.fromJson(gson.toJson(course), Curriculum.Course.class);
-                    course.classTime = "60304";
-                    List<Curriculum.Course> courseList = curriculum.data.get(0).courses;
-                    courseList.add(courseList.size(), course);
-                    gj.sc("成功添加了一个数据com：" + course);
+                public void ShowLongAdd(Curriculum.Course obj) {
+
+                    curriculum.data.get(0).courses = GetListKc(dataList);
+//                    Gson gson = new Gson();
+//                    course = gson.fromJson(gson.toJson(course), Curriculum.Course.class);
+////                    course.classTime = "60304";
+//                    List<Curriculum.Course> courseList = curriculum.data.get(0).courses;
+//                    courseList.add(courseList.size(), course);
                     wj.xrwb(FilePath, new Gson().toJson(curriculum));
 //                    wj.xrwb(new File(wj.data, "Debug.json"), new Gson().toJson(curriculum));
                 }
@@ -107,25 +105,46 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         }
     }
 
-    private List<KcLei> GetKcLei(Curriculum curriculum) {
-        List<KcLei> list = new ArrayList<>();
+    private List<Curriculum.Course> GetListKc(List<Curriculum.Course> dataList) {
+        List<Curriculum.Course> filtered = new ArrayList<>();
+        for (int i = 0; i < dataList.size(); i++) {
+            if (i > 8 && i % 8 != 0) {
+                Curriculum.Course course = dataList.get(i);
+                if (course.classTime == null) {
+                    continue;
+                }
+                filtered.add(course);
+            }
+        }
+        return filtered;
+
+    }
+
+    private List<Curriculum.Course> GetKcLei(Curriculum curriculum) {
+        List<Curriculum.Course> list = new ArrayList<>();
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col < 8; col++) {
                 if (row == 0 && col == 0) {
-                    list.add(new KcLei("节/日期"));
+                    Curriculum.Course course = new Curriculum.Course();
+                    course.courseName = "节/日";
+                    list.add(course);
                     continue;
                 }
-                list.add(new KcLei("R" + (row + 1) + " C" + (col + 1)));
+                Curriculum.Course course = new Curriculum.Course();
+                list.add(course);
             }
         }
         Curriculum.DataItem dataItem = curriculum.data.get(0);
         for (int i = 0; i < dataItem.date.size(); i++) {
             Curriculum.DateInfo dateInfo = dataItem.date.get(i);
-            list.set(i + 1, new KcLei(String.format("%s(%s)", dateInfo.xqmc, dateInfo.rq)));
+            Curriculum.Course course = new Curriculum.Course();
+            course.courseName = String.format("%s(%s)", dateInfo.xqmc, dateInfo.rq);
+            list.set(i + 1, course);
         }
         for (int i = 0, j = 8; i < schedule.length; i++, j += 8) {
-            KcLei kcLei = new KcLei(schedule[i].session);
-            kcLei.message = schedule[i].time1 + "\n" + schedule[i].time2;
+            Curriculum.Course kcLei = new Curriculum.Course();
+            kcLei.courseName = schedule[i].session;
+            kcLei.classroomName = schedule[i].time1 + "\n" + schedule[i].time2;
             list.set(j, kcLei);
         }
         // 1. 遍历每个节次，创建行数据
@@ -138,13 +157,12 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                 Curriculum.Course result = dataItem.courses.stream().filter(c -> c.classTime.endsWith(String.format("%s%s", ric[finalRic_i], ric[finalRic_i + 1])) && c.weekDay == finalI).findFirst().orElse(null);
 //                gj.sc(result);
                 if (result == null) {
-//                    result = new Curriculum.Course();
+                    result = new Curriculum.Course();
 //                    result.startTime = schedule[i].time1.split("-")[0];
 //                    result.endTime = schedule[i].time2.split("-")[1];
 //                    result.weekDay = k + 1;
                 }
-                KcLei kcLei = new KcLei(result);
-                list.set(j, kcLei);
+                list.set(j, result);
             }
             j++;
             ric_i += 2;

@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             zhouDialog zhouDialog = new zhouDialog(MainActivity.this) {
                 @Override
                 public void click(int position) {
-                    MainActivity.this.binding.viewpage.setCurrentItem(position, true);
+                    MainActivity.this.binding.viewpage.setCurrentItem(position, false);
                 }
             };
             zhouDialog.zhouAdapter.week = MainActivity.this.binding.viewpage.getCurrentItem() + 1;
@@ -218,11 +218,9 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
                 } catch (Exception e) {
                     gj.sc(e);
                 }
-                viewWidth = recyclerView.getMeasuredWidth();
-                viewHeight = recyclerView.getMeasuredHeight();
-                Bitmap fullRecyclerViewBitmap = getFullRecyclerViewBitmap(recyclerView, null);
-                gj.sc(fullRecyclerViewBitmap);
-                jietuActivity.start(this, fullRecyclerViewBitmap);
+                    Bitmap bitmap = getFullRecyclerViewBitmap(recyclerView, null);
+//                Bitmap bitmap = gj.getRecyclerViewScreenshot(recyclerView);
+                jietuActivity.start(MainActivity.this, bitmap);
                 k.adapter.isjt = false;
             }
         } else if (id == R.id.settings) {
@@ -313,15 +311,22 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         public abstract void error();
     }
 
-    private int viewWidth, viewHeight;
-
     public Bitmap getFullRecyclerViewBitmap(View view, Bitmap background) {
-        if (viewWidth == 0 || viewHeight == 0) {
-            gj.sc("避免创建空 Bitmap");
-            return null; // 避免创建空 Bitmap
-        }
-        Bitmap bitmap = Bitmap.createBitmap(viewWidth, viewHeight, Bitmap.Config.ARGB_8888);
+        // 先测量整个内容大小（未指定尺寸）
+        int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        view.measure(widthSpec, heightSpec);
+
+        // 再布局（layout）View
+        int width = view.getMeasuredWidth();
+        int height = view.getMeasuredHeight();
+        view.layout(0, 0, width, height);
+
+        // 然后创建Bitmap并绘制
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+
         TypedArray array = getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorBackground, android.R.attr.textColorPrimary,});
         int backgroundColor = array.getColor(0, 0xFFF5F5F5);
         canvas.drawColor(backgroundColor);
@@ -332,19 +337,19 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             int bgHeight = background.getHeight();
 
             // 计算比例，确保背景图充满整个 View
-            float scaleX = (float) viewWidth / bgWidth;
-            float scaleY = (float) viewHeight / bgHeight;
+            float scaleX = (float) widthSpec / bgWidth;
+            float scaleY = (float) heightSpec / bgHeight;
             float scale = Math.max(scaleX, scaleY);
 
             // 计算裁剪区域
-            int cropWidth = (int) (viewWidth / scale);
-            int cropHeight = (int) (viewHeight / scale);
+            int cropWidth = (int) (widthSpec / scale);
+            int cropHeight = (int) (heightSpec / scale);
 
             int cropX = (bgWidth - cropWidth) / 2;
             int cropY = (bgHeight - cropHeight) / 2;
 
             Rect src = new Rect(cropX, cropY, cropX + cropWidth, cropY + cropHeight);
-            Rect dst = new Rect(0, 0, viewWidth, viewHeight);
+            Rect dst = new Rect(0, 0, widthSpec, heightSpec);
 
             Paint path = new Paint();
             path.setAlpha(30);
