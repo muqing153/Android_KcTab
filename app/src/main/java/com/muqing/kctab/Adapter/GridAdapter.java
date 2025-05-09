@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
@@ -111,9 +112,10 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
                     isjq = -1;
                     break;
                 case R.id.menu_jq:
-                    isjq = position;
-                    jqadapter = GridAdapter.this;
-                    kcleishuju = data;
+                    Toast.makeText(context, "此功能内测中ing", Toast.LENGTH_SHORT).show();
+//                    isjq = position;
+//                    jqadapter = GridAdapter.this;
+//                    kcleishuju = data;
                     break;
                 case R.id.menu_sc:
                     dataList.set(position, new Curriculum.Course());
