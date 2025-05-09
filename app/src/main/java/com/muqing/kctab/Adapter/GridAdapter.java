@@ -75,6 +75,14 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
 
     @SuppressLint({"NonConstantResourceId"})
     private boolean ShowLong(KcLei data, View view, int position) {
+        if (position < 8) {
+            return true;
+        }
+        for (int i = 1; i <= 5; i++) {
+            if (position == 8 * i) {
+                return true;
+            }
+        }
 //        PopupWindow popupWindow = new PopupWindow(view, 300, ViewGroup.LayoutParams.WRAP_CONTENT);
 //        popupWindow.setOutsideTouchable(true);
 //        popupWindow.setFocusable(true);
@@ -107,6 +115,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
                     kcleishuju = data;
                     break;
                 case R.id.menu_sc:
+                    ShowLongDelete(data.data);
                     data.title = null;
                     data.message = null;
                     data.data = null;
@@ -115,7 +124,9 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
                     data.data = kcleishuju.data;
                     data.message = kcleishuju.message;
                     data.title = kcleishuju.title;
+                    ShowLongAdd(data.data);
                     if (isjq != -1 && jqadapter != null) {
+                        ShowLongDelete(kcleishuju.data);
                         kcleishuju.title = null;
                         kcleishuju.message = null;
                         kcleishuju.data = null;
@@ -136,6 +147,13 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, KcLei> {
         }
         return true;
     }
+
+    public void ShowLongDelete(Curriculum.Course course) {
+    }
+
+    public void ShowLongAdd(Curriculum.Course course) {
+    }
+
 
     private void ShowKc(Curriculum.Course course) {
 /*        String format = String.format(Locale.getDefault(), "%s\n" +

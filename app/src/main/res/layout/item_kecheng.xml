@@ -59,6 +59,7 @@
             android:layout_marginHorizontal="16dp"
             android:orientation="vertical"
             android:visibility="gone"
+            android:layout_marginBottom="6dp"
             tools:visibility="visible">
 
             <TextView

@@ -197,8 +197,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         }
     }
 
-    public static final ScheduleItem[] schedule = {new ScheduleItem("第 1 节", "08:20-09:05", "09:15-10:00"), new ScheduleItem("第 2 节", "10:10-11:40", "10:30-12:00"), new ScheduleItem("第 3 节", "13:30-14:15", "14:25-15:10"), new ScheduleItem("第 4 节", "15:20-16:05", "16:15-17:00"), new ScheduleItem("第 5 节", "18:30-19:15", "19:25-20:10")};
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
@@ -210,20 +208,23 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         int id = item.getItemId();
         if (id == R.id.share) {
             int currentItem = binding.viewpage.getCurrentItem();
-            kecheng kecheng = pageAdapter.data.get(currentItem);
-            kecheng.adapter.isjt = true;
-            RecyclerView recyclerView = kecheng.binding.recyclerview;
-            try {
-                kecheng.adapter.Load(kecheng.binding.recyclerview);
-            } catch (Exception e) {
-                gj.sc(e);
+            Fragment fragment = getSupportFragmentManager().findFragmentByTag("f" + currentItem);
+            if (fragment instanceof kecheng) {
+                kecheng k = (kecheng) fragment;
+                k.adapter.isjt = true;
+                RecyclerView recyclerView = k.binding.recyclerview;
+                try {
+                    k.adapter.Load(k.binding.recyclerview);
+                } catch (Exception e) {
+                    gj.sc(e);
+                }
+                viewWidth = recyclerView.getMeasuredWidth();
+                viewHeight = recyclerView.getMeasuredHeight();
+                Bitmap fullRecyclerViewBitmap = getFullRecyclerViewBitmap(recyclerView, null);
+                gj.sc(fullRecyclerViewBitmap);
+                jietuActivity.start(this, fullRecyclerViewBitmap);
+                k.adapter.isjt = false;
             }
-            viewWidth = recyclerView.getMeasuredWidth();
-            viewHeight = recyclerView.getMeasuredHeight();
-            Bitmap fullRecyclerViewBitmap = getFullRecyclerViewBitmap(recyclerView, null);
-            gj.sc(fullRecyclerViewBitmap);
-            jietuActivity.start(this, fullRecyclerViewBitmap);
-            kecheng.adapter.isjt = false;
         } else if (id == R.id.settings) {
             startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.sync) {

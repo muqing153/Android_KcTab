@@ -69,8 +69,23 @@ public class CourseOverviewAdapter extends BaseAdapter<ItemKechengBinding, Curri
      */
     public void expandHeight(final ItemKechengBinding view) {
         view.infoLin.setVisibility(View.VISIBLE);
-        view.imageView.setImageResource(R.drawable.book_ribbon_24px);
-        isDh = false;
+        view.infoLin.post(() -> {
+            view.imageView.setImageResource(R.drawable.book_ribbon_24px);
+            int height = view.infoLin.getHeight();
+            ValueAnimator animator = ValueAnimator.ofInt(0, height); // 从 0 到 500
+            animator.setDuration(100); // 动画时长 300ms
+            animator.addUpdateListener(animation -> {
+                view.infoLin.getLayoutParams().height = (int) animation.getAnimatedValue();
+                view.infoLin.requestLayout(); // 更新布局
+            });
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    isDh = false;
+                }
+            });
+            animator.start();
+        });
     }
 
     /**
@@ -79,9 +94,26 @@ public class CourseOverviewAdapter extends BaseAdapter<ItemKechengBinding, Curri
      * @param view
      */
     public void collapseHeight(final ItemKechengBinding view) {
-        view.infoLin.setVisibility(View.GONE);
-        view.imageView.setImageResource(R.drawable.book_24px);
-        isDh = false;
+        view.infoLin.post(() -> {
+            int height = view.infoLin.getHeight();
+            ValueAnimator animator = ValueAnimator.ofInt(height, 0); // 从 0 到 500
+            animator.setDuration(100); // 动画时长 300ms
+            animator.addUpdateListener(animation -> {
+                view.infoLin.getLayoutParams().height = (int) animation.getAnimatedValue();
+                view.infoLin.requestLayout(); // 更新布局
+            });
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    view.infoLin.setVisibility(View.GONE);
+                    view.infoLin.getLayoutParams().height = height;
+                    view.infoLin.requestLayout();
+                    view.imageView.setImageResource(R.drawable.book_24px);
+                    isDh = false;
+                }
+            });
+            animator.start();
+        });
     }
 
 }
