@@ -21,6 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "KcTab"
 include ':app'
-//include ':AndroidMuqing'
-//project(':AndroidMuqing').projectDir = new File('../AndroidMuqing')
+include ':AndroidMuqing'
+project(':AndroidMuqing').projectDir = new File('../AndroidMuqing/library')
 include ':mylibrary'

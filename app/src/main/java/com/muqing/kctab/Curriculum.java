@@ -1,7 +1,10 @@
 package com.muqing.kctab;
+
 import android.text.TextUtils;
 
 import java.util.List;
+import java.util.Objects;
+
 import com.google.gson.annotations.SerializedName;
 
 public class Curriculum {
@@ -113,6 +116,19 @@ public class Curriculum {
 
         @SerializedName("coursesNote")
         public int coursesNote;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Course)) return false;
+            Course course = (Course) o;
+            return xkrs == course.xkrs && weekDay == course.weekDay && coursesNote == course.coursesNote && Objects.equals(classWeek, course.classWeek) && Objects.equals(teacherName, course.teacherName) && Objects.equals(weekNoteDetail, course.weekNoteDetail) && Objects.equals(buttonCode, course.buttonCode) && Objects.equals(ktmc, course.ktmc) && Objects.equals(classTime, course.classTime) && Objects.equals(classroomNub, course.classroomNub) && Objects.equals(jx0408Id, course.jx0408Id) && Objects.equals(buildingName, course.buildingName) && Objects.equals(courseName, course.courseName) && Objects.equals(isRepeatCode, course.isRepeatCode) && Objects.equals(jx0404Id, course.jx0404Id) && Objects.equals(getClassroomName(), course.getClassroomName()) && Objects.equals(khfs, course.khfs) && Objects.equals(startTime, course.startTime) && Objects.equals(Time, course.Time) && Objects.equals(Zhou, course.Zhou) && Objects.equals(endTime, course.endTime) && Objects.equals(location, course.location) && Objects.equals(fzmc, course.fzmc) && Objects.equals(classWeekDetails, course.classWeekDetails);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(classWeek, teacherName, weekNoteDetail, buttonCode, xkrs, ktmc, classTime, classroomNub, jx0408Id, buildingName, courseName, isRepeatCode, jx0404Id, weekDay, getClassroomName(), khfs, startTime, Time, Zhou, endTime, location, fzmc, classWeekDetails, coursesNote);
+        }
     }
 
     public static class Node {

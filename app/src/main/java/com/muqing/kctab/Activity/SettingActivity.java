@@ -92,7 +92,7 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
         } else {
             binding.themeDynamic.setEnabled(false);
             binding.themeDynamic.setChecked(false);
-            binding.themeDynamic.setText("动态颜色(你目前的系统不支持此选项)");
+            binding.themeDynamic.setMessage("你目前的系统不支持此选项");
         }
 
         binding.kbDaochu.setOnClickListener(view -> {

@@ -44,6 +44,10 @@ public class SettingSwitch extends LinearLayout {
                     context.obtainStyledAttributes(attrs, R.styleable.SettingTextView);
             String title = typedArray.getString(R.styleable.SettingTextView_title);
             String message = typedArray.getString(R.styleable.SettingTextView_message);
+            boolean enable = typedArray.getBoolean(R.styleable.SettingTextView_enabled, true);
+            binding.MaterialSwitch.setEnabled(enable);
+            binding.title.setEnabled(enable);
+            binding.message.setEnabled(enable);
             setTitle(title);
             setMessage(message);
 

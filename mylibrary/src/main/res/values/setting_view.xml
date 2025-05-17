@@ -4,5 +4,6 @@
         <attr name="title" format="string"/>
         <attr name="message" format="string"/>
         <attr name="icon" format="reference" />
+        <attr name="enabled" format="boolean" />
     </declare-styleable>
 </resources>

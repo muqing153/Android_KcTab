@@ -45,16 +45,16 @@
                     android:id="@+id/theme_system"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/chevron_right_24px"
                     app:title="跟随系统" />
 
-                <com.google.android.material.materialswitch.MaterialSwitch
+                <com.muqing.ViewUI.SettingSwitch
                     android:id="@+id/theme_dynamic"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:enabled="false"
-                    android:paddingHorizontal="6dp"
-                    android:text="动态颜色(重启后生效)" />
+                    app:enabled="false"
+                    app:message="(重启后生效)"
+                    app:title="动态颜色" />
+
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_theme"
@@ -80,16 +80,22 @@
                     android:id="@+id/kb_daochu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/chevron_right_24px"
                     app:title="导出课表" />
 
                 <com.muqing.ViewUI.SettingTextView
                     android:id="@+id/kb_zhengli"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/chevron_right_24px"
                     app:message="功能性测试"
                     app:title="整理课表课程" />
+
+                <com.muqing.ViewUI.SettingTextView
+                    android:id="@+id/kb_stzdy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:message="可自定义课表的高亮颜色以及宽高等"
+                    app:title="自定义课表视图" />
+
             </LinearLayout>
 
             <TextView
@@ -101,7 +107,6 @@
                 android:id="@+id/qt_jcgx"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/chevron_right_24px"
                 app:title="检查更新" />
 
             <com.muqing.ViewUI.SettingSwitch
@@ -114,7 +119,6 @@
                 android:id="@+id/qt_about"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/chevron_right_24px"
                 app:title="关于" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

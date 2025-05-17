@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +20,7 @@ import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.GridItemBinding;
 import com.muqing.kctab.databinding.KcinfoDialogBinding;
+import com.muqing.kctab.fragment.kecheng;
 
 import java.util.List;
 import java.util.Locale;
@@ -51,7 +51,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
     @Override
     protected void onBindView(Curriculum.Course data, GridItemBinding viewBinding, ViewHolder<GridItemBinding> viewHolder, int position) {
         viewBinding.title.setText(data.courseName);
-        if (position < 8) {
+        if (position < 8 || data.classroomName == null) {
             viewBinding.message.setVisibility(View.GONE);
             viewBinding.getRoot().getLayoutParams().height = 130;
         } else {
@@ -68,12 +68,10 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
     }
 
     public static Curriculum.Course kcleishuju;
-
     public boolean isjt = false;//是否处于截图状态 截图状态不高亮
     public static int isjq = -1;//是否处于剪切状态 -1是无剪切 大于是记录上一个剪切的位置
+    @SuppressLint("StaticFieldLeak")
     public static GridAdapter jqadapter;//获取剪切的课表Adapter用于更新
-
-
     @SuppressLint({"NonConstantResourceId"})
     private boolean ShowLong(Curriculum.Course data, View view, int position) {
         if (position < 8) {
@@ -84,15 +82,12 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
                 return true;
             }
         }
-//        PopupWindow popupWindow = new PopupWindow(view, 300, ViewGroup.LayoutParams.WRAP_CONTENT);
-//        popupWindow.setOutsideTouchable(true);
-//        popupWindow.setFocusable(true);
-//        popupWindow.showAsDropDown(view);
+
         PopupMenu popupMenu = new PopupMenu(context, view);
         popupMenu.getMenuInflater().inflate(R.menu.kc_menu, popupMenu.getMenu());
         int size = 4;
         //保证是否以及复制数据 并且复制的数据不能可data相同位置
-        if (kcleishuju == null || kcleishuju == data) {
+        if (kcleishuju == null || kcleishuju.equals(data)) {
             MenuItem menuItem = popupMenu.getMenu().findItem(R.id.menu_zt);
             size--;
             menuItem.setVisible(false);
@@ -112,37 +107,31 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
                     isjq = -1;
                     break;
                 case R.id.menu_jq:
-                    Toast.makeText(context, "此功能内测中ing", Toast.LENGTH_SHORT).show();
-//                    isjq = position;
-//                    jqadapter = GridAdapter.this;
-//                    kcleishuju = data;
+                    isjq = position;
+                    jqadapter = GridAdapter.this;
+                    kcleishuju = gson.fromJson(gson.toJson(data), Curriculum.Course.class);
                     break;
                 case R.id.menu_sc:
                     dataList.set(position, new Curriculum.Course());
                     ShowLongDelete(data);
-//                    data.title = null;
-//                    data.message = null;
-//                    data.data = null;
                     break;
                 case R.id.menu_zt:
-//                    data.data = kcleishuju.data;
-//                    data.message = kcleishuju.message;
-//                    data.title = kcleishuju.title;
                     dataList.set(position, kcleishuju);
                     int spanCount = 8; // 每行的列数
                     int row = position / spanCount;   // 第几行（从0开始）
                     int column = position % spanCount; // 第几列（从0开始）
+                    dataList.get(position).startTime = kecheng.schedule[row - 1].time1.split("-")[0];
+                    dataList.get(position).endTime = kecheng.schedule[row - 1].time2.split("-")[1];
                     if (row > 1) {
                         row += position / spanCount - 1;
                     }
                     dataList.get(position).classTime = String.format(Locale.CANADA, "%2d%02d%02d", column, row, row + 1);
                     dataList.get(position).weekDay = column;
+
                     ShowLongAdd(dataList.get(position));
                     if (isjq != -1 && jqadapter != null) {
-//                        ShowLongDelete(kcleishuju.data);
-//                        kcleishuju.title = null;
-//                        kcleishuju.message = null;
-//                        kcleishuju.data = null;
+                        jqadapter.ShowLongDelete(jqadapter.dataList.get(isjq));
+                        jqadapter.dataList.set(isjq, new Curriculum.Course());
                         jqadapter.notifyItemChanged(isjq);
                         jqadapter = null;
                         isjq = -1;

@@ -39,7 +39,6 @@ public class GXThread extends Thread {
     }
 
     private Runnable runnable;
-
     public GXThread(Activity activity, Runnable runnable) {
         this.activity = activity;
         this.runnable = runnable;
@@ -50,7 +49,7 @@ public class GXThread extends Thread {
     public void run() {
         //检测是否Debug运行
         if (gj.Debug) {
-            return;
+//            return;
         }
         try {
             String versionName = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;

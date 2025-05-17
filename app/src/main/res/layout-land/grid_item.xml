@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Widget.Material3.CardView.Elevated"
     android:layout_width="130dp"
-    android:layout_height="wrap_content"
+    android:layout_height="85dp"
     app:cardUseCompatPadding="true">
 
     <LinearLayout
@@ -31,8 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:gravity="top|center_horizontal"
-            android:lines="2"
+            android:gravity="center"
             android:maxLines="2"
             android:text="@string/app_name" />
     </LinearLayout>

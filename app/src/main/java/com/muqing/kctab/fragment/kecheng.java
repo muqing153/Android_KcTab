@@ -1,5 +1,7 @@
 package com.muqing.kctab.fragment;
 
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -21,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class kecheng extends Fragment<FragmentKebiaoBinding> {
-    public Curriculum curriculum;
     public GridAdapter adapter;
     private String FilePath;
     private int zhou = 0;
@@ -54,13 +55,14 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         return FragmentKebiaoBinding.inflate(inflater, container, false);
     }
 
-    public static final MainActivity.ScheduleItem[] schedule = {new MainActivity.ScheduleItem("第1.2节", "08:20-09:05", "09:15-10:00"),
-            new MainActivity.ScheduleItem("第3.4节", "10:10-11:40", "10:30-12:00"),
-            new MainActivity.ScheduleItem("第5.6节", "13:30-14:15", "14:25-15:10"),
-            new MainActivity.ScheduleItem("第7.8节", "15:20-16:05", "16:15-17:00"),
-            new MainActivity.ScheduleItem("第9.10节", "18:30-19:15", "19:25-20:10")};
+    public static final MainActivity.ScheduleItem[] schedule = {new MainActivity.ScheduleItem("1.2", "08:20-09:05", "09:15-10:00"),
+            new MainActivity.ScheduleItem("3.4", "10:10-11:40", "10:30-12:00"),
+            new MainActivity.ScheduleItem("5.6", "13:30-14:15", "14:25-15:10"),
+            new MainActivity.ScheduleItem("7.8", "15:20-16:05", "16:15-17:00"),
+            new MainActivity.ScheduleItem("9.10", "18:30-19:15", "19:25-20:10")};
 
 
+    public Curriculum curriculum;
     @Override
     public void setUI(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         gj.sc("启动Fragment UI " + binding);
@@ -85,15 +87,8 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
 
                 @Override
                 public void ShowLongAdd(Curriculum.Course obj) {
-
                     curriculum.data.get(0).courses = GetListKc(dataList);
-//                    Gson gson = new Gson();
-//                    course = gson.fromJson(gson.toJson(course), Curriculum.Course.class);
-////                    course.classTime = "60304";
-//                    List<Curriculum.Course> courseList = curriculum.data.get(0).courses;
-//                    courseList.add(courseList.size(), course);
                     wj.xrwb(FilePath, new Gson().toJson(curriculum));
-//                    wj.xrwb(new File(wj.data, "Debug.json"), new Gson().toJson(curriculum));
                 }
             };
             adapter.zhou = curriculum.data.get(0).week;
@@ -103,6 +98,11 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                 binding.horizontal.scrollTo(adapter.ItemXY[0], adapter.ItemXY[1]);
             });
         }
+        //获取屏幕高度
+//        int heightPixels = Resources.getSystem().getDisplayMetrics().heightPixels;
+//        binding.horizontal.getLayoutParams().height = heightPixels;
+//        binding.horizontal.buildLayer();
+//        binding.horizontal.setBackgroundColor(Color.GRAY);
     }
 
     private List<Curriculum.Course> GetListKc(List<Curriculum.Course> dataList) {
@@ -145,6 +145,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
             Curriculum.Course kcLei = new Curriculum.Course();
             kcLei.courseName = schedule[i].session;
             kcLei.classroomName = schedule[i].time1 + "\n" + schedule[i].time2;
+//            kcLei.classroomName = schedule[i].time1.split("-")[0] + "\n" + schedule[i].time2.split("-")[1];
             list.set(j, kcLei);
         }
         // 1. 遍历每个节次，创建行数据
@@ -169,5 +170,4 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         }
         return list;
     }
-
 }

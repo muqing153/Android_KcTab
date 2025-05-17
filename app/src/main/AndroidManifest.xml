@@ -41,9 +41,9 @@
         <activity
             android:name=".Activity.WebActivity"
             android:exported="false" />
+<!--        android:configChanges="screenLayout|screenSize|keyboardHidden|navigation|fontScale|smallestScreenSize"-->
         <activity
             android:name=".MainActivity"
-            android:configChanges="screenLayout|screenSize|keyboardHidden|navigation|fontScale|smallestScreenSize"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
@@ -59,13 +59,14 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <!-- 匹配 MIME 类型和后缀 -->
-                <data android:scheme="file" />
-                <data android:scheme="content" />
-                <data android:host="*" />
-                <data android:pathPattern=".*\\.kczip" />
-                <data android:mimeType="application/octet-stream" />
+
+                <data android:scheme="file"/>
+                <data android:host="*"/>
+                <data android:pathPattern=".*\\.kczip"/>
+                <data android:scheme="content"/>
+                <data android:pathPattern=".*\\.kc"/>
+                <data android:mimeType="*/*"/>
             </intent-filter>
         </activity>
         <activity
