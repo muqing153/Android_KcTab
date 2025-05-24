@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.Material3.CardView.Elevated"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@macro/m3_comp_elevated_card_container_color"
+    app:cardUseCompatPadding="true">
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/title"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20"
+        tools:ignore="HardcodedText" />
+
+
+</com.google.android.material.card.MaterialCardView>

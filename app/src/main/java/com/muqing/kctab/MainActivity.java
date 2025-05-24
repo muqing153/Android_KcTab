@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.muqing.AppCompatActivity;
 import com.muqing.gj;
 import com.muqing.kctab.Activity.LoginActivity;
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             return;
         }
         new GXThread(this);
+//        gxThread.gx("https://gitee.com/muqing15379/Android_KcTab/releases/download/1.3.6/app-release.apk"
+//                , "1.3.6");
         LoadUI();
     }
 
@@ -218,7 +221,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
                 } catch (Exception e) {
                     gj.sc(e);
                 }
-                    Bitmap bitmap = getFullRecyclerViewBitmap(recyclerView, null);
+                Bitmap bitmap = getFullRecyclerViewBitmap(recyclerView, null);
 //                Bitmap bitmap = gj.getRecyclerViewScreenshot(recyclerView);
                 jietuActivity.start(MainActivity.this, bitmap);
                 k.adapter.isjt = false;
@@ -287,15 +290,11 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             } else if (sycn.equals("kczip")) {
                 load = true;
             } else {
+                List<Integer> o = new Gson().fromJson(sycn, new TypeToken<List<Integer>>() {
+                }.getType());
+                Integer[] array = o.toArray(new Integer[0]);
                 try {
-                    File file = new File(wj.data, "TabList");
-                    String s = KcApi.GetCurriculum(sycn, "");
-                    Curriculum curriculum = new Gson().fromJson(s, Curriculum.class);
-                    curriculum.data.get(0).week = Integer.parseInt(sycn);
-                    int length = curriculum.data.get(0).date.size();
-                    String zc = curriculum.data.get(0).date.get(length - 1).mxrq;
-                    wj.xrwb(new File(file, zc + ".txt"), new Gson().toJson(curriculum));
-                    load = true;
+                    load = KcApi.Load(token, array);
                 } catch (Exception e) {
                     gj.sc(e);
                 }

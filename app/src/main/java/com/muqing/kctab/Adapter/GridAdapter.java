@@ -50,14 +50,18 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
 
     @Override
     protected void onBindView(Curriculum.Course data, GridItemBinding viewBinding, ViewHolder<GridItemBinding> viewHolder, int position) {
-        viewBinding.title.setText(data.courseName);
         if (position < 8 || data.classroomName == null) {
+            viewBinding.titleRi.setText(data.courseName);
             viewBinding.message.setVisibility(View.GONE);
-            viewBinding.getRoot().getLayoutParams().height = 130;
+            viewBinding.line1.setVisibility(View.GONE);
+            viewBinding.line2.setVisibility(View.VISIBLE);
         } else {
+            viewBinding.title.setText(data.courseName);
             viewBinding.getRoot().setCardBackgroundColor(ColorThis);
             viewBinding.message.setVisibility(View.VISIBLE);
             viewBinding.message.setText(data.classroomName);
+            viewBinding.line1.setVisibility(View.VISIBLE);
+            viewBinding.line2.setVisibility(View.GONE);
         }
         viewBinding.getRoot().setOnClickListener(v -> {
             if (data.courseName != null && data.classTime != null) {
@@ -72,6 +76,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
     public static int isjq = -1;//是否处于剪切状态 -1是无剪切 大于是记录上一个剪切的位置
     @SuppressLint("StaticFieldLeak")
     public static GridAdapter jqadapter;//获取剪切的课表Adapter用于更新
+
     @SuppressLint({"NonConstantResourceId"})
     private boolean ShowLong(Curriculum.Course data, View view, int position) {
         if (position < 8) {

@@ -12,6 +12,7 @@
     <!-- CHANGE_NETWORK_STATE 是为了请求网络、切换绑定网络，比如你用 requestNetwork() 或 bindProcessToNetwork() 就必须要这个。 -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name=".main"

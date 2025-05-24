@@ -12,14 +12,22 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.gson.Gson;
 import com.muqing.AppCompatActivity;
+import com.muqing.Dialog.BottomSheetDialog;
 import com.muqing.Dialog.DialogEditText;
 import com.muqing.gj;
+import com.muqing.kctab.Adapter.ZhouBoxAdapter;
 import com.muqing.kctab.LoginApi;
+import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.ActivityLoginBinding;
+import com.muqing.kctab.databinding.DialogZhouBoxBinding;
+import com.muqing.kctab.databinding.ItemZhouBoxBinding;
+import com.muqing.kctab.databinding.ZhouDialogBinding;
 import com.muqing.kctab.zhouDialog;
 import com.muqing.wj;
 
@@ -28,7 +36,9 @@ import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
@@ -51,6 +61,8 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         }
     });
 
+
+    public List<Integer> zhouList = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -128,19 +140,33 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
 
 
         binding.syncButton.setOnClickListener(view -> {
-            zhouDialog zhouDialog = new zhouDialog(LoginActivity.this) {
-                @Override
-                public void click(int position) {
-                    LoginActivity.this.binding.syncButton.setText(zhouAdapter.dataList.get(position));
-                }
-            };
-            zhouDialog.zhouAdapter.gaoliang = false;
-            zhouDialog.binding.fh.setVisibility(View.GONE);
-            zhouDialog.zhouAdapter.dataList.add(0, "ALL");
+            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(LoginActivity.this);
+            DialogZhouBoxBinding zhouDialogBinding = DialogZhouBoxBinding.inflate(LayoutInflater.from(LoginActivity.this));
+//            zhouDialogBinding.fh.setText("同步课程表");
+            bottomSheetDialog.setContentView(zhouDialogBinding.getRoot());
+
+            ArrayList<String> objects = new ArrayList<>();
+            for (int i = 0; i < MainActivity.TabList.size(); i++) {
+                objects.add(String.valueOf(i + 1));
+            }
+            int itemWidthDp = 100;
+            float density = getResources().getDisplayMetrics().density;
+            int itemWidthPx = (int) (itemWidthDp * density + 0.5f);
+            zhouList.clear();
+            zhouList.add(MainActivity.benzhou - 1);
+            zhouDialogBinding.getRoot().post(() -> {
+                int width = zhouDialogBinding.getRoot().getWidth();
+                int spanCount = Math.max(5, width / itemWidthPx);
+                zhouDialogBinding.recyclerview.setLayoutManager(new GridLayoutManager(LoginActivity.this, spanCount));
+                zhouDialogBinding.recyclerview.setAdapter(new ZhouBoxAdapter(LoginActivity.this, objects, zhouDialogBinding, zhouList));
+            });
+            bottomSheetDialog.show();
         });
         Intent intent = getIntent();
         if (intent.getStringExtra("sync") != null) {
             binding.syncButton.setEnabled(true);
+            zhouList.clear();
+            zhouList.add(MainActivity.benzhou - 1);
             binding.syncButton.setText(intent.getStringExtra("sync"));
         }
 
@@ -178,7 +204,11 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
     private void EndToken(String token) {
         Intent resultIntent = new Intent();
         resultIntent.putExtra("token", token);
-        resultIntent.putExtra("sync", binding.syncButton.getText().toString());
+        if (zhouList.isEmpty()) {
+            resultIntent.putExtra("sync", binding.syncButton.getText().toString());
+        }else{
+            resultIntent.putExtra("sync", new Gson().toJson(zhouList));
+        }
         setResult(RESULT_OK, resultIntent);
         finish();
     }

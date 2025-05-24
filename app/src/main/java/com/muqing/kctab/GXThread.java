@@ -3,18 +3,31 @@ package com.muqing.kctab;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
+
+import androidx.core.content.FileProvider;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.muqing.gj;
+import com.muqing.wj;
 import com.muqing.wl;
 
 import org.json.JSONObject;
 
+import java.io.File;
+
 public class GXThread extends Thread {
 
     private final Activity activity;
+    private String version;//当前软件的版本号
+    private String newversion;//最新的版本号
+    private String apk_url;
+
     /**
      * 自动更新
      *
@@ -39,6 +52,7 @@ public class GXThread extends Thread {
     }
 
     private Runnable runnable;
+
     public GXThread(Activity activity, Runnable runnable) {
         this.activity = activity;
         this.runnable = runnable;
@@ -47,14 +61,10 @@ public class GXThread extends Thread {
 
     @Override
     public void run() {
-        //检测是否Debug运行
-        if (gj.Debug) {
-//            return;
-        }
         try {
-            String versionName = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
+            version = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
             String hq = wl.post("https://muqingcandy.top/php/GetKCTabBB.php", new Object[][]{
-                    {"version", versionName}
+                    {"version", version}
             });
             gj.sc(hq);
             if (hq != null) {
@@ -62,14 +72,14 @@ public class GXThread extends Thread {
                 String message = jsonObject.getString("msg");
                 if (jsonObject.getInt("code") == 200) {
                     String nickname = jsonObject.getString("name");
-                    String version = jsonObject.getString("version");
-                    String apk_url = jsonObject.getString("apk_url");
+                    newversion = jsonObject.getString("version");
+                    apk_url = jsonObject.getString("apk_url");
                     //获取本地版本versionName
-                    if (!version.equals(versionName)) {
+                    if (!newversion.equals(version)) {
                         activity.runOnUiThread(() -> new MaterialAlertDialogBuilder(activity)
                                 .setTitle(nickname)
-                                .setMessage(message + "\n" + versionName + "->" + version)
-                                .setPositiveButton("确定", (dialogInterface, i) -> gj.llq(activity, apk_url))
+                                .setMessage(message + "\n" + version + "->" + newversion)
+                                .setPositiveButton("确定", (dialogInterface, i) -> gx())
                                 .show());
                     } else if (runnable != null) {
                         activity.runOnUiThread(runnable);
@@ -88,4 +98,57 @@ public class GXThread extends Thread {
     public void error(String msg) {
 
     }
+
+    public void gx() {
+        if (!activity.getPackageManager().canRequestPackageInstalls()) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+            intent.setData(Uri.parse("package:" + activity.getPackageName()));
+            activity.startActivity(intent);
+            return;
+        }
+        File file = new File(wj.data, "apk/");
+        if (!file.exists()) {
+            boolean mkdirs = file.mkdirs();
+            if (!mkdirs) {
+                gj.sc("创建文件夹失败");
+                return;
+            }
+        }
+        file = new File(file, newversion + ".apk");
+        gj.sc(file.getPath());
+        if (file.exists()) {
+            gj.sc("文件存在");
+            installApk(file);
+        } else {
+            gj.sc("从网络中下载:" + apk_url);
+            wl.xz(apk_url, file);
+        }
+    }
+
+    public void gx(String url, String newversion) {
+        this.apk_url = url;
+        this.newversion = newversion;
+        this.gx();
+    }
+
+
+
+    public void installApk(File apkFile) {
+        if (apkFile == null || !apkFile.exists()) return;
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        Uri apkUri;
+        apkUri = FileProvider.getUriForFile(
+                activity,
+                activity.getPackageName() + ".fileprovider",
+                apkFile
+        );
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+        activity.startActivity(intent);
+    }
+
 }

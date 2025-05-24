@@ -56,6 +56,7 @@ public class KcApi {
 
     /**
      * 获取当前周数
+     *
      * @return
      */
     public static int getWeek() {
@@ -74,7 +75,7 @@ public class KcApi {
                 String dateStr = matcher.group();
                 LocalDate date2 = LocalDate.parse(dateStr);
                 // 如果当前日期在找到的日期之前
-                if (currentDate.isBefore(date2) || currentDate.isEqual(date2)){
+                if (currentDate.isBefore(date2) || currentDate.isEqual(date2)) {
                     // 返回解析后的课程表对象
                     return i;
                 }
@@ -110,6 +111,25 @@ public class KcApi {
         return false;
     }
 
+    public static boolean Load(String Token, Integer[] week) throws Exception {
+        File file = new File(wj.data, "TabList");
+        LoginApi.Token = Token;
+        Gson gson = new Gson();
+        for (int i : week) {
+            String value = GetCurriculum(String.valueOf(i), "");
+            gj.sc(value);
+            if (value == null) {
+                return false;
+            }
+            Curriculum curriculum = gson.fromJson(value, Curriculum.class);
+            curriculum.data.get(0).week = i;
+            int length = curriculum.data.get(0).date.size();
+            String zc = curriculum.data.get(0).date.get(length - 1).mxrq;
+            wj.xrwb(new File(file, zc + ".txt"), gson.toJson(curriculum));
+        }
+        return true;
+    }
+
     /**
      * 获取当前周的课程表数据。
      * 遍历 TabList 中的字符串，找到第一个日期在当前日期之后的项，
@@ -135,7 +155,7 @@ public class KcApi {
                 String dateStr = matcher.group();
                 LocalDate date2 = LocalDate.parse(dateStr);
                 // 如果当前日期在找到的日期之前
-                if (currentDate.isBefore(date2) || currentDate.isEqual(date2)){
+                if (currentDate.isBefore(date2) || currentDate.isEqual(date2)) {
                     // 使用 dqwb 方法处理字符串，获取对应的课程表 JSON
                     String dqwb = wj.dqwb(s);
                     // 将 JSON 字符串反序列化为 Curriculum 对象
@@ -156,6 +176,7 @@ public class KcApi {
         // 如果遍历结束没有找到符合条件的数据，返回 null
         return null;
     }
+
     public static Curriculum GetCurriculumFile(String path) {
         int i = 1;
         for (String s :
