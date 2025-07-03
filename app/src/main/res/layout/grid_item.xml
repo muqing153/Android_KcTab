@@ -6,7 +6,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     app:cardUseCompatPadding="true">
-
     <LinearLayout
         android:id="@+id/line1"
         android:layout_width="80dp"
@@ -16,7 +15,6 @@
         android:gravity="center"
         android:orientation="vertical"
         tools:ignore="UselessParent">
-
         <TextView
             android:id="@+id/title"
             style="@style/TextAppearance.Material3.BodyLarge"
@@ -26,7 +24,6 @@
             android:gravity="center"
             android:maxLines="2"
             android:text="@string/app_name" />
-
         <TextView
             android:id="@+id/message"
             style="@style/TextAppearance.Material3.BodySmall"
@@ -37,7 +34,6 @@
             android:maxLines="2"
             android:text="@string/app_name" />
     </LinearLayout>
-
     <LinearLayout
         android:id="@+id/line2"
         android:layout_width="80dp"
@@ -45,11 +41,19 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:layout_margin="3dp">
-
         <TextView
             android:id="@+id/title_ri"
             style="@style/TextAppearance.Material3.BodyLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/list_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:text="- -"
+        android:visibility="gone"/>
 </com.google.android.material.card.MaterialCardView>

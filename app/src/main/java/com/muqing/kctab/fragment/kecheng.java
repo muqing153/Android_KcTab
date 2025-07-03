@@ -63,6 +63,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
 
 
     public Curriculum curriculum;
+
     @Override
     public void setUI(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         gj.sc("启动Fragment UI " + binding);
@@ -79,16 +80,21 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
 //            gj.sc("启动Fragment UI 初始化表内容");
             adapter = new GridAdapter(this.getContext(), GetKcLei(curriculum)) {
                 @Override
-                public void ShowLongDelete(Curriculum.Course course) {
+                public void ShowLongDelete(List<Curriculum.Course> course) {
                     gj.sc("成功删除了一个数据com：" + course);
                     curriculum.data.get(0).courses.remove(course);
                     wj.xrwb(FilePath, new Gson().toJson(curriculum));
                 }
 
                 @Override
-                public void ShowLongAdd(Curriculum.Course obj) {
-                    curriculum.data.get(0).courses = GetListKc(dataList);
-                    wj.xrwb(FilePath, new Gson().toJson(curriculum));
+                public boolean ShowLongAdd(List<Curriculum.Course> obj) {
+//                    curriculum.data.get(0).courses = GetListKc(dataList);
+                    for (Curriculum.Course course :
+                            obj) {
+//                        gj.sc("成功添加了一个数据com：" + course);
+                        curriculum.data.get(0).courses.add(course);
+                    }
+                    return wj.xrwb(FilePath, new Gson().toJson(curriculum));
                 }
             };
             adapter.zhou = curriculum.data.get(0).week;
@@ -105,69 +111,91 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
 //        binding.horizontal.setBackgroundColor(Color.GRAY);
     }
 
-    private List<Curriculum.Course> GetListKc(List<Curriculum.Course> dataList) {
+    private List<Curriculum.Course> GetListKc(List<List<Curriculum.Course>> dataList) {
         List<Curriculum.Course> filtered = new ArrayList<>();
         for (int i = 0; i < dataList.size(); i++) {
             if (i > 8 && i % 8 != 0) {
-                Curriculum.Course course = dataList.get(i);
-                if (course.classTime == null) {
-                    continue;
+                for (Curriculum.Course course : dataList.get(i)) {
+                    if (course.classTime == null) {
+                        continue;
+                    }
+                    filtered.add(course);
                 }
-                filtered.add(course);
             }
         }
         return filtered;
 
     }
 
-    private List<Curriculum.Course> GetKcLei(Curriculum curriculum) {
-        List<Curriculum.Course> list = new ArrayList<>();
+    private List<List<Curriculum.Course>> GetKcLei(Curriculum curriculum) {
+        List<List<Curriculum.Course>> list = new ArrayList<>();
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col < 8; col++) {
-                if (row == 0 && col == 0) {
-                    Curriculum.Course course = new Curriculum.Course();
-                    course.courseName = "节/日";
-                    list.add(course);
-                    continue;
-                }
-                Curriculum.Course course = new Curriculum.Course();
-                list.add(course);
+                list.add(new ArrayList<>());
             }
         }
+//初始化头部
         Curriculum.DataItem dataItem = curriculum.data.get(0);
+        {
+            List<Curriculum.Course> arrayList = new ArrayList<>();
+            Curriculum.Course course = new Curriculum.Course();
+            course.courseName = "节/日";
+            arrayList.add(course);
+            list.set(0, arrayList);
+        }
         for (int i = 0; i < dataItem.date.size(); i++) {
+            List<Curriculum.Course> arrayList = new ArrayList<>();
             Curriculum.DateInfo dateInfo = dataItem.date.get(i);
             Curriculum.Course course = new Curriculum.Course();
             course.courseName = String.format("%s(%s)", dateInfo.xqmc, dateInfo.rq);
-            list.set(i + 1, course);
+            arrayList.add(course);
+            list.set(i + 1, arrayList);
         }
+        // 创建节次数据
         for (int i = 0, j = 8; i < schedule.length; i++, j += 8) {
+            List<Curriculum.Course> arrayList = new ArrayList<>();
             Curriculum.Course kcLei = new Curriculum.Course();
             kcLei.courseName = schedule[i].session;
             kcLei.classroomName = schedule[i].time1 + "\n" + schedule[i].time2;
 //            kcLei.classroomName = schedule[i].time1.split("-")[0] + "\n" + schedule[i].time2.split("-")[1];
-            list.set(j, kcLei);
+            arrayList.add(kcLei);
+            list.set(j, arrayList);
         }
+
+//        48
         // 1. 遍历每个节次，创建行数据
-        String[] ric = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
-        int ric_i = 0;
-        for (int i = 0, j = 9; i < 5; i++) {
-            for (int k = 0; k < 7; k++, j++) {
-                int finalRic_i = ric_i;
-                int finalI = k + 1;
-                Curriculum.Course result = dataItem.courses.stream().filter(c -> c.classTime.endsWith(String.format("%s%s", ric[finalRic_i], ric[finalRic_i + 1])) && c.weekDay == finalI).findFirst().orElse(null);
-//                gj.sc(result);
-                if (result == null) {
-                    result = new Curriculum.Course();
-//                    result.startTime = schedule[i].time1.split("-")[0];
-//                    result.endTime = schedule[i].time2.split("-")[1];
-//                    result.weekDay = k + 1;
-                }
-                list.set(j, result);
-            }
-            j++;
-            ric_i += 2;
+        for (Curriculum.Course adapter : dataItem.courses) {
+            String classTime = adapter.classTime;
+            // 提取第一个数字字符
+            String part1 = classTime.substring(0, 1); // "1"
+            // 提取第二部分
+            String part2 = classTime.substring(1, 3); // "03"
+            // 提取第三部分
+            String part3 = classTime.substring(3, 5); // "04"
+            // 提取第四部分
+            String part4 = classTime.substring(1, 5);
+            // 转成整数
+            int num1 = Integer.parseInt(part1); // 1
+            int i = GetInt(part4);
+            int p = num1 + 8 * i;
+//            System.out.println(p);
+            List<Curriculum.Course> courses = list.get(p);
+            courses.add(adapter);
+            list.set(p, courses);
         }
         return list;
+    }
+
+    private static final String[] classTime = {
+            "0102", "0304", "0506", "0708", "0910"
+    };
+
+    static int GetInt(String str) {
+        for (int i = 0; i < classTime.length; i++) {
+            if (classTime[i].equals(str)) {
+                return i + 1;
+            }
+        }
+        return 0;
     }
 }

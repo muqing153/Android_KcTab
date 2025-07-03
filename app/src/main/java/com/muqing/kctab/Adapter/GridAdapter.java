@@ -9,9 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.appcompat.widget.PopupMenu;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.muqing.BaseAdapter;
 import com.muqing.Dialog.BottomSheetDialog;
 import com.muqing.gj;
@@ -22,11 +24,14 @@ import com.muqing.kctab.databinding.GridItemBinding;
 import com.muqing.kctab.databinding.KcinfoDialogBinding;
 import com.muqing.kctab.fragment.kecheng;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course> {
+public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Course>> {
+
 
     public final int ColorThis;
     //当前课的颜色高亮
@@ -35,7 +40,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
     public final int ColorNext;
     public int zhou = 0;
 
-    public GridAdapter(Context context, List<Curriculum.Course> dataList) {
+    public GridAdapter(Context context, List<List<Curriculum.Course>> dataList) {
         super(context, dataList);
         ColorThis = gj.getThemeColor(context, com.google.android.material.R.attr.colorSurfaceContainerLow);
         ColorWhen = gj.getThemeColor(context, com.google.android.material.R.attr.colorPrimary);
@@ -49,36 +54,58 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
     }
 
     @Override
-    protected void onBindView(Curriculum.Course data, GridItemBinding viewBinding, ViewHolder<GridItemBinding> viewHolder, int position) {
-        if (position < 8 || data.classroomName == null) {
-            viewBinding.titleRi.setText(data.courseName);
-            viewBinding.message.setVisibility(View.GONE);
+    protected void onBindView(List<Curriculum.Course> data, GridItemBinding viewBinding, ViewHolder<GridItemBinding> viewHolder, int position) {
+        Curriculum.Course course;
+        if (data.isEmpty()) {
+            course = null;
             viewBinding.line1.setVisibility(View.GONE);
             viewBinding.line2.setVisibility(View.VISIBLE);
         } else {
-            viewBinding.title.setText(data.courseName);
-            viewBinding.getRoot().setCardBackgroundColor(ColorThis);
-            viewBinding.message.setVisibility(View.VISIBLE);
-            viewBinding.message.setText(data.classroomName);
-            viewBinding.line1.setVisibility(View.VISIBLE);
-            viewBinding.line2.setVisibility(View.GONE);
+            course = data.get(0);
+        }
+
+        if (course != null) {
+            if (position < 8 || course.classroomName == null) {
+                viewBinding.titleRi.setText(course.courseName);
+                viewBinding.message.setVisibility(View.GONE);
+                viewBinding.line1.setVisibility(View.GONE);
+                viewBinding.line2.setVisibility(View.VISIBLE);
+            } else {
+                viewBinding.title.setText(course.courseName);
+                viewBinding.getRoot().setCardBackgroundColor(ColorThis);
+                viewBinding.message.setVisibility(View.VISIBLE);
+                viewBinding.message.setText(course.classroomName);
+                viewBinding.line1.setVisibility(View.VISIBLE);
+                viewBinding.line2.setVisibility(View.GONE);
+            }
+            if (data.size() > 1) {
+                StringBuffer stringBuffer = new StringBuffer();
+                for (int i = 0; i < data.size(); i++) {
+                    stringBuffer.append('-');
+                    if (i != data.size() - 1) {
+                        stringBuffer.append(' ');
+                    }
+                }
+                viewBinding.listSize.setText(stringBuffer);
+                viewBinding.listSize.setVisibility(View.VISIBLE);
+            }
         }
         viewBinding.getRoot().setOnClickListener(v -> {
-            if (data.courseName != null && data.classTime != null) {
+            if (course != null && course.courseName != null && course.classTime != null) {
                 ShowKc(data);
             }
         });
         viewBinding.getRoot().setOnLongClickListener(view -> ShowLong(data, view, position));
     }
 
-    public static Curriculum.Course kcleishuju;
+    public static List<Curriculum.Course> kcleishuju;
     public boolean isjt = false;//是否处于截图状态 截图状态不高亮
     public static int isjq = -1;//是否处于剪切状态 -1是无剪切 大于是记录上一个剪切的位置
     @SuppressLint("StaticFieldLeak")
     public static GridAdapter jqadapter;//获取剪切的课表Adapter用于更新
 
     @SuppressLint({"NonConstantResourceId"})
-    private boolean ShowLong(Curriculum.Course data, View view, int position) {
+    private boolean ShowLong(List<Curriculum.Course> data, View view, int position) {
         if (position < 8) {
             return true;
         }
@@ -90,53 +117,60 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
 
         PopupMenu popupMenu = new PopupMenu(context, view);
         popupMenu.getMenuInflater().inflate(R.menu.kc_menu, popupMenu.getMenu());
-        int size = 4;
         //保证是否以及复制数据 并且复制的数据不能可data相同位置
         if (kcleishuju == null || kcleishuju.equals(data)) {
             MenuItem menuItem = popupMenu.getMenu().findItem(R.id.menu_zt);
-            size--;
             menuItem.setVisible(false);
         }
-        if (data.classroomName == null) {
+        if (data.isEmpty() || data.get(0).classroomName == null) {
             popupMenu.getMenu().findItem(R.id.menu_fz).setVisible(false);
             popupMenu.getMenu().findItem(R.id.menu_jq).setVisible(false);
             popupMenu.getMenu().findItem(R.id.menu_sc).setVisible(false);
-            size -= 3;
         }
         popupMenu.setOnMenuItemClickListener(item -> {
             Gson gson = new Gson();
+            Type listType = new TypeToken<List<Curriculum.Course>>() {
+            }.getType();
             switch (item.getItemId()) {
                 case R.id.menu_fz:
-                    kcleishuju = gson.fromJson(gson.toJson(data), Curriculum.Course.class);
+                    kcleishuju = gson.fromJson(gson.toJson(data), listType);
                     jqadapter = null;
                     isjq = -1;
                     break;
                 case R.id.menu_jq:
                     isjq = position;
                     jqadapter = GridAdapter.this;
-                    kcleishuju = gson.fromJson(gson.toJson(data), Curriculum.Course.class);
+                    kcleishuju = gson.fromJson(gson.toJson(data), listType);
                     break;
                 case R.id.menu_sc:
-                    dataList.set(position, new Curriculum.Course());
+                    dataList.set(position, new ArrayList<>());
                     ShowLongDelete(data);
                     break;
                 case R.id.menu_zt:
                     dataList.set(position, kcleishuju);
-                    int spanCount = 8; // 每行的列数
-                    int row = position / spanCount;   // 第几行（从0开始）
-                    int column = position % spanCount; // 第几列（从0开始）
-                    dataList.get(position).startTime = kecheng.schedule[row - 1].time1.split("-")[0];
-                    dataList.get(position).endTime = kecheng.schedule[row - 1].time2.split("-")[1];
-                    if (row > 1) {
-                        row += position / spanCount - 1;
+                    for (Curriculum.Course course : dataList.get(position)) {
+                        int spanCount = 8; // 每行的列数
+                        int row = position / spanCount;   // 第几行（从0开始）
+                        int column = position % spanCount; // 第几列（从0开始）
+                        course.startTime = kecheng.schedule[row - 1].time1.split("-")[0];
+                        course.endTime = kecheng.schedule[row - 1].time2.split("-")[1];
+                        if (row > 1) {
+                            row += position / spanCount - 1;
+                        }
+                        course.classTime = String.format(Locale.CANADA, "%d%02d%02d", column, row, row + 1);
+                        course.weekDay = column;
+                        gj.sc(course);
                     }
-                    dataList.get(position).classTime = String.format(Locale.CANADA, "%2d%02d%02d", column, row, row + 1);
-                    dataList.get(position).weekDay = column;
-
-                    ShowLongAdd(dataList.get(position));
+                    boolean b = ShowLongAdd(dataList.get(position));
+                    if (b) {
+                        gj.ts(context, "添加成功");
+                    } else {
+                        gj.ts(context, "添加失败");
+                        dataList.set(position, new ArrayList<>());
+                    }
                     if (isjq != -1 && jqadapter != null) {
                         jqadapter.ShowLongDelete(jqadapter.dataList.get(isjq));
-                        jqadapter.dataList.set(isjq, new Curriculum.Course());
+                        jqadapter.dataList.set(isjq, new ArrayList<>());
                         jqadapter.notifyItemChanged(isjq);
                         jqadapter = null;
                         isjq = -1;
@@ -148,47 +182,41 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
             notifyItemChanged(position);
             return false;
         });
-        if (size != 0) {
+        if (!data.isEmpty()) {
             popupMenu.show();
-            return false;
+        } else if (kcleishuju != null) {
+            popupMenu.show();
         }
         return true;
     }
 
-    public void ShowLongDelete(Curriculum.Course course) {
+    /**
+     * 长按删除
+     */
+    public void ShowLongDelete(List<Curriculum.Course> course) {
     }
 
-    public void ShowLongAdd(Curriculum.Course course) {
+    /**
+     * 长按添加
+     */
+    public boolean ShowLongAdd(List<Curriculum.Course> course) {
+        return false;
     }
 
 
-    private void ShowKc(Curriculum.Course course) {
-/*        String format = String.format(Locale.getDefault(), "%s\n" +
-                "老师:%s\n" +
-                "班级:%s\n" +
-                "地点:%s\n" +
-                "时间:%s-%s", course.courseName, course.teacherName, course.ktmc, course.classroomName, course.startTime, course.endTime);*/
+    private void ShowKc(List<Curriculum.Course> course) {
+        if (course.isEmpty()) {
+            return;
+        }
         KcinfoDialogBinding binding = KcinfoDialogBinding.inflate(LayoutInflater.from(context));
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
-
         bottomSheetDialog.setContentView(binding.getRoot());
         ViewGroup.LayoutParams params = binding.getRoot().getLayoutParams();
         params.height = (int) (Resources.getSystem().getDisplayMetrics().heightPixels * 0.5);
         binding.getRoot().setLayoutParams(params);
-        binding.kc.setText(course.courseName);
-        binding.teacher.setText(course.teacherName);
-        //分割班级
-        String[] split = course.ktmc.split(",");
-        StringBuilder stringBuffer = new StringBuilder();
-        for (int i = 0; i < split.length; i++) {
-            stringBuffer.append(split[i]);
-            if (i != split.length - 1) {
-                stringBuffer.append("\n");
-            }
-        }
-        binding.classroom.setText(stringBuffer.toString());
-        binding.address.setText(course.getClassroomName());
-        binding.time.setText(String.format(Locale.getDefault(), "%s-%s", course.startTime, course.endTime));
+        binding.recyclerview.setAdapter(new KcInfoAdapter(context, course));
+        DividerItemDecoration decoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
+        binding.recyclerview.addItemDecoration(decoration);
         bottomSheetDialog.show();
     }
 
@@ -216,7 +244,10 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
         String time = MainActivity.Time; // 获取当前时间
 //        time = "08:00";
         for (int x = 1, y = weekDay + 8; x < 6; y += 8, x++) {
-            Curriculum.Course data = dataList.get(y);
+            if (dataList.get(y).isEmpty()) {
+                continue;
+            }
+            Curriculum.Course data = dataList.get(y).get(0);
             if (data.courseName != null) {
                 if (data.startTime != null && data.endTime != null) {
                     // 格式化成 HH:mm
@@ -238,8 +269,6 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
                         ItemBinding.getRoot().setCardBackgroundColor(ColorThis);
                         ItemBinding = null;
                     }
-
-
                     if (data.startTime.compareTo(time) > 0 && Objects.equals(data.weekDay, weekDay)) {
                         View viewByPosition = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(y);
                         if (viewByPosition != null) {
@@ -262,7 +291,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, Curriculum.Course>
         if (NextItemBinding == null && ItemBinding == null && weekDay + 1 != 8) {
             MainActivity.Week++;
             MainActivity.Time = "08:00";
-            Load(recyclerView);
+//            Load(recyclerView);
         }
     }
 }

@@ -11,9 +11,9 @@
         android:id="@+id/line1"
         android:layout_width="130dp"
         android:layout_height="85dp"
+        android:layout_margin="3dp"
         android:gravity="center"
         android:orientation="vertical"
-        android:layout_margin="3dp"
         tools:ignore="UselessParent">
 
         <TextView
@@ -21,10 +21,10 @@
             style="@style/TextAppearance.Material3.TitleMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="3dp"
             android:ellipsize="middle"
             android:gravity="center"
             android:maxLines="1"
-            android:layout_margin="3dp"
             android:text="@string/app_name" />
 
         <TextView
@@ -44,13 +44,21 @@
         android:layout_width="130dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:gravity="center"
-        android:layout_margin="3dp">
+        android:layout_margin="3dp"
+        android:gravity="center">
 
         <TextView
             android:id="@+id/title_ri"
             style="@style/TextAppearance.Material3.BodyLarge"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/list_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:text="- -"
+        android:visibility="gone" />
 </com.google.android.material.card.MaterialCardView>
