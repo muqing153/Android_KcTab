@@ -1,7 +1,21 @@
-### 简介
-适用于青幼大学生宝宝的课程表  
-支持多种方式登陆教务系统来获取课表并且保存到本地  
+# 课程表 App 📅
 
-#### 开源地址🔗
-[GieHub](https://github.com/muqing153/Android_KcTab)  
-[Gitee](https://gitee.com/muqing15379/Android_KcTab)
+**一柚表** 是一款专为 **青幼大学生宝宝** 设计的课程表应用，界面清爽、操作便捷，轻松管理你的上课安排。
+
+支持多种方式登录教务系统（如统一身份认证、账号密码登录等），自动同步并保存课程表至本地，实现离线查看，无网络也能随时掌握课表信息。
+
+## 功能亮点✨
+- 📌 **多方式登录教务系统**：兼容不同的认证机制
+- 🔄 **自动同步课表信息**：一键获取最新课表数据
+- 💾 **本地存储课表数据**：无需每次联网，节省流量
+- 🎨 **界面简洁清新**：专为学生优化的用户体验设计
+- 📅 **周次切换/节次显示**：灵活查看任意周的课程安排
+- 🔔 **上课提醒功能（可选）**：不再错过每一节课
+
+## 开源地址📎
+
+- GitHub:[https://github.com/muqing153/Android_KcTab](https://github.com/muqing153/Android_KcTab)
+- Gitee:[https://gitee.com/muqing15379/Android_KcTab](https://gitee.com/muqing15379/Android_KcTab)
+
+欢迎 ⭐Star 和 Fork，共同完善项目！
+

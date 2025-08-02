@@ -89,7 +89,7 @@ public class KcApi {
 
     public static boolean Load(String Token) {
         try {
-            File file = new File(wj.data, "TabList");
+//            File file = MainActivity.fileTabList;
             LoginApi.Token = Token;
             Gson gson = new Gson();
             for (int i = 1; i <= 20; i++) {
@@ -100,9 +100,7 @@ public class KcApi {
                 }
                 Curriculum curriculum = gson.fromJson(value, Curriculum.class);
                 curriculum.data.get(0).week = i;
-                int length = curriculum.data.get(0).date.size();
-                String zc = curriculum.data.get(0).date.get(length - 1).mxrq;
-                wj.xrwb(new File(file, zc + ".txt"), gson.toJson(curriculum));
+                putjsonkc(curriculum, gson);
             }
             return true;
         } catch (Exception e) {
@@ -111,8 +109,16 @@ public class KcApi {
         return false;
     }
 
+    public static void putjsonkc(Curriculum curriculum, Gson gson) {
+        int length = curriculum.data.get(0).date.size();
+        String zc = curriculum.data.get(0).date.get(length - 1).mxrq;
+        String semesterId = curriculum.data.get(0).topInfo.get(0).semesterId;
+        File file = new File(wj.data, "TabList/" + semesterId);
+        wj.xrwb(new File(file, zc + ".txt"), gson.toJson(curriculum));
+    }
+
     public static boolean Load(String Token, Integer[] week) throws Exception {
-        File file = new File(wj.data, "TabList");
+//        File file = MainActivity.fileTabList;
         LoginApi.Token = Token;
         Gson gson = new Gson();
         for (int i : week) {
@@ -123,9 +129,7 @@ public class KcApi {
             }
             Curriculum curriculum = gson.fromJson(value, Curriculum.class);
             curriculum.data.get(0).week = i;
-            int length = curriculum.data.get(0).date.size();
-            String zc = curriculum.data.get(0).date.get(length - 1).mxrq;
-            wj.xrwb(new File(file, zc + ".txt"), gson.toJson(curriculum));
+            putjsonkc(curriculum, gson);
         }
         return true;
     }

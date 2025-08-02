@@ -16,18 +16,13 @@ import com.muqing.AppCompatActivity;
 import com.muqing.gj;
 import com.muqing.wj;
 
-public class main extends Application {
-    private static Application application;
+import java.io.File;
+import java.time.LocalDate;
 
-    //校园网IP
-    public static String XYIP = "10.200.30.200";
-    public static Application getApplication() {
-        return application;
-    }
+public class main extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        application = this;
         gj.Debug = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         wj.data = wj.data(this);
 
@@ -37,6 +32,44 @@ public class main extends Application {
         //是否大于Android12+=
         if (sharedPreferences.getBoolean("dynamic", false) && DynamicColors.isDynamicColorAvailable()) {
             DynamicColors.applyToActivitiesIfAvailable(this);
+        }
+    }
+    public static String getSchoolYearTerm(LocalDate date) {
+        int year = date.getYear();
+        int month = date.getMonthValue();
+
+        String schoolYear;
+        String term;
+
+        if (month >= 2 && month < 8) {
+            // 2月-7月：属于上一学年的第二学期
+            schoolYear = (year - 1) + "-" + year;
+            term = "1"; // 上学年
+        } else {
+            // 8月-次年1月：属于当前学年的第一学期
+            if (month == 1) {
+                schoolYear = (year - 1) + "-" + year;
+            } else {
+                schoolYear = year + "-" + (year + 1);
+            }
+            term = "2"; // 下学年
+        }
+
+        return schoolYear + "-" + term;
+    }
+    public static int getXueNianPosition(String schoolYearTerm) {
+        if (schoolYearTerm == null || !schoolYearTerm.matches("\\d{4}-\\d{4}-[12]")) {
+            gj.sc("输入格式错误，应为：YYYY-YYYY-1 或 YYYY-YYYY-2");
+            return 0;
+        }
+
+        String[] parts = schoolYearTerm.split("-");
+        String term = parts[2];
+
+        if ("1".equals(term)) {
+            return 1;
+        } else {
+            return 2;
         }
     }
 

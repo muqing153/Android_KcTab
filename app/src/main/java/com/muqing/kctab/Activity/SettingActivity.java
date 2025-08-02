@@ -11,17 +11,16 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.graphics.Insets;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.color.DynamicColors;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.muqing.AppCompatActivity;
 import com.muqing.gj;
 import com.muqing.kctab.Adapter.ThemeAdapter;
@@ -32,12 +31,10 @@ import com.muqing.kctab.main;
 import com.muqing.wj;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Stack;
-import java.util.zip.ZipEntry;
+import java.util.Arrays;
 import java.util.zip.ZipOutputStream;
 
 public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
@@ -102,6 +99,36 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
             intent.putExtra(Intent.EXTRA_TITLE, "TabList.kczip");
             createZipLauncher.launch(intent);
         });
+        {
+            File file = new File(wj.data, "TabList");
+            String[] list = file.list();
+            if (list != null) {
+                Arrays.sort(list);
+                SharedPreferences kebiao = getSharedPreferences("kebiao", MODE_PRIVATE);
+                binding.kbXuenian.setMessage(kebiao.getString("xuenian", "null"));
+                binding.kbXuenian.setOnClickListener(view -> new MaterialAlertDialogBuilder(SettingActivity.this)
+                        .setTitle("选择学年")
+                        .setItems(list, (dialogInterface, i) -> {
+                            SharedPreferences kebiao1 = getSharedPreferences("kebiao", MODE_PRIVATE);
+                            kebiao1.edit().putString("xuenian", list[i]).apply();
+                            binding.kbXuenian.setMessage(list[i]);
+                        })
+                        .show());
+            }
+        }
+        binding.kbDelete.setOnClickListener(view -> {
+            new MaterialAlertDialogBuilder(SettingActivity.this)
+                    .setTitle("格式化")
+                    .setMessage("此操作将删除所有课表数据，是否继续？")
+                    .setPositiveButton("确定", (dialogInterface, i) -> {
+                        wj.sc(new File(wj.data, "TabList"));
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                        System.exit(0);
+                    })
+                    .setNegativeButton("取消", null)
+                    .show();
+
+        });
 
 
         try {
@@ -133,9 +160,7 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
 
         SharedPreferences SpSetting = getSharedPreferences("setting", MODE_PRIVATE);
         binding.qtJcgxSwitch.setChecked(SpSetting.getBoolean("jcgx", true));
-        binding.qtJcgxSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
-            SpSetting.edit().putBoolean("jcgx", b).apply();
-        });
+        binding.qtJcgxSwitch.setOnCheckedChangeListener((compoundButton, b) -> SpSetting.edit().putBoolean("jcgx", b).apply());
     }
 
     private final ActivityResultLauncher<Intent> createZipLauncher = registerForActivityResult(

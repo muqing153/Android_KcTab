@@ -21,6 +21,8 @@ import com.muqing.Dialog.BottomSheetDialog;
 import com.muqing.Dialog.DialogEditText;
 import com.muqing.gj;
 import com.muqing.kctab.Adapter.ZhouBoxAdapter;
+import com.muqing.kctab.Curriculum;
+import com.muqing.kctab.KcApi;
 import com.muqing.kctab.LoginApi;
 import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
@@ -181,17 +183,28 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         });
     }
 
+    /**
+     * kczip导入
+     */
     ActivityResultLauncher<String[]> fhkczip = registerForActivityResult(new ActivityResultContracts.OpenDocument(),
             uri -> {
                 if (uri != null) {
                     try {
                         InputStream inputStream = getContentResolver().openInputStream(uri);
                         gj.sc("成功获取文件流"); // 你的回调方法
-                        File outputDir = new File(wj.data, "TabList");
-                        wj.sc(outputDir);
+                        File outputDir = new File(wj.data, "kchuancun");
                         if (!outputDir.exists()) outputDir.mkdirs();
                         boolean b = YourKczipOpenActivity.unzipFromUri(LoginActivity.this, inputStream, outputDir);
                         if (b) {
+                            File[] files = outputDir.listFiles();
+                            if (files != null && files.length > 0) {
+                                Gson gson = new Gson();
+                                for (File file : files){
+                                    Curriculum curriculum = gson.fromJson(wj.dqwb(file), Curriculum.class);
+                                    KcApi.putjsonkc(curriculum,gson);
+                                }
+                            }
+                            wj.sc(outputDir);
                             binding.syncButton.setText("kczip");
                             EndToken(null);
                         }

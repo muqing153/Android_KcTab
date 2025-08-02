@@ -4,7 +4,9 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +18,7 @@ import com.muqing.gj;
 import com.muqing.kctab.Adapter.GridAdapter;
 import com.muqing.kctab.Curriculum;
 import com.muqing.kctab.MainActivity;
+import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.FragmentKebiaoBinding;
 import com.muqing.wj;
 
@@ -64,9 +67,15 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
 
     public Curriculum curriculum;
 
+    public void toolbar_time() {
+        if (!isAdded()) return;
+        gj.sc("启动Fragment UI 读取时间");
+        TextView viewById = requireActivity().findViewById(R.id.toolbar_time);
+        viewById.setText(curriculum.data.get(0).date.get(0).mxrq);
+    }
+
     @Override
     public void setUI(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        gj.sc("启动Fragment UI " + binding);
         GridLayoutManager layoutManager = new GridLayoutManager(this.getContext(), 8); // 列
         binding.recyclerview.setLayoutManager(layoutManager);
         if (FilePath != null) {

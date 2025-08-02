@@ -114,7 +114,6 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
                 return true;
             }
         }
-
         PopupMenu popupMenu = new PopupMenu(context, view);
         popupMenu.getMenuInflater().inflate(R.menu.kc_menu, popupMenu.getMenu());
         //保证是否以及复制数据 并且复制的数据不能可data相同位置
@@ -159,7 +158,6 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
                         }
                         course.classTime = String.format(Locale.CANADA, "%d%02d%02d", column, row, row + 1);
                         course.weekDay = column;
-                        gj.sc(course);
                     }
                     boolean b = ShowLongAdd(dataList.get(position));
                     if (b) {
@@ -187,7 +185,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         } else if (kcleishuju != null) {
             popupMenu.show();
         }
-        return true;
+        return false;
     }
 
     /**

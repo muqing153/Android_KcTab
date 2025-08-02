@@ -1,12 +1,14 @@
 package com.muqing.kctab;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +41,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
@@ -66,18 +69,30 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         LoginStart.launch(intent);
     }
 
-    final File fileTabList = new File(wj.data, "TabList");
+    public static File fileTabList = new File(wj.data, "TabList");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!fileTabList.isDirectory()) {
-            Login();
-            return;
+        SharedPreferences kebiao = getSharedPreferences("kebiao", MODE_PRIVATE);
+        fileTabList = new File(wj.data, "TabList");
+        String xuenian = kebiao.getString("xuenian", null);
+        if (xuenian == null) {
+            String schoolYearTerm = main.getSchoolYearTerm(LocalDate.now());
+            kebiao.edit().putString("xuenian", schoolYearTerm).apply();
+            fileTabList = new File(fileTabList, schoolYearTerm);
+        } else {
+            fileTabList = new File(fileTabList, xuenian);
+        }
+        {
+            if (!fileTabList.isDirectory() || Objects.requireNonNull(fileTabList.list()).length == 0) {
+                //noinspection ResultOfMethodCallIgnored
+                fileTabList.mkdirs();
+                Login();
+                return;
+            }
         }
         new GXThread(this);
-//        gxThread.gx("https://gitee.com/muqing15379/Android_KcTab/releases/download/1.3.6/app-release.apk"
-//                , "1.3.6");
         LoadUI();
     }
 
@@ -171,20 +186,31 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 binding.menuZhou.setText(String.format("第%s周", position + 1));
+
+                Handler handler = new Handler();
+                handler.postDelayed(() -> {
+                    kecheng fragment = pageAdapter.data.get(position);
+                    if (fragment != null && fragment.isAdded() && fragment.isVisible()) {
+                        fragment.toolbar_time();
+                    }
+                },500);
             }
         });
-        timer.schedule(task, 0, 1000); // 立即开始，每隔1秒执行
-        //获取yyyy-MM-dd
-        binding.time.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         binding.menuZhou.setOnClickListener(view -> {
             zhouDialog zhouDialog = new zhouDialog(MainActivity.this) {
                 @Override
                 public void click(int position) {
                     MainActivity.this.binding.viewpage.setCurrentItem(position, false);
+
+                    kecheng fragment = pageAdapter.data.get(position);
+                    if (fragment != null && fragment.isAdded() && fragment.isVisible()) {
+                        fragment.toolbar_time();
+                    }
                 }
             };
             zhouDialog.zhouAdapter.week = MainActivity.this.binding.viewpage.getCurrentItem() + 1;
         });
+        timer.schedule(task, 0, 1000); // 立即开始，每隔1秒执行
     }
 
 
