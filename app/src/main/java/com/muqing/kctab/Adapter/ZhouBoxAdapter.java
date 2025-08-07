@@ -38,13 +38,13 @@ public class ZhouBoxAdapter extends BaseAdapter<ItemZhouBoxBinding, String> {
         dialogZhouBoxBinding.all.setOnClickListener(view -> {
             zhou.clear();
             for (int i = 0; i < dataList.size(); i++) {
-                zhou.add(i + 1);
+                zhou.add(i+1);
             }
             notifyDataSetChanged();
         });
         dialogZhouBoxBinding.benzhou.setOnClickListener(view -> {
             zhou.clear();
-            zhou.add(MainActivity.benzhou - 1);
+            zhou.add(MainActivity.benzhou);
             notifyDataSetChanged();
         });
     }
@@ -58,7 +58,7 @@ public class ZhouBoxAdapter extends BaseAdapter<ItemZhouBoxBinding, String> {
     @Override
     protected void onBindView(String data, ItemZhouBoxBinding viewBinding, ViewHolder<ItemZhouBoxBinding> viewHolder, int position) {
         viewBinding.title.setText(data);
-        viewBinding.title.setChecked(zhou.contains(position));
+        viewBinding.title.setChecked(zhou.contains(position + 1));
 
         viewBinding.title.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {

@@ -155,7 +155,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             float density = getResources().getDisplayMetrics().density;
             int itemWidthPx = (int) (itemWidthDp * density + 0.5f);
             zhouList.clear();
-            zhouList.add(MainActivity.benzhou - 1);
+            zhouList.add(MainActivity.benzhou);
             zhouDialogBinding.getRoot().post(() -> {
                 int width = zhouDialogBinding.getRoot().getWidth();
                 int spanCount = Math.max(5, width / itemWidthPx);

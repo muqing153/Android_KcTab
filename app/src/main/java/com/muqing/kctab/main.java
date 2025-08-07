@@ -41,22 +41,56 @@ public class main extends Application {
         String schoolYear;
         String term;
 
-        if (month >= 2 && month < 8) {
-            // 2月-7月：属于上一学年的第二学期
+        if (month >= 8) {
+            // 8月 ~ 12月：新学年上学期
+            schoolYear = year + "-" + (year + 1);
+            term = "1";
+        } else if (month == 1) {
+            // 1月：依然是上学期，但属于上一年的学年
             schoolYear = (year - 1) + "-" + year;
-            term = "1"; // 上学年
+            term = "1";
         } else {
-            // 8月-次年1月：属于当前学年的第一学期
-            if (month == 1) {
-                schoolYear = (year - 1) + "-" + year;
-            } else {
-                schoolYear = year + "-" + (year + 1);
-            }
-            term = "2"; // 下学年
+            // 2月 ~ 7月：是下学期，属于上一个学年
+            schoolYear = (year - 1) + "-" + year;
+            term = "2";
         }
 
         return schoolYear + "-" + term;
     }
+
+    /**
+     * 比较不存在的学年
+     * @param currentTerm
+     * @param savedTerm
+     * @return
+     */
+    public static boolean isFutureSchoolYearTerm(String currentTerm, String savedTerm) {
+        if (savedTerm == null || currentTerm == null) return false;
+
+        String[] curParts = currentTerm.split("-");
+        String[] savParts = savedTerm.split("-");
+
+        if (curParts.length != 3 || savParts.length != 3) return false;
+
+        int curStart = Integer.parseInt(curParts[0]);
+        int curEnd = Integer.parseInt(curParts[1]);
+        int curTerm = Integer.parseInt(curParts[2]);
+
+        int savStart = Integer.parseInt(savParts[0]);
+        int savEnd = Integer.parseInt(savParts[1]);
+        int savTerm = Integer.parseInt(savParts[2]);
+
+        // 比较起始年
+        if (savStart > curStart) {
+            return true;
+        } else if (savStart == curStart) {
+            // 同一个学年，比较学期（1是上学期，2是下学期）
+            return savTerm > curTerm;
+        } else {
+            return false;
+        }
+    }
+
     public static int getXueNianPosition(String schoolYearTerm) {
         if (schoolYearTerm == null || !schoolYearTerm.matches("\\d{4}-\\d{4}-[12]")) {
             gj.sc("输入格式错误，应为：YYYY-YYYY-1 或 YYYY-YYYY-2");

@@ -74,7 +74,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
                 viewBinding.title.setText(course.courseName);
                 viewBinding.getRoot().setCardBackgroundColor(ColorThis);
                 viewBinding.message.setVisibility(View.VISIBLE);
-                viewBinding.message.setText(course.classroomName);
+                viewBinding.message.setText(course.getClassroomName());
                 viewBinding.line1.setVisibility(View.VISIBLE);
                 viewBinding.line2.setVisibility(View.GONE);
             }

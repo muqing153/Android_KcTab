@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,13 +25,18 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.muqing.AppCompatActivity;
+import com.muqing.BaseAdapter;
 import com.muqing.gj;
+import com.muqing.kctab.Adapter.GridAdapter;
 import com.muqing.kctab.databinding.ActivityJietuBinding;
+import com.muqing.kctab.databinding.GridItemBinding;
 import com.muqing.wj;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
@@ -88,6 +96,7 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
         }
         return super.onOptionsItemSelected(item);
     }
+
     public void shareBitmap(Bitmap bitmap) {
         try {
             // 1. 创建临时文件
@@ -132,4 +141,86 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
     protected ActivityJietuBinding getViewBindingObject(LayoutInflater layoutInflater) {
         return ActivityJietuBinding.inflate(layoutInflater);
     }
+
+    public static Bitmap recyclerViewToBitmapGrid(int backcolor,RecyclerView recyclerView) {
+        GridAdapter adapter = (GridAdapter) recyclerView.getAdapter();
+        if (adapter == null) return null;
+
+        int itemCount = adapter.getItemCount();
+        int columnCount = 8; // 多少列
+        int rowCount = (int) Math.ceil(itemCount / (float) columnCount);
+
+        List<Bitmap> itemBitmaps = new ArrayList<>();
+        List<Integer> rowHeights = new ArrayList<>();
+
+        int totalHeight = 0;
+        int itemWidth = recyclerView.getWidth() / columnCount;
+
+        // 收集每个 item 的 Bitmap
+        for (int i = 0; i < itemCount; i++) {
+
+            List<Curriculum.Course> item = adapter.dataList.get(i); // 👈 获取数据项
+            if (item.isEmpty() || item.get(0).courseName == null) {
+                Bitmap emptyBitmap = Bitmap.createBitmap(itemWidth, 1, Bitmap.Config.ARGB_8888); // 高度先设为1，稍后按行最大高度填充
+                itemBitmaps.add(emptyBitmap);
+                continue;
+            }
+            BaseAdapter.ViewHolder<GridItemBinding> holder = adapter.createViewHolder(recyclerView, adapter.getItemViewType(i));
+            adapter.onBindViewHolder(holder, i);
+
+            holder.itemView.measure(
+                    View.MeasureSpec.makeMeasureSpec(itemWidth, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            );
+            holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
+
+            Bitmap itemBitmap = Bitmap.createBitmap(
+                    holder.itemView.getMeasuredWidth(),
+                    holder.itemView.getMeasuredHeight(),
+                    Bitmap.Config.ARGB_8888
+            );
+            Canvas canvas = new Canvas(itemBitmap);
+            holder.itemView.draw(canvas);
+
+            itemBitmaps.add(itemBitmap);
+        }
+
+        // 计算每一行的最大高度（网格中，每一行高度由本行中 item 的最大高度决定）
+        for (int row = 0; row < rowCount; row++) {
+            int maxHeight = 0;
+            for (int col = 0; col < columnCount; col++) {
+                int index = row * columnCount + col;
+                if (index >= itemCount) break;
+                Bitmap bmp = itemBitmaps.get(index);
+                maxHeight = Math.max(maxHeight, bmp.getHeight());
+            }
+            rowHeights.add(maxHeight);
+            totalHeight += maxHeight;
+        }
+
+        // 合成整张 Bitmap
+        Bitmap fullBitmap = Bitmap.createBitmap(recyclerView.getWidth(), totalHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(fullBitmap);
+        canvas.drawColor(backcolor);
+        Paint paint = new Paint();
+
+        int y = 0;
+        for (int row = 0; row < rowCount; row++) {
+            int rowHeight = rowHeights.get(row);
+            for (int col = 0; col < columnCount; col++) {
+                int index = row * columnCount + col;
+                if (index >= itemBitmaps.size()) break;
+
+                Bitmap bmp = itemBitmaps.get(index);
+                int x = col * itemWidth;
+                canvas.drawBitmap(bmp, x, y, paint);
+                bmp.recycle(); // 可选：回收内存
+            }
+            y += rowHeight;
+        }
+
+        return fullBitmap;
+    }
+
+
 }

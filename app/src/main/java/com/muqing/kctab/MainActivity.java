@@ -76,9 +76,9 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         super.onCreate(savedInstanceState);
         SharedPreferences kebiao = getSharedPreferences("kebiao", MODE_PRIVATE);
         fileTabList = new File(wj.data, "TabList");
+        String schoolYearTerm = main.getSchoolYearTerm(LocalDate.now());
         String xuenian = kebiao.getString("xuenian", null);
-        if (xuenian == null) {
-            String schoolYearTerm = main.getSchoolYearTerm(LocalDate.now());
+        if (xuenian == null || fileTabList.isDirectory()) {
             kebiao.edit().putString("xuenian", schoolYearTerm).apply();
             fileTabList = new File(fileTabList, schoolYearTerm);
         } else {
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
                     if (fragment != null && fragment.isAdded() && fragment.isVisible()) {
                         fragment.toolbar_time();
                     }
-                },500);
+                }, 500);
             }
         });
         binding.menuZhou.setOnClickListener(view -> {
@@ -240,17 +240,10 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             Fragment fragment = getSupportFragmentManager().findFragmentByTag("f" + currentItem);
             if (fragment instanceof kecheng) {
                 kecheng k = (kecheng) fragment;
-                k.adapter.isjt = true;
                 RecyclerView recyclerView = k.binding.recyclerview;
-                try {
-                    k.adapter.Load(k.binding.recyclerview);
-                } catch (Exception e) {
-                    gj.sc(e);
-                }
-                Bitmap bitmap = getFullRecyclerViewBitmap(recyclerView, null);
-//                Bitmap bitmap = gj.getRecyclerViewScreenshot(recyclerView);
-                jietuActivity.start(MainActivity.this, bitmap);
-                k.adapter.isjt = false;
+                TypedArray array = getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorBackground, android.R.attr.textColorPrimary,});
+                int backgroundColor = array.getColor(0, 0xFFF5F5F5);
+                jietuActivity.start(MainActivity.this, jietuActivity.recyclerViewToBitmapGrid(backgroundColor, recyclerView));
             }
         } else if (id == R.id.settings) {
             startActivity(new Intent(this, SettingActivity.class));
@@ -334,55 +327,5 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         }
 
         public abstract void error();
-    }
-
-    public Bitmap getFullRecyclerViewBitmap(View view, Bitmap background) {
-        // 先测量整个内容大小（未指定尺寸）
-        int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-        int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-        view.measure(widthSpec, heightSpec);
-
-        // 再布局（layout）View
-        int width = view.getMeasuredWidth();
-        int height = view.getMeasuredHeight();
-        view.layout(0, 0, width, height);
-
-        // 然后创建Bitmap并绘制
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        view.draw(canvas);
-
-        TypedArray array = getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorBackground, android.R.attr.textColorPrimary,});
-        int backgroundColor = array.getColor(0, 0xFFF5F5F5);
-        canvas.drawColor(backgroundColor);
-        view.draw(canvas);
-        // **绘制背景图片**
-        if (background != null) {
-            int bgWidth = background.getWidth();
-            int bgHeight = background.getHeight();
-
-            // 计算比例，确保背景图充满整个 View
-            float scaleX = (float) widthSpec / bgWidth;
-            float scaleY = (float) heightSpec / bgHeight;
-            float scale = Math.max(scaleX, scaleY);
-
-            // 计算裁剪区域
-            int cropWidth = (int) (widthSpec / scale);
-            int cropHeight = (int) (heightSpec / scale);
-
-            int cropX = (bgWidth - cropWidth) / 2;
-            int cropY = (bgHeight - cropHeight) / 2;
-
-            Rect src = new Rect(cropX, cropY, cropX + cropWidth, cropY + cropHeight);
-            Rect dst = new Rect(0, 0, widthSpec, heightSpec);
-
-            Paint path = new Paint();
-            path.setAlpha(30);
-
-            // 绘制背景图
-            canvas.drawBitmap(background, src, dst, path);
-        }
-        array.recycle();
-        return bitmap;
     }
 }

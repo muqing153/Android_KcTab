@@ -112,6 +112,8 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
                             SharedPreferences kebiao1 = getSharedPreferences("kebiao", MODE_PRIVATE);
                             kebiao1.edit().putString("xuenian", list[i]).apply();
                             binding.kbXuenian.setMessage(list[i]);
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                            System.exit(0);
                         })
                         .show());
             }
