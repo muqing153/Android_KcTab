@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         fileTabList = new File(wj.data, "TabList");
         String schoolYearTerm = main.getSchoolYearTerm(LocalDate.now());
         String xuenian = kebiao.getString("xuenian", null);
-        if (xuenian == null || fileTabList.isDirectory()) {
+        if (xuenian == null) {
             kebiao.edit().putString("xuenian", schoolYearTerm).apply();
             fileTabList = new File(fileTabList, schoolYearTerm);
         } else {
@@ -114,11 +114,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             if (date1 == null || date2 == null) return 0;
             return date1.compareTo(date2);
         });
-        int i = 1;
-        for (String s : TabList) {
-            pageAdapter.addPage(kecheng.newInstance(s, i));
-            i++;
-        }
         UI();
 
     }
@@ -175,6 +170,11 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         if (binding == null) {
             setContentView();
             setSupportActionBar(binding.toolbar);
+        }
+        int i = 1;
+        for (String s : TabList) {
+            pageAdapter.addPage(kecheng.newInstance(s, i));
+            i++;
         }
         binding.viewpage.setAdapter(pageAdapter);
         int week = KcApi.getWeek();

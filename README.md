@@ -22,6 +22,9 @@
 项目源码托管在GitHub/Gitee上，欢迎访问我们的项目页面进行查看和贡献代码。
 ## 后续的改进
 我们计划增加更多的个性化设置选项，以及优化用户体验。
+
+## Windows(开发中)
+请前往[GieHub](https://github.com/muqing153/Windows_KcTab)
 ## 贡献者✨
 <a href="https://github.com/muqing153/Android_KcTab/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=muqing153/Android_KcTab"  alt="贡献者"/>

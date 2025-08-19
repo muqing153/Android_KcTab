@@ -1,5 +1,7 @@
 package com.muqing.kctab.Activity;
 
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -39,6 +41,7 @@ import java.util.zip.ZipOutputStream;
 
 public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
 
+    @SuppressLint("ApplySharedPref")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,25 +115,21 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
                             SharedPreferences kebiao1 = getSharedPreferences("kebiao", MODE_PRIVATE);
                             kebiao1.edit().putString("xuenian", list[i]).apply();
                             binding.kbXuenian.setMessage(list[i]);
-                            android.os.Process.killProcess(android.os.Process.myPid());
-                            System.exit(0);
+                            Toast.makeText(SettingActivity.this, "需要重启生效", Toast.LENGTH_SHORT).show();
                         })
                         .show());
             }
         }
-        binding.kbDelete.setOnClickListener(view -> {
-            new MaterialAlertDialogBuilder(SettingActivity.this)
-                    .setTitle("格式化")
-                    .setMessage("此操作将删除所有课表数据，是否继续？")
-                    .setPositiveButton("确定", (dialogInterface, i) -> {
-                        wj.sc(new File(wj.data, "TabList"));
-                        android.os.Process.killProcess(android.os.Process.myPid());
-                        System.exit(0);
-                    })
-                    .setNegativeButton("取消", null)
-                    .show();
-
-        });
+        binding.kbDelete.setOnClickListener(view -> new MaterialAlertDialogBuilder(SettingActivity.this)
+                .setTitle("格式化")
+                .setMessage("此操作将删除所有课表数据，是否继续？")
+                .setPositiveButton("确定", (dialogInterface, i) -> {
+                    wj.sc(new File(wj.data, "TabList"));
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    System.exit(0);
+                })
+                .setNegativeButton("取消", null)
+                .show());
 
 
         try {

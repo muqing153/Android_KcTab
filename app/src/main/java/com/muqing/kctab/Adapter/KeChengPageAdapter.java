@@ -19,15 +19,6 @@ public class KeChengPageAdapter extends androidx.viewpager2.adapter.FragmentStat
     public void addPage(kecheng kecheng) {
         data.add(kecheng);
     }
-    public void removePage(int position) {
-        if (position >= 0 && position < data.size()) {
-            data.remove(position);
-            notifyItemRemoved(position);
-        }
-    }
-    public void removePage(kecheng kecheng) {
-        data.remove(kecheng);
-    }
     @NonNull
     @Override
     public Fragment createFragment(int position) {
