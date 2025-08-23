@@ -58,55 +58,6 @@ public class main extends Application {
         return schoolYear + "-" + term;
     }
 
-    /**
-     * 比较不存在的学年
-     * @param currentTerm
-     * @param savedTerm
-     * @return
-     */
-    public static boolean isFutureSchoolYearTerm(String currentTerm, String savedTerm) {
-        if (savedTerm == null || currentTerm == null) return false;
-
-        String[] curParts = currentTerm.split("-");
-        String[] savParts = savedTerm.split("-");
-
-        if (curParts.length != 3 || savParts.length != 3) return false;
-
-        int curStart = Integer.parseInt(curParts[0]);
-        int curEnd = Integer.parseInt(curParts[1]);
-        int curTerm = Integer.parseInt(curParts[2]);
-
-        int savStart = Integer.parseInt(savParts[0]);
-        int savEnd = Integer.parseInt(savParts[1]);
-        int savTerm = Integer.parseInt(savParts[2]);
-
-        // 比较起始年
-        if (savStart > curStart) {
-            return true;
-        } else if (savStart == curStart) {
-            // 同一个学年，比较学期（1是上学期，2是下学期）
-            return savTerm > curTerm;
-        } else {
-            return false;
-        }
-    }
-
-    public static int getXueNianPosition(String schoolYearTerm) {
-        if (schoolYearTerm == null || !schoolYearTerm.matches("\\d{4}-\\d{4}-[12]")) {
-            gj.sc("输入格式错误，应为：YYYY-YYYY-1 或 YYYY-YYYY-2");
-            return 0;
-        }
-
-        String[] parts = schoolYearTerm.split("-");
-        String term = parts[2];
-
-        if ("1".equals(term)) {
-            return 1;
-        } else {
-            return 2;
-        }
-    }
-
     public static void setThemeMode(int position) {
         switch (position) {
             case 0:

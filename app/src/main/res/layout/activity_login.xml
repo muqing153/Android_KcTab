@@ -37,22 +37,6 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="16dp"
                 app:cardUseCompatPadding="true">
-
-                <!--                <com.google.android.material.tabs.TabLayout-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="wrap_content">-->
-
-                <!--                    <com.google.android.material.tabs.TabItem-->
-                <!--                        android:layout_width="wrap_content"-->
-                <!--                        android:layout_height="wrap_content"-->
-                <!--                        android:text="本地" />-->
-
-                <!--                    <com.google.android.material.tabs.TabItem-->
-                <!--                        android:layout_width="wrap_content"-->
-                <!--                        android:layout_height="wrap_content"-->
-                <!--                        android:saveEnabled="false"-->
-                <!--                        android:text="流量" />-->
-                <!--                </com.google.android.material.tabs.TabLayout>-->
                 <TextView
                     android:id="@+id/syncButton"
                     style="@style/Widget.Material3.Button.TextButton"
@@ -218,6 +202,7 @@
         android:layout_gravity="center_horizontal|bottom"
         android:layout_margin="3dp"
         android:gravity="center_horizontal"
-        android:text="获取到的Token不会保存到本地或者网络\n那玩意甚至没用一会就过期了"
-        android:textColor="?android:attr/textColorSecondaryInverse" />
+        android:text="使用登陆功能请同意《用户协议》与《隐私政策》"
+        android:textColor="?android:attr/textColorSecondaryInverse"
+        tools:ignore="HardcodedText" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
