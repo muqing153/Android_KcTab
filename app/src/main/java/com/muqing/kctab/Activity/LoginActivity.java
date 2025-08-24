@@ -168,7 +168,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         if (intent.getStringExtra("sync") != null) {
             binding.syncButton.setEnabled(true);
             zhouList.clear();
-            zhouList.add(MainActivity.benzhou - 1);
+            zhouList.add(MainActivity.benzhou);
             binding.syncButton.setText(intent.getStringExtra("sync"));
         }
 

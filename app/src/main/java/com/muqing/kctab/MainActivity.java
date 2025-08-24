@@ -315,7 +315,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
                 try {
                     load = KcApi.Load(token, array);
                 } catch (Exception e) {
-                    gj.sc(e);
+                    gj.sc("load = KcApi.Load(token, array); " + e);
                 }
             }
             if (load) {

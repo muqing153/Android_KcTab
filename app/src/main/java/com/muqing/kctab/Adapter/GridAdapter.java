@@ -18,6 +18,7 @@ import com.muqing.BaseAdapter;
 import com.muqing.Dialog.BottomSheetDialog;
 import com.muqing.gj;
 import com.muqing.kctab.Curriculum;
+import com.muqing.kctab.Dialog.KcinfoDialog;
 import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.GridItemBinding;
@@ -206,16 +207,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         if (course.isEmpty()) {
             return;
         }
-        KcinfoDialogBinding binding = KcinfoDialogBinding.inflate(LayoutInflater.from(context));
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
-        bottomSheetDialog.setContentView(binding.getRoot());
-        ViewGroup.LayoutParams params = binding.getRoot().getLayoutParams();
-        params.height = (int) (Resources.getSystem().getDisplayMetrics().heightPixels * 0.5);
-        binding.getRoot().setLayoutParams(params);
-        binding.recyclerview.setAdapter(new KcInfoAdapter(context, course));
-        DividerItemDecoration decoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
-        binding.recyclerview.addItemDecoration(decoration);
-        bottomSheetDialog.show();
+        new KcinfoDialog(context, course);
     }
 
     GridItemBinding ItemBinding, NextItemBinding;

@@ -22,6 +22,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class KcApi {
+    public static String api="http://jw.qdpec.edu.cn:8088";
     @Nullable
     public static String GetCurriculum(String week, String kbjcmsid) throws Exception {
         if (kbjcmsid == null) {
@@ -32,7 +33,7 @@ public class KcApi {
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url("http://jw.qdpec.edu.cn:8088/njwhd/student/curriculum?week=" + week + "&kbjcmsid=" + kbjcmsid)
+                .url(api + "/njwhd/student/curriculum?week=" + week + "&kbjcmsid=" + kbjcmsid)
                 .method("POST", body)
                 .addHeader("Pragma", "no-cache")
                 .addHeader("token", Token)
@@ -94,7 +95,7 @@ public class KcApi {
             Gson gson = new Gson();
             for (int i = 1; i <= 20; i++) {
                 String value = GetCurriculum(String.valueOf(i), "");
-                gj.sc(value);
+//                gj.sc(""+value);
                 if (value == null) {
                     return false;
                 }
@@ -114,6 +115,7 @@ public class KcApi {
         String zc = curriculum.data.get(0).date.get(length - 1).mxrq;
         String semesterId = curriculum.data.get(0).topInfo.get(0).semesterId;
         File file = new File(wj.data, "TabList/" + semesterId);
+        gj.sc(file.toString());
         wj.xrwb(new File(file, zc + ".txt"), gson.toJson(curriculum));
     }
 
@@ -123,7 +125,7 @@ public class KcApi {
         Gson gson = new Gson();
         for (int i : week) {
             String value = GetCurriculum(String.valueOf(i), "");
-            gj.sc(value);
+            gj.sc("Load(String Token, Integer[] week)  " + value);
             if (value == null) {
                 return false;
             }
