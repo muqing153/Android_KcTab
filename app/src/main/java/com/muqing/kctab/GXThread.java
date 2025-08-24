@@ -63,7 +63,7 @@ public class GXThread extends Thread {
     public void run() {
         try {
             version = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
-            String hq = wl.post("https://muqingcandy.top/php/GetKCTabBB.php", new Object[][]{
+            String hq = wl.post("https://muqingcandy.top/api/GetKCTabBB", new Object[][]{
                     {"version", version}
             });
             gj.sc(hq);
