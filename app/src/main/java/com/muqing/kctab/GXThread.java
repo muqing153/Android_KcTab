@@ -5,9 +5,7 @@ import static android.content.Context.MODE_PRIVATE;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.Settings;
 
 import androidx.core.content.FileProvider;
@@ -31,7 +29,6 @@ public class GXThread extends Thread {
     /**
      * 自动更新
      *
-     * @param activity
      */
     public GXThread(Activity activity) {
         this.activity = activity;

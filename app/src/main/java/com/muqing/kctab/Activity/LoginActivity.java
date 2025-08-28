@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -181,6 +183,19 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             intent1.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
             fhkczip.launch(new String[]{"*/*"});
         });
+
+        String text = "使用登陆功能请同意 <a href='https://yourdomain.com/user'>《用户协议》</a> 与 <a href='https://yourdomain.com/privacy'>《隐私政策》</a>";
+        binding.checkbox.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
+        binding.checkbox.setMovementMethod(LinkMovementMethod.getInstance());
+        boolean xieyi = sharedPreferences.getBoolean("xieyi", false);
+        binding.checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPreferences.Editor edit = sharedPreferences.edit();
+            edit.putBoolean("xieyi", isChecked);
+            edit.apply();
+            setXieyi(isChecked);
+        });
+        binding.checkbox.setChecked(xieyi);
+        setXieyi(xieyi);
     }
 
     /**
@@ -199,9 +214,9 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                             File[] files = outputDir.listFiles();
                             if (files != null && files.length > 0) {
                                 Gson gson = new Gson();
-                                for (File file : files){
+                                for (File file : files) {
                                     Curriculum curriculum = gson.fromJson(wj.dqwb(file), Curriculum.class);
-                                    KcApi.putjsonkc(curriculum,gson);
+                                    KcApi.putjsonkc(curriculum, gson);
                                 }
                             }
                             wj.sc(outputDir);
@@ -219,7 +234,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         resultIntent.putExtra("token", token);
         if (zhouList.isEmpty()) {
             resultIntent.putExtra("sync", binding.syncButton.getText().toString());
-        }else{
+        } else {
             resultIntent.putExtra("sync", new Gson().toJson(zhouList));
         }
         setResult(RESULT_OK, resultIntent);
@@ -239,21 +254,10 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
 
     }
 
-    public static String getLocalIpAddress() {
-        try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-                NetworkInterface intf = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
-                    InetAddress inetAddress = enumIpAddr.nextElement();
-                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-                        return inetAddress.getHostAddress();
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
+    private void setXieyi(boolean xieyi) {
+        binding.other1.setEnabled(xieyi);
+        binding.other2.setEnabled(xieyi);
+        binding.other3.setEnabled(xieyi);
+        binding.loginButton.setEnabled(xieyi);
     }
-
 }

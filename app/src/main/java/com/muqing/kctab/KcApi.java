@@ -69,12 +69,14 @@ public class KcApi {
         int i = 1;
         // 遍历 TabList 列表
         for (String s : MainActivity.TabList) {
+            String fileName = s.substring(s.lastIndexOf("/") + 1);
             // 在字符串中查找符合日期格式的部分
-            Matcher matcher = pattern.matcher(s);
+            Matcher matcher = pattern.matcher(fileName);
             if (matcher.find()) {
                 // 解析找到的日期字符串
                 String dateStr = matcher.group();
                 LocalDate date2 = LocalDate.parse(dateStr);
+//                gj.sc("当前日期" + currentDate + " " + "date2:" + date2);
                 // 如果当前日期在找到的日期之前
                 if (currentDate.isBefore(date2) || currentDate.isEqual(date2)) {
                     // 返回解析后的课程表对象
@@ -83,6 +85,9 @@ public class KcApi {
             }
             // 周数递增
             i++;
+        }
+        if (i > 0) {
+            return MainActivity.TabList.size();
         }
         // 如果遍历结束没有找到符合条件的数据，返回 null
         return 0;

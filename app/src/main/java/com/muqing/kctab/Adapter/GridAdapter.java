@@ -2,27 +2,24 @@ package com.muqing.kctab.Adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.Resources;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.appcompat.widget.PopupMenu;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.muqing.BaseAdapter;
-import com.muqing.Dialog.BottomSheetDialog;
 import com.muqing.gj;
 import com.muqing.kctab.Curriculum;
-import com.muqing.kctab.Dialog.KcinfoDialog;
+import com.muqing.kctab.Dialog.KcinfoBottomDialog;
 import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.GridItemBinding;
-import com.muqing.kctab.databinding.KcinfoDialogBinding;
 import com.muqing.kctab.fragment.kecheng;
 
 import java.lang.reflect.Type;
@@ -92,7 +89,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
             }
         }
         viewBinding.getRoot().setOnClickListener(v -> {
-            if (course != null && course.courseName != null && course.classTime != null) {
+            if (position > 8 && position % 8 != 0) {
                 ShowKc(data);
             }
         });
@@ -203,11 +200,17 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     }
 
 
-    private void ShowKc(List<Curriculum.Course> course) {
-        if (course.isEmpty()) {
-            return;
-        }
-        new KcinfoDialog(context, course);
+    @SuppressLint("NotifyDataSetChanged")
+    private void ShowKc(List<Curriculum.Course> data) {
+        KcinfoBottomDialog dialog = new KcinfoBottomDialog(context, data);
+        dialog.setOnDismissListener(dialogInterface -> {
+            if (data != dialog.data) {
+                data.clear();
+                data.addAll(dialog.data);
+            }
+            notifyDataSetChanged();
+        });
+
     }
 
     GridItemBinding ItemBinding, NextItemBinding;

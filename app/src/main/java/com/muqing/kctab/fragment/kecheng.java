@@ -140,7 +140,14 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         List<List<Curriculum.Course>> list = new ArrayList<>();
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col < 8; col++) {
-                list.add(new ArrayList<>());
+                List<Curriculum.Course> a = new ArrayList<>();
+                if (row > 0 && col > 0) {
+                    Curriculum.Course course = new Curriculum.Course();
+                    course.startTime = schedule[row - 1].time1.split("-")[0];
+                    course.endTime = schedule[row - 1].time2.split("-")[1];
+                    a.add(course);
+                }
+                list.add(a);
             }
         }
 //初始化头部
@@ -189,6 +196,9 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
             int p = num1 + 8 * i;
 //            System.out.println(p);
             List<Curriculum.Course> courses = list.get(p);
+            if (courses.get(0).courseName == null) {
+                courses.clear();
+            }
             courses.add(adapter);
             list.set(p, courses);
         }

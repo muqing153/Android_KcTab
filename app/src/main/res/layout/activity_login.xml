@@ -37,6 +37,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="13dp"
                 app:cardUseCompatPadding="true">
+
                 <TextView
                     android:id="@+id/syncButton"
                     style="@style/Widget.Material3.Button.TextButton"
@@ -195,13 +196,13 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <TextView
+    <CheckBox
+        android:id="@+id/checkbox"
         style="@style/TextAppearance.Material3.BodySmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
         android:layout_margin="3dp"
-        android:gravity="center_horizontal"
         android:text="使用登陆功能请同意《用户协议》与《隐私政策》"
         android:textColor="?android:attr/textColorSecondaryInverse"
         tools:ignore="HardcodedText" />
