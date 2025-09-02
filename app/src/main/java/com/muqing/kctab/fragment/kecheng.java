@@ -3,6 +3,7 @@ package com.muqing.kctab.fragment;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import com.muqing.wj;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class kecheng extends Fragment<FragmentKebiaoBinding> {
     public GridAdapter adapter;
@@ -105,6 +107,21 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                     }
                     return wj.xrwb(FilePath, new Gson().toJson(curriculum));
                 }
+
+                @Override
+                public boolean update(List<List<Curriculum.Course>> list) {
+                    List<Curriculum.Course> q = new ArrayList<>();
+                    for (List<Curriculum.Course> a : list) {
+                        for (Curriculum.Course c : a) {
+                            if (IsCourse(c)) {
+                                q.add(c);
+                            }
+                        }
+                    }
+                    curriculum.data.get(0).courses = q;
+                    wj.xrwb(FilePath, new Gson().toJson(curriculum));
+                    return false;
+                }
             };
             adapter.zhou = curriculum.data.get(0).week;
             binding.recyclerview.setAdapter(adapter);
@@ -145,6 +162,9 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                     Curriculum.Course course = new Curriculum.Course();
                     course.startTime = schedule[row - 1].time1.split("-")[0];
                     course.endTime = schedule[row - 1].time2.split("-")[1];
+                    course.weekDay = col;
+                    course.classTime = String.format(Locale.CANADA, "%d%02d%02d", col, row, row + 1);
+//                    gj.sc(" " + col + " " + course.classTime);
                     a.add(course);
                 }
                 list.add(a);
@@ -217,4 +237,32 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         }
         return 0;
     }
+
+
+    public static boolean IsCourseList(List<Curriculum.Course> course) {
+        for (Curriculum.Course course1 : course) {
+            boolean b = IsCourse(course1);
+            if (!b) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public static boolean IsCourse(Curriculum.Course course) {
+        if (course.classTime == null || course.endTime == null || course.startTime == null) {
+            return false;
+        }
+        if (course.weekDay < 0 || course.weekDay > 7) {
+            return false;
+        }
+        if (TextUtils.isEmpty(course.courseName)
+                || TextUtils.isEmpty(course.teacherName)
+                || TextUtils.isEmpty(course.classroomName)
+                || TextUtils.isEmpty(course.ktmc)) {
+            return false;
+        }
+
+        return true;
+    }
+
 }

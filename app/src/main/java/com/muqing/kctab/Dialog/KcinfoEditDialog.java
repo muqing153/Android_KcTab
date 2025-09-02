@@ -12,6 +12,7 @@ import com.google.gson.reflect.TypeToken;
 import com.muqing.ViewUI.BaseDialog;
 import com.muqing.kctab.Curriculum;
 import com.muqing.kctab.databinding.DialogKcinfoEditBinding;
+import com.muqing.kctab.fragment.kecheng;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -79,6 +80,8 @@ public class KcinfoEditDialog extends BaseDialog<DialogKcinfoEditBinding> {
                 Curriculum.Course c = new Curriculum.Course();
                 c.startTime = course.startTime;
                 c.endTime = course.endTime;
+                c.weekDay = course.weekDay;
+                c.classTime = course.classTime;
                 data.add(c);
             }
             if (position < data.size()) {
@@ -95,7 +98,15 @@ public class KcinfoEditDialog extends BaseDialog<DialogKcinfoEditBinding> {
 
         binding.cancle.setOnClickListener(view -> dismiss());
 
-        binding.sure.setOnClickListener(view -> dismiss(data));
+        binding.sure.setOnClickListener(view -> {
+            for (Curriculum.Course c : data) {
+                boolean b = kecheng.IsCourse(c);
+                if (!b) {
+                    data.remove(c);
+                }
+            }
+            dismiss(data);
+        });
         EditBind();
     }
 

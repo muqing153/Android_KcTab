@@ -21,6 +21,7 @@ import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.GridItemBinding;
 import com.muqing.kctab.fragment.kecheng;
+import com.muqing.wj;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -199,6 +200,10 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         return false;
     }
 
+    public boolean update(List<List<Curriculum.Course>> course) {
+        return false;
+    }
+
 
     @SuppressLint("NotifyDataSetChanged")
     private void ShowKc(List<Curriculum.Course> data) {
@@ -207,10 +212,10 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
             if (data != dialog.data) {
                 data.clear();
                 data.addAll(dialog.data);
+                update(dataList);
             }
             notifyDataSetChanged();
         });
-
     }
 
     GridItemBinding ItemBinding, NextItemBinding;
