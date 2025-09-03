@@ -2,33 +2,19 @@ package com.muqing.kctab.Adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.muqing.BaseAdapter;
 import com.muqing.gj;
 import com.muqing.kctab.Curriculum;
 import com.muqing.kctab.Dialog.KcinfoBottomDialog;
 import com.muqing.kctab.MainActivity;
-import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.GridItemBinding;
-import com.muqing.kctab.fragment.kecheng;
-import com.muqing.wj;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Course>> {
@@ -113,110 +99,13 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         });
 //        viewBinding.getRoot().setOnLongClickListener(view -> ShowLong(data, view, position));
     }
-
-    public static List<Curriculum.Course> kcleishuju;
     public boolean isjt = false;//是否处于截图状态 截图状态不高亮
-    public static int isjq = -1;//是否处于剪切状态 -1是无剪切 大于是记录上一个剪切的位置
-    @SuppressLint("StaticFieldLeak")
-    public static GridAdapter jqadapter;//获取剪切的课表Adapter用于更新
-
-    @SuppressLint({"NonConstantResourceId"})
-    private boolean ShowLong(List<Curriculum.Course> data, View view, int position) {
-        if (position < 8) {
-            return true;
-        }
-        for (int i = 1; i <= 5; i++) {
-            if (position == 8 * i) {
-                return true;
-            }
-        }
-        PopupMenu popupMenu = new PopupMenu(context, view);
-        popupMenu.getMenuInflater().inflate(R.menu.kc_menu, popupMenu.getMenu());
-        //保证是否以及复制数据 并且复制的数据不能可data相同位置
-        if (kcleishuju == null || kcleishuju.equals(data)) {
-            MenuItem menuItem = popupMenu.getMenu().findItem(R.id.menu_zt);
-            menuItem.setVisible(false);
-        }
-        if (data.isEmpty() || data.get(0).classroomName == null) {
-            popupMenu.getMenu().findItem(R.id.menu_fz).setVisible(false);
-            popupMenu.getMenu().findItem(R.id.menu_jq).setVisible(false);
-            popupMenu.getMenu().findItem(R.id.menu_sc).setVisible(false);
-        }
-        popupMenu.setOnMenuItemClickListener(item -> {
-            Gson gson = new Gson();
-            Type listType = new TypeToken<List<Curriculum.Course>>() {
-            }.getType();
-            switch (item.getItemId()) {
-                case R.id.menu_fz:
-                    kcleishuju = gson.fromJson(gson.toJson(data), listType);
-                    jqadapter = null;
-                    isjq = -1;
-                    break;
-                case R.id.menu_jq:
-                    isjq = position;
-                    jqadapter = GridAdapter.this;
-                    kcleishuju = gson.fromJson(gson.toJson(data), listType);
-                    break;
-                case R.id.menu_sc:
-                    dataList.set(position, new ArrayList<>());
-                    ShowLongDelete(data);
-                    break;
-                case R.id.menu_zt:
-                    dataList.set(position, kcleishuju);
-                    for (Curriculum.Course course : dataList.get(position)) {
-                        int spanCount = 8; // 每行的列数
-                        int row = position / spanCount;   // 第几行（从0开始）
-                        int column = position % spanCount; // 第几列（从0开始）
-                        course.startTime = kecheng.schedule[row - 1].time1.split("-")[0];
-                        course.endTime = kecheng.schedule[row - 1].time2.split("-")[1];
-                        if (row > 1) {
-                            row += position / spanCount - 1;
-                        }
-                        course.classTime = String.format(Locale.CANADA, "%d%02d%02d", column, row, row + 1);
-                        course.weekDay = column;
-                    }
-                    boolean b = ShowLongAdd(dataList.get(position));
-                    if (b) {
-                        gj.ts(context, "添加成功");
-                    } else {
-                        gj.ts(context, "添加失败");
-                        dataList.set(position, new ArrayList<>());
-                    }
-                    if (isjq != -1 && jqadapter != null) {
-                        jqadapter.ShowLongDelete(jqadapter.dataList.get(isjq));
-                        jqadapter.dataList.set(isjq, new ArrayList<>());
-                        jqadapter.notifyItemChanged(isjq);
-                        jqadapter = null;
-                        isjq = -1;
-                    }
-                    kcleishuju = null;
-                    break;
-                default:
-            }
-            notifyItemChanged(position);
-            return false;
-        });
-        if (!data.isEmpty()) {
-            popupMenu.show();
-        } else if (kcleishuju != null) {
-            popupMenu.show();
-        }
-        return false;
-    }
 
     /**
-     * 长按删除
+     * 更新保存课表
+     * @param course
+     * @return
      */
-    public void ShowLongDelete(List<Curriculum.Course> course) {
-    }
-
-    /**
-     * 长按添加
-     */
-    public boolean ShowLongAdd(List<Curriculum.Course> course) {
-        return false;
-    }
-
     public boolean update(List<List<Curriculum.Course>> course) {
         return false;
     }
@@ -238,9 +127,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     GridItemBinding ItemBinding, NextItemBinding;
 
     public int[] ItemXY = new int[]{0, 0};
-
     public void Load(RecyclerView recyclerView) {
-//        gj.sc("Load");
         if (isjt) {
             if (ItemBinding != null) {
                 ItemBinding.getRoot().setCardBackgroundColor(ColorThis);
