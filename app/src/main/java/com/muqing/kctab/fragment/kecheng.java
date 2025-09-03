@@ -1,5 +1,6 @@
 package com.muqing.kctab.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -50,7 +51,6 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         }
     }
 
-
     public kecheng() {
     }
 
@@ -60,13 +60,52 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         return FragmentKebiaoBinding.inflate(inflater, container, false);
     }
 
-    public static final MainActivity.ScheduleItem[] schedule = {new MainActivity.ScheduleItem("1.2", "08:20-09:05", "09:15-10:00"),
-            new MainActivity.ScheduleItem("3.4", "10:10-11:40", "10:30-12:00"),
+//    public static final MainActivity.ScheduleItem[] schedule = {new MainActivity.ScheduleItem("1.2", "08:20-09:05", "09:15-10:00"),
+//            new MainActivity.ScheduleItem("3.4", "10:10-11:40", "10:30-12:00"),
+//            new MainActivity.ScheduleItem("5.6", "13:30-14:15", "14:25-15:10"),
+//            new MainActivity.ScheduleItem("7.8", "15:20-16:05", "16:15-17:00"),
+//            new MainActivity.ScheduleItem("9.10", "18:30-19:15", "19:25-20:10")};
+//
+    public static final MainActivity.ScheduleItem[] schedule = {
+            new MainActivity.ScheduleItem("1.2", "08:20-09:05", "09:15-10:00"),
+            new MainActivity.ScheduleItem("3.4", "10:20-11:05", "11:15-12:00"),
             new MainActivity.ScheduleItem("5.6", "13:30-14:15", "14:25-15:10"),
-            new MainActivity.ScheduleItem("7.8", "15:20-16:05", "16:15-17:00"),
-            new MainActivity.ScheduleItem("9.10", "18:30-19:15", "19:25-20:10")};
+            new MainActivity.ScheduleItem("7.8", "15:30-16:15", "16:25-17:10"),
+            new MainActivity.ScheduleItem("9.10", "18:30-19:15", "19:25-20:10")
+    };
 
-
+    @SuppressLint("NotifyDataSetChanged")
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (isAdded()) {
+            if (curriculum != null && curriculum.data != null) {
+//            gj.sc("启动Fragment UI 初始化表内容");
+                adapter = new GridAdapter(this.getContext(), GetKcLei(curriculum)) {
+                    @Override
+                    public boolean update(List<List<Curriculum.Course>> list) {
+                        List<Curriculum.Course> q = new ArrayList<>();
+                        for (List<Curriculum.Course> a : list) {
+                            for (Curriculum.Course c : a) {
+                                if (IsCourse(c)) {
+                                    q.add(c);
+                                }
+                            }
+                        }
+                        curriculum.data.get(0).courses = q;
+                        wj.xrwb(FilePath, new Gson().toJson(curriculum));
+                        return false;
+                    }
+                };
+                adapter.zhou = curriculum.data.get(0).week;
+                binding.recyclerview.setAdapter(adapter);
+                binding.recyclerview.post(() -> {
+                    adapter.Load(binding.recyclerview);
+                    binding.horizontal.scrollTo(adapter.ItemXY[0], adapter.ItemXY[1]);
+                });
+            }
+        }
+    }
     public Curriculum curriculum;
 
     public void toolbar_time() {
@@ -87,49 +126,6 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
             curriculum.data.get(0).week = zhou;
         }
 
-        if (curriculum != null && curriculum.data != null) {
-//            gj.sc("启动Fragment UI 初始化表内容");
-            adapter = new GridAdapter(this.getContext(), GetKcLei(curriculum)) {
-                @Override
-                public void ShowLongDelete(List<Curriculum.Course> course) {
-                    gj.sc("成功删除了一个数据com：" + course);
-                    curriculum.data.get(0).courses.remove(course);
-                    wj.xrwb(FilePath, new Gson().toJson(curriculum));
-                }
-
-                @Override
-                public boolean ShowLongAdd(List<Curriculum.Course> obj) {
-//                    curriculum.data.get(0).courses = GetListKc(dataList);
-                    for (Curriculum.Course course :
-                            obj) {
-//                        gj.sc("成功添加了一个数据com：" + course);
-                        curriculum.data.get(0).courses.add(course);
-                    }
-                    return wj.xrwb(FilePath, new Gson().toJson(curriculum));
-                }
-
-                @Override
-                public boolean update(List<List<Curriculum.Course>> list) {
-                    List<Curriculum.Course> q = new ArrayList<>();
-                    for (List<Curriculum.Course> a : list) {
-                        for (Curriculum.Course c : a) {
-                            if (IsCourse(c)) {
-                                q.add(c);
-                            }
-                        }
-                    }
-                    curriculum.data.get(0).courses = q;
-                    wj.xrwb(FilePath, new Gson().toJson(curriculum));
-                    return false;
-                }
-            };
-            adapter.zhou = curriculum.data.get(0).week;
-            binding.recyclerview.setAdapter(adapter);
-            binding.recyclerview.post(() -> {
-                adapter.Load(binding.recyclerview);
-                binding.horizontal.scrollTo(adapter.ItemXY[0], adapter.ItemXY[1]);
-            });
-        }
         //获取屏幕高度
 //        int heightPixels = Resources.getSystem().getDisplayMetrics().heightPixels;
 //        binding.horizontal.getLayoutParams().height = heightPixels;

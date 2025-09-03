@@ -95,18 +95,35 @@
                     android:layout_height="wrap_content"
                     app:message="可自定义课表的高亮颜色以及宽高等"
                     app:title="自定义课表视图" />
+
                 <com.muqing.ViewUI.SettingTextView
                     android:id="@+id/kb_xuenian"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:message="2024-2025-1"
                     app:title="课表学年" />
+
                 <com.muqing.ViewUI.SettingTextView
                     android:id="@+id/kb_delete"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:message="清空当前课表所有数据"
                     app:title="初始化课表" />
+
+                <com.muqing.ViewUI.SettingSwitch
+                    android:id="@+id/kb_show_jie"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:message="显示节列的1.2 3.4 是否显示"
+                    app:title="节" />
+
+                <com.muqing.ViewUI.SettingSwitch
+                    android:id="@+id/kb_show_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:message="是否显示课表的地点信息"
+                    app:title="课程详情信息" />
+
             </LinearLayout>
 
             <TextView

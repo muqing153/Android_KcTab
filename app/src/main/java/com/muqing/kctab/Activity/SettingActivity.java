@@ -102,24 +102,6 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
             intent.putExtra(Intent.EXTRA_TITLE, "TabList.kczip");
             createZipLauncher.launch(intent);
         });
-        {
-            File file = new File(wj.data, "TabList");
-            String[] list = file.list();
-            if (list != null) {
-                Arrays.sort(list);
-                SharedPreferences kebiao = getSharedPreferences("kebiao", MODE_PRIVATE);
-                binding.kbXuenian.setMessage(kebiao.getString("xuenian", "null"));
-                binding.kbXuenian.setOnClickListener(view -> new MaterialAlertDialogBuilder(SettingActivity.this)
-                        .setTitle("选择学年")
-                        .setItems(list, (dialogInterface, i) -> {
-                            SharedPreferences kebiao1 = getSharedPreferences("kebiao", MODE_PRIVATE);
-                            kebiao1.edit().putString("xuenian", list[i]).apply();
-                            binding.kbXuenian.setMessage(list[i]);
-                            Toast.makeText(SettingActivity.this, "需要重启生效", Toast.LENGTH_SHORT).show();
-                        })
-                        .show());
-            }
-        }
         binding.kbDelete.setOnClickListener(view -> new MaterialAlertDialogBuilder(SettingActivity.this)
                 .setTitle("格式化")
                 .setMessage("此操作将删除所有课表数据，是否继续？")
@@ -158,10 +140,10 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
 
         binding.kbZhengli.setOnClickListener(view -> startActivity(new Intent(SettingActivity.this, CourseOverviewActivity.class)));
 
-
         SharedPreferences SpSetting = getSharedPreferences("setting", MODE_PRIVATE);
         binding.qtJcgxSwitch.setChecked(SpSetting.getBoolean("jcgx", true));
         binding.qtJcgxSwitch.setOnCheckedChangeListener((compoundButton, b) -> SpSetting.edit().putBoolean("jcgx", b).apply());
+        UIKb();
     }
 
     private final ActivityResultLauncher<Intent> createZipLauncher = registerForActivityResult(
@@ -183,6 +165,32 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
             }
     );
 
+    private void UIKb() {
+
+        SharedPreferences kebiao = getSharedPreferences("kebiao", MODE_PRIVATE);
+        {
+            File file = new File(wj.data, "TabList");
+            String[] list = file.list();
+            if (list != null) {
+                Arrays.sort(list);
+                binding.kbXuenian.setMessage(kebiao.getString("xuenian", "null"));
+                binding.kbXuenian.setOnClickListener(view -> new MaterialAlertDialogBuilder(SettingActivity.this)
+                        .setTitle("选择学年")
+                        .setItems(list, (dialogInterface, i) -> {
+                            SharedPreferences kebiao1 = getSharedPreferences("kebiao", MODE_PRIVATE);
+                            kebiao1.edit().putString("xuenian", list[i]).apply();
+                            binding.kbXuenian.setMessage(list[i]);
+                            Toast.makeText(SettingActivity.this, "需要重启生效", Toast.LENGTH_SHORT).show();
+                        })
+                        .show());
+            }
+        }
+        binding.kbShowJie.setChecked(kebiao.getBoolean("showJie", true));
+        binding.kbShowJie.setOnCheckedChangeListener((compoundButton, b) -> kebiao.edit().putBoolean("showJie", b).apply());
+
+        binding.kbShowInfo.setChecked(kebiao.getBoolean("showInfo", true));
+        binding.kbShowInfo.setOnCheckedChangeListener((compoundButton, b) -> kebiao.edit().putBoolean("showInfo", b).apply());
+    }
     @Override
     public void setOnApplyWindowInsetsListener(Insets systemBars, View v) {
 //        binding.toolbar.setPadding(0, systemBars.top, 0, 0);

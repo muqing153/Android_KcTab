@@ -40,6 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
+        tools:visibility="visible"
         android:layout_margin="3dp">
         <TextView
             android:id="@+id/title_ri"

@@ -3,6 +3,8 @@ package com.muqing.kctab.Adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,9 +40,13 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     //下节课的颜色高亮
     public final int ColorNext;
     public int zhou = 0;
+    private boolean showJie = true, showInfo = true;
 
     public GridAdapter(Context context, List<List<Curriculum.Course>> dataList) {
         super(context, dataList);
+        SharedPreferences sharedPreferences = context.getSharedPreferences("kebiao", Context.MODE_PRIVATE);
+        showJie = sharedPreferences.getBoolean("showJie", true);
+        showInfo = sharedPreferences.getBoolean("showInfo", true);
         ColorThis = gj.getThemeColor(context, com.google.android.material.R.attr.colorSurfaceContainerLow);
         ColorWhen = gj.getThemeColor(context, com.google.android.material.R.attr.colorPrimary);
         ColorNext = gj.getThemeColor(context, com.google.android.material.R.attr.colorOnPrimary);
@@ -62,20 +68,31 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         } else {
             course = data.get(0);
         }
-
+        viewBinding.line1.setVisibility(View.GONE);
+        viewBinding.line2.setVisibility(View.GONE);
+        viewBinding.message.setVisibility(View.GONE);
         if (course != null) {
-            if (position < 8 || course.classroomName == null) {
+            if (position < 8) {
                 viewBinding.titleRi.setText(course.courseName);
                 viewBinding.message.setVisibility(View.GONE);
-                viewBinding.line1.setVisibility(View.GONE);
                 viewBinding.line2.setVisibility(View.VISIBLE);
-            } else {
-                viewBinding.title.setText(course.courseName);
-                viewBinding.getRoot().setCardBackgroundColor(ColorThis);
+            } else if (position % 8 == 0) {
+                if (showJie) {
+                    viewBinding.title.setText(course.courseName);
+                }else {
+                    viewBinding.title.setVisibility(View.GONE);
+                }
                 viewBinding.message.setVisibility(View.VISIBLE);
                 viewBinding.message.setText(course.getClassroomName());
                 viewBinding.line1.setVisibility(View.VISIBLE);
-                viewBinding.line2.setVisibility(View.GONE);
+            } else {
+                viewBinding.title.setText(course.courseName);
+                viewBinding.getRoot().setCardBackgroundColor(ColorThis);
+                if (!TextUtils.isEmpty(course.courseName) && showInfo) {
+                    viewBinding.message.setVisibility(View.VISIBLE);
+                    viewBinding.message.setText(course.getClassroomName());
+                }
+                viewBinding.line1.setVisibility(View.VISIBLE);
             }
             if (data.size() > 1) {
                 StringBuffer stringBuffer = new StringBuffer();
@@ -94,7 +111,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
                 ShowKc(data);
             }
         });
-        viewBinding.getRoot().setOnLongClickListener(view -> ShowLong(data, view, position));
+//        viewBinding.getRoot().setOnLongClickListener(view -> ShowLong(data, view, position));
     }
 
     public static List<Curriculum.Course> kcleishuju;
@@ -223,6 +240,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     public int[] ItemXY = new int[]{0, 0};
 
     public void Load(RecyclerView recyclerView) {
+//        gj.sc("Load");
         if (isjt) {
             if (ItemBinding != null) {
                 ItemBinding.getRoot().setCardBackgroundColor(ColorThis);
