@@ -17,12 +17,12 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="9dp"
         android:gravity="end">
-
         <Button
             style="@style/Widget.Material3.Button.IconButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:tooltipText="提醒"
+            android:enabled="false"
             app:icon="@drawable/alarm_add_24px" />
         <Button
             android:id="@+id/edit_view"

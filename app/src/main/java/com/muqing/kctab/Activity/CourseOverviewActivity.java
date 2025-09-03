@@ -9,10 +9,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.gson.Gson;
 import com.muqing.AppCompatActivity;
+import com.muqing.gj;
 import com.muqing.kctab.Adapter.CourseOverviewAdapter;
 import com.muqing.kctab.Curriculum;
 import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.databinding.ActivityCourseOverviewBinding;
+import com.muqing.kctab.fragment.kecheng;
 import com.muqing.wj;
 
 import java.util.ArrayList;
@@ -38,39 +40,39 @@ public class CourseOverviewActivity extends AppCompatActivity<ActivityCourseOver
             String dqwb = wj.dqwb(s, "");
             Curriculum c = new Gson().fromJson(dqwb, Curriculum.class);
             c.data.get(0).week = i;
-            for (Curriculum.Course cours : c.data.get(0).courses) {
-                // 查找是否已存在同名课程
-                Optional<Curriculum.Course> existingCourse = list.stream()
-                        .filter(existing -> existing.courseName.equals(cours.courseName))
-                        .findFirst();
-                if (existingCourse.isPresent()) {
-                    // 如果存在，追加教室信息
-                    Curriculum.Course found = existingCourse.get();
-                    if (!found.getClassroomName().contains(cours.getClassroomName())) {
-                        found.classroomName += "/" + cours.getClassroomName();
+            for (Curriculum.Course course : c.data.get(0).courses) {
+                boolean b = kecheng.IsCourse(course);
+                if (b) {
+                    boolean exists = false;
+                    for (Curriculum.Course added : list) {
+                        if (added.courseName != null
+                                && added.courseName.equals(course.courseName)) {
+                            if (!added.getClassroomName().contains(course.getClassroomName())) {
+                                added.classroomName += "/" + course.getClassroomName();
+                            }
+                            if (!added.Time.contains(course.startTime + "-" + course.endTime)) {
+                                added.Time += "/" + course.startTime + "-" + course.endTime;
+                            }
+                            if (!added.Zhou.contains(String.valueOf(i))) {
+                                added.Zhou += "/" + i;
+                            }
+                            exists = true;
+                            break;
+                        }
                     }
-                    if (found.Time == null) {
-                        found.Time = found.startTime + "-" + found.endTime;
+                    if (!exists) {
+                        if (course.Time == null) {
+                            course.Time = course.startTime + "-" + course.endTime;
+                        }
+                        if (course.Zhou == null) {
+                            course.Zhou = String.valueOf(i);
+                        }
+                        list.add(course);
                     }
-                    cours.Time = cours.startTime + "-" + cours.endTime;
-                    if (!found.Time.contains(cours.Time)) {
-                        found.Time += "/" + cours.Time;
-                    }
-                    if (found.Zhou == null) {
-                        found.Zhou = String.valueOf(i);
-                    }
-                    if (!found.Zhou.contains(String.valueOf(i))) {
-                        found.Zhou += "/" + i;
-                    }
-                    // 也可以追加其他信息，如教师、时间等
-                    // found.teacherName += " / " + cours.teacherName;
-                } else {
-                    list.add(cours);
                 }
             }
             i++;
         }
-
         binding.recyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         binding.recyclerview.setAdapter(new CourseOverviewAdapter(this, list));
     }
