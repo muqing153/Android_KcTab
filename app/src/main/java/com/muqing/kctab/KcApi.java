@@ -120,7 +120,7 @@ public class KcApi {
         String zc = curriculum.data.get(0).date.get(length - 1).mxrq;
         String semesterId = curriculum.data.get(0).topInfo.get(0).semesterId;
         File file = new File(wj.data, "TabList/" + semesterId);
-        gj.sc(file.toString());
+//        gj.sc(file.toString());
         wj.xrwb(new File(file, zc + ".txt"), gson.toJson(curriculum));
     }
 

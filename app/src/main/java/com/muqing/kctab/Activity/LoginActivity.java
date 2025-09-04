@@ -211,14 +211,21 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                         if (!outputDir.exists()) outputDir.mkdirs();
                         boolean b = YourKczipOpenActivity.unzipFromUri(LoginActivity.this, inputStream, outputDir);
                         if (b) {
-                            File[] files = outputDir.listFiles();
-                            if (files != null && files.length > 0) {
+                            List<File> allFiles = wj.getAllFiles(outputDir);
                                 Gson gson = new Gson();
-                                for (File file : files) {
+                            for (File file : allFiles){
+                                try {
                                     Curriculum curriculum = gson.fromJson(wj.dqwb(file), Curriculum.class);
                                     KcApi.putjsonkc(curriculum, gson);
+                                } catch (Exception e) {
+                                    gj.sc("这个文件不是正确的数据：" + e);
                                 }
                             }
+//                            if (files != null && files.length > 0) {
+//                                for (File file : files) {
+//                                    KcApi.putjsonkc(curriculum, gson);
+//                                }
+//                            }
                             wj.sc(outputDir);
                             binding.syncButton.setText("kczip");
                             EndToken(null);

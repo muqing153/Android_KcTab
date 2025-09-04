@@ -253,7 +253,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         }
         if (TextUtils.isEmpty(course.courseName)
                 || TextUtils.isEmpty(course.teacherName)
-                || TextUtils.isEmpty(course.classroomName)
+                || TextUtils.isEmpty(course.getClassroomName())
                 || TextUtils.isEmpty(course.ktmc)) {
             return false;
         }
