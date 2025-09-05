@@ -17,8 +17,8 @@ public class TableStyleData {
         name = "默认";
         style = true;
         cardUseCompatPadding = true;
-        width = 80;
-        height = 100;
+        width = -1;
+        height = -1;
         cardElevation = -1;
         cardCornerRadius = -1;
     }

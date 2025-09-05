@@ -66,8 +66,12 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         if (tablestyle.cardCornerRadius > -1) {
             inflate.getRoot().setRadius(tablestyle.cardCornerRadius);
         }
-        inflate.line1.getLayoutParams().height = gj.dp2px(context, tablestyle.height);
-        inflate.line1.getLayoutParams().width = gj.dp2px(context, tablestyle.width);
+        if (tablestyle.height > -1) {
+            inflate.line1.getLayoutParams().height = gj.dp2px(context, tablestyle.height);
+        }
+        if (tablestyle.width > -1){
+            inflate.line1.getLayoutParams().width = gj.dp2px(context, tablestyle.width);
+        }
 //        inflate.getRoot().setCardBackgroundColor(ColorNext);
         return inflate;
     }
