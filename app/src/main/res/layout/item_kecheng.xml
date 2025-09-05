@@ -73,27 +73,30 @@
                 style="@style/TextAppearance.Material3.BodySmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
             <TextView
                 style="@style/TextAppearance.Material3.BodySmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="上课地点:" />
+
             <TextView
                 android:id="@+id/info_dd"
                 style="@style/TextAppearance.Material3.BodySmall"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
             <TextView
                 style="@style/TextAppearance.Material3.BodySmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="周:" />
+
             <TextView
                 android:id="@+id/info_zhou"
                 style="@style/TextAppearance.Material3.BodySmall"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </LinearLayout>

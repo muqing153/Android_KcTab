@@ -166,7 +166,6 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
     );
 
     private void UIKb() {
-
         SharedPreferences kebiao = getSharedPreferences("kebiao", MODE_PRIVATE);
         {
             File file = new File(wj.data, "TabList");
@@ -190,6 +189,7 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
 
         binding.kbShowInfo.setChecked(kebiao.getBoolean("showInfo", true));
         binding.kbShowInfo.setOnCheckedChangeListener((compoundButton, b) -> kebiao.edit().putBoolean("showInfo", b).apply());
+        binding.kbStzdy.setOnClickListener(view -> startActivity(new Intent(SettingActivity.this, AutoTableActivity.class)));
     }
     @Override
     public void setOnApplyWindowInsetsListener(Insets systemBars, View v) {

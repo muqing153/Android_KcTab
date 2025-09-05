@@ -44,8 +44,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
-    public static String Time;//当前时间xx:xx 当前日期 1234567
-    public static int Week;
+    public static String Time = "08:00";//当前时间xx:xx
+    public static int Week;// 当前日期 1234567
     public static int benzhou = 0;
     public static List<String> TabList = new ArrayList<>();
 

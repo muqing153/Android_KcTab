@@ -12,11 +12,13 @@
         android:scrollbars="none"
         android:fillViewport="true"
         tools:ignore="UselessParent">
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:overScrollMode="never"
-            android:padding="9dp" />
+            tools:listitem="@layout/grid_item"
+            tools:itemCount="6"
+            android:overScrollMode="never" />
     </com.muqing.kctab.SmartHorizontalScrollView>
 </FrameLayout>

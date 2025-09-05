@@ -3,19 +3,30 @@ package com.muqing.kctab.Adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.gson.Gson;
 import com.muqing.BaseAdapter;
 import com.muqing.gj;
 import com.muqing.kctab.Curriculum;
+import com.muqing.kctab.DataType.TableStyleData;
 import com.muqing.kctab.Dialog.KcinfoBottomDialog;
 import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.databinding.GridItemBinding;
+
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 
 public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Course>> {
 
@@ -26,10 +37,16 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     //下节课的颜色高亮
     public final int ColorNext;
     public int zhou = 0;
-    private boolean showJie = true, showInfo = true;
+    private final boolean showJie, showInfo;
+
+    TableStyleData tablestyle;
 
     public GridAdapter(Context context, List<List<Curriculum.Course>> dataList) {
         super(context, dataList);
+        Gson gson = new Gson();
+        SharedPreferences a = context.getSharedPreferences("tablestyle", Context.MODE_PRIVATE);
+        tablestyle = gson.fromJson(a.getString("tablestyle", gson.toJson(new TableStyleData())), TableStyleData.class);
+
         SharedPreferences sharedPreferences = context.getSharedPreferences("kebiao", Context.MODE_PRIVATE);
         showJie = sharedPreferences.getBoolean("showJie", true);
         showInfo = sharedPreferences.getBoolean("showInfo", true);
@@ -41,7 +58,18 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
 
     @Override
     protected GridItemBinding getViewBindingObject(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        return GridItemBinding.inflate(inflater, parent, false);
+        GridItemBinding inflate = GridItemBinding.inflate(inflater, parent, false);
+        inflate.getRoot().setUseCompatPadding(tablestyle.cardUseCompatPadding);
+        if (tablestyle.cardElevation > -1) {
+            inflate.getRoot().setCardElevation(tablestyle.cardElevation);
+        }
+        if (tablestyle.cardCornerRadius > -1) {
+            inflate.getRoot().setRadius(tablestyle.cardCornerRadius);
+        }
+        inflate.line1.getLayoutParams().height = gj.dp2px(context, tablestyle.height);
+        inflate.line1.getLayoutParams().width = gj.dp2px(context, tablestyle.width);
+//        inflate.getRoot().setCardBackgroundColor(ColorNext);
+        return inflate;
     }
 
     @Override
@@ -65,7 +93,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
             } else if (position % 8 == 0) {
                 if (showJie) {
                     viewBinding.title.setText(course.courseName);
-                }else {
+                } else {
                     viewBinding.title.setVisibility(View.GONE);
                 }
                 viewBinding.message.setVisibility(View.VISIBLE);
@@ -73,7 +101,6 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
                 viewBinding.line1.setVisibility(View.VISIBLE);
             } else {
                 viewBinding.title.setText(course.courseName);
-                viewBinding.getRoot().setCardBackgroundColor(ColorThis);
                 if (!TextUtils.isEmpty(course.courseName) && showInfo) {
                     viewBinding.message.setVisibility(View.VISIBLE);
                     viewBinding.message.setText(course.getClassroomName());
@@ -99,10 +126,9 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         });
 //        viewBinding.getRoot().setOnLongClickListener(view -> ShowLong(data, view, position));
     }
-    public boolean isjt = false;//是否处于截图状态 截图状态不高亮
-
     /**
      * 更新保存课表
+     *
      * @param course
      * @return
      */
@@ -128,16 +154,6 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
 
     public int[] ItemXY = new int[]{0, 0};
     public void Load(RecyclerView recyclerView) {
-        if (isjt) {
-            if (ItemBinding != null) {
-                ItemBinding.getRoot().setCardBackgroundColor(ColorThis);
-            }
-            if (NextItemBinding != null) {
-                NextItemBinding.getRoot().setCardBackgroundColor(ColorThis);
-            }
-            return;
-        }
-//        gj.sc(zhou + " " + MainActivity.benzhou);
         if (zhou != MainActivity.benzhou) {
             //不是本周的课程不高亮
             return;
@@ -145,11 +161,9 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         int weekDay = MainActivity.Week; // 获取当前星期
 //        weekDay = 1;
         String time = MainActivity.Time; // 获取当前时间
-//        time = "08:00";
+//        随机生成时间 每过3S
+//        time = "15:15";
         for (int x = 1, y = weekDay + 8; x < 6; y += 8, x++) {
-            if (dataList.get(y).isEmpty()) {
-                continue;
-            }
             Curriculum.Course data = dataList.get(y).get(0);
             if (data.courseName != null) {
                 if (data.startTime != null && data.endTime != null) {
@@ -172,21 +186,20 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
                         ItemBinding.getRoot().setCardBackgroundColor(ColorThis);
                         ItemBinding = null;
                     }
+
                     if (data.startTime.compareTo(time) > 0 && Objects.equals(data.weekDay, weekDay)) {
                         View viewByPosition = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(y);
                         if (viewByPosition != null) {
-                            if (NextItemBinding != null && NextItemBinding.getRoot() != viewByPosition) {
+                            if (NextItemBinding == null){
+                                NextItemBinding = GridItemBinding.bind(viewByPosition);
+                                NextItemBinding.getRoot().setCardBackgroundColor(ColorNext);
+                                NextItemBinding.getRoot().getLocationInWindow(ItemXY);
+                            }else if (NextItemBinding.getRoot() != viewByPosition){
                                 NextItemBinding.getRoot().setCardBackgroundColor(ColorThis);
+                                NextItemBinding = null;
                             }
-                            NextItemBinding = GridItemBinding.bind(viewByPosition);
-                            NextItemBinding.getRoot().setCardBackgroundColor(ColorNext);
-                            NextItemBinding.getRoot().getLocationInWindow(ItemXY);
-//                            gj.sc("ItemBinding:" + ItemXY[0] + " " + ItemXY[1]);
                         }
                         break;
-                    } else if (NextItemBinding != null) {
-                        NextItemBinding.getRoot().setCardBackgroundColor(ColorThis);
-                        NextItemBinding = null;
                     }
                 }
             }
