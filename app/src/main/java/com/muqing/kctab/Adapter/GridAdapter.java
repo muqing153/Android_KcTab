@@ -139,8 +139,6 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     public boolean update(List<List<Curriculum.Course>> course) {
         return false;
     }
-
-
     @SuppressLint("NotifyDataSetChanged")
     private void ShowKc(List<Curriculum.Course> data) {
         KcinfoBottomDialog dialog = new KcinfoBottomDialog(context, data);
@@ -153,7 +151,6 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
             notifyDataSetChanged();
         });
     }
-
     GridItemBinding ItemBinding, NextItemBinding;
 
     public int[] ItemXY = new int[]{0, 0};

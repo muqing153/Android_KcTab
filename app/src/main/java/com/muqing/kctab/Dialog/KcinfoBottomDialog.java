@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.recyclerview.widget.DividerItemDecoration;
 
 import com.muqing.ViewUI.BaseBottomDialog;
+import com.muqing.gj;
 import com.muqing.kctab.Adapter.KcInfoAdapter;
 import com.muqing.kctab.Curriculum;
 import com.muqing.kctab.databinding.KcinfoDialogBinding;
@@ -40,7 +41,8 @@ public class KcinfoBottomDialog extends BaseBottomDialog<KcinfoDialogBinding> {
             public void dismiss(List<Curriculum.Course> data) {
                 super.dismiss();
                 KcinfoBottomDialog.this.data = data;
-                KcinfoBottomDialog.this.binding.recyclerview.setAdapter(new KcInfoAdapter(getContext(), data));
+                KcinfoBottomDialog.this.binding.recyclerview.setAdapter(new KcInfoAdapter(getContext(),
+                        KcinfoBottomDialog.this.data = data));
             }
         });
     }

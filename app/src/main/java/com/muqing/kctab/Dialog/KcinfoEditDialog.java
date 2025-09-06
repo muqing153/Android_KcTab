@@ -73,6 +73,10 @@ public class KcinfoEditDialog extends BaseDialog<DialogKcinfoEditBinding> {
 
         binding.cancle.setOnClickListener(view -> dismiss());
         binding.sure.setOnClickListener(view -> {
+            if (data.size() == 1) {
+                dismiss(data);
+                return;
+            }
             for (Curriculum.Course c : data) {
                 boolean b = kecheng.IsCourse(c);
                 if (!b) {
@@ -109,6 +113,9 @@ public class KcinfoEditDialog extends BaseDialog<DialogKcinfoEditBinding> {
                             c.startTime = course.startTime;
                             c.endTime = course.endTime;
                             c.classTime = course.classTime;
+//                            course = c;
+                            data.remove(course);
+                            data.add(c);
                             course = c;
                             setEdit(course);
                         }).setNegativeButton("取消", null)
