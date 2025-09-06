@@ -3,21 +3,41 @@ package com.muqing.kctab;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.provider.Settings;
+import android.view.View;
+import android.view.Window;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.muqing.gj;
+import com.muqing.kctab.databinding.DialogDownloadApkBinding;
 import com.muqing.wj;
 import com.muqing.wl;
 
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Locale;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class GXThread extends Thread {
 
@@ -28,7 +48,6 @@ public class GXThread extends Thread {
 
     /**
      * 自动更新
-     *
      */
     public GXThread(Activity activity) {
         this.activity = activity;
@@ -73,11 +92,29 @@ public class GXThread extends Thread {
                     apk_url = jsonObject.getString("apk_url");
                     //获取本地版本versionName
                     if (!newversion.equals(version)) {
-                        activity.runOnUiThread(() -> new MaterialAlertDialogBuilder(activity)
-                                .setTitle(nickname)
-                                .setMessage(message + "\n" + version + "->" + newversion)
-                                .setPositiveButton("确定", (dialogInterface, i) -> gx())
-                                .show());
+                        activity.runOnUiThread(() -> {
+
+                            MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(activity);
+                            DialogDownloadApkBinding dialogBinding = DialogDownloadApkBinding.inflate(activity.getLayoutInflater());
+                            dialog.setView(dialogBinding.getRoot());
+                            AlertDialog c = dialog.create();
+                            if (c.getWindow() != null) {
+                                c.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                            }
+                            dialogBinding.bbh.setText(String.format("%s %s->%s", nickname, version, newversion));
+                            dialogBinding.info.setText(message);
+                            dialogBinding.no.setOnClickListener(view -> c.dismiss());
+                            dialogBinding.web.setOnClickListener(view -> {
+                                c.dismiss();
+                                gj.llq(activity, apk_url);
+                            });
+                            dialogBinding.app.setOnClickListener(view -> {
+                                gx(c, dialogBinding);
+                            });
+                            c.setCanceledOnTouchOutside(false);
+                            c.setCancelable(false);
+                            c.show();
+                        });
                     } else if (runnable != null) {
                         activity.runOnUiThread(runnable);
                     }
@@ -96,38 +133,107 @@ public class GXThread extends Thread {
 
     }
 
-    public void gx() {
+    public void gx(Dialog dialog, DialogDownloadApkBinding dialogBinding) {
         if (!activity.getPackageManager().canRequestPackageInstalls()) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
             intent.setData(Uri.parse("package:" + activity.getPackageName()));
             activity.startActivity(intent);
             return;
         }
-        File file = new File(wj.data, "apk/");
-        if (!file.exists()) {
-            boolean mkdirs = file.mkdirs();
+        if (!new File(wj.data, "apk/").exists()) {
+            boolean mkdirs = new File(wj.data, "apk/").mkdirs();
             if (!mkdirs) {
                 gj.sc("创建文件夹失败");
                 return;
             }
         }
-        file = new File(file, newversion + ".apk");
-        gj.sc(file.getPath());
+        File file = new File(new File(wj.data, "apk/" + newversion + ".apk").getPath());
+//        gj.sc(file.getPath());
+//        wj.sc(file);
         if (file.exists()) {
             gj.sc("文件存在");
             installApk(file);
         } else {
             gj.sc("从网络中下载:" + apk_url);
-            wl.xz(apk_url, file);
+            OkHttpClient client = new OkHttpClient.Builder().build();
+            Request request = new Request.Builder()
+                    .url(apk_url)
+                    .build();
+            dialogBinding.gx.setVisibility(View.VISIBLE);
+            dialogBinding.no.setEnabled(false);
+            dialogBinding.web.setEnabled(false);
+            dialogBinding.app.setEnabled(false);
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                    activity.runOnUiThread(() -> {
+                        Toast.makeText(activity, "下载失败", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    });
+                }
+
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    if (!response.isSuccessful() || response.body() == null) {
+                        activity.runOnUiThread(() -> {
+                            Toast.makeText(activity, "下载失败", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                        });
+                        return;
+                    }
+
+                    InputStream is = null;
+                    FileOutputStream fos = null;
+                    try {
+                        long total = response.body().contentLength(); // 文件总大小
+                        long downloaded = 0;
+
+                        is = response.body().byteStream();
+                        fos = new FileOutputStream(file);
+
+                        byte[] buffer = new byte[4096];
+                        int len;
+                        while ((len = is.read(buffer)) != -1) {
+                            fos.write(buffer, 0, len);
+                            downloaded += len;
+
+                            int progress = (int) (downloaded * 100 / total);
+
+                            // 更新进度条 UI
+                            activity.runOnUiThread(() -> {
+                                dialogBinding.gxbar.setProgress(progress);
+                                dialogBinding.gxtext.setText(String.format(Locale.CANADA, "%d %%", progress));
+                            });
+                        }
+                        fos.flush();
+
+                        // 下载完成 → 安装
+                        activity.runOnUiThread(() -> {
+                            Toast.makeText(activity, "下载完成", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                            installApk(file);
+                        });
+                    } catch (Exception e) {
+                        gj.sc(e);
+                        activity.runOnUiThread(() -> {
+                            Toast.makeText(activity, "下载失败", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                        });
+                    } finally {
+                        if (is != null) is.close();
+                        if (fos != null) fos.close();
+                    }
+                }
+            });
+
         }
     }
 
     public void gx(String url, String newversion) {
         this.apk_url = url;
         this.newversion = newversion;
-        this.gx();
+//        this.gx();
     }
-
 
 
     public void installApk(File apkFile) {
