@@ -7,8 +7,13 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.muqing.gj;
 import com.muqing.wj;
+import com.muqing.wl;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -22,7 +27,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class KcApi {
-    public static String api="http://jw.qdpec.edu.cn:8088";
+    public static String api = "http://jw.qdpec.edu.cn:8088";
+
     @Nullable
     public static String GetCurriculum(String week, String kbjcmsid) throws Exception {
         if (kbjcmsid == null) {
@@ -95,18 +101,49 @@ public class KcApi {
 
     public static boolean Load(String Token) {
         try {
-//            File file = MainActivity.fileTabList;
             LoginApi.Token = Token;
             Gson gson = new Gson();
-            for (int i = 1; i <= 20; i++) {
-                String value = GetCurriculum(String.valueOf(i), "");
-//                gj.sc(""+value);
-                if (value == null) {
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("text/plain");
+            RequestBody body = RequestBody.create(mediaType, "");
+            Request request = new Request.Builder()
+                    .url("http://jw.qdpec.edu.cn:8088/njwhd/teachingWeek")
+                    .method("POST", body)
+                    .addHeader("Accept", "application/json, text/plain, */*")
+                    .addHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+                    .addHeader("Cache-Control", "no-cache")
+                    .addHeader("Connection", "keep-alive")
+                    .addHeader("Origin", "http://jw.qdpec.edu.cn:8088")
+                    .addHeader("Referer", "http://jw.qdpec.edu.cn:8088/")
+                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0")
+                    .addHeader("token", Token)
+                    .addHeader("Host", "jw.qdpec.edu.cn:8088")
+                    .build();
+            Response response = client.newCall(request).execute();
+            if (!response.isSuccessful()) {
+                gj.sc("Load: 获取失败");
+                return false;
+            }
+            if (response.body() != null) {
+                String teachingWeek = response.body().string();
+                JSONObject jsonObject = new JSONObject(teachingWeek);
+                int code = jsonObject.getInt("code");
+                JSONArray data = jsonObject.getJSONArray("data");
+                if (code != 1) {
+                    gj.sc("Load: 获取失败");
                     return false;
                 }
-                Curriculum curriculum = gson.fromJson(value, Curriculum.class);
-                curriculum.data.get(0).week = i;
-                putjsonkc(curriculum, gson);
+                for (int i = 1; i <= data.length(); i++) {
+                    String value = GetCurriculum(String.valueOf(i), "");
+//                gj.sc(""+value);
+                    if (value == null) {
+                        return false;
+                    }
+                    Curriculum curriculum = gson.fromJson(value, Curriculum.class);
+                    curriculum.data.get(0).week = i;
+                    putjsonkc(curriculum, gson);
+                }
             }
             return true;
         } catch (Exception e) {
@@ -124,20 +161,15 @@ public class KcApi {
         wj.xrwb(new File(file, zc + ".txt"), gson.toJson(curriculum));
     }
 
-    public static boolean Load(String Token, Integer[] week) throws Exception {
-//        File file = MainActivity.fileTabList;
-        LoginApi.Token = Token;
+    public static boolean Load(int week) throws Exception {
         Gson gson = new Gson();
-        for (int i : week) {
-            String value = GetCurriculum(String.valueOf(i), "");
-            gj.sc("Load(String Token, Integer[] week)  " + value);
-            if (value == null) {
-                return false;
-            }
-            Curriculum curriculum = gson.fromJson(value, Curriculum.class);
-            curriculum.data.get(0).week = i;
-            putjsonkc(curriculum, gson);
+        String value = GetCurriculum(String.valueOf(week), "");
+        if (value == null) {
+            return false;
         }
+        Curriculum curriculum = gson.fromJson(value, Curriculum.class);
+        curriculum.data.get(0).week = week;
+        putjsonkc(curriculum, gson);
         return true;
     }
 

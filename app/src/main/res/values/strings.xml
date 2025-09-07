@@ -13,4 +13,35 @@
     <string name="about">关于</string>
     <string name="dijizhou">第%d周</string>
     <string name="yyyy_mm_dd">yyyy-mm-dd</string>
+
+    <!-- VPN 服务器设置 -->
+    <string name="address">服务器地址：</string> <!-- Server Address -->
+    <string name="port">服务器端口：</string> <!-- Server Port -->
+    <string name="secret">共享密钥：</string> <!-- Shared Secret -->
+
+    <!-- 连接/断开按钮 -->
+    <string name="connect">连接</string> <!-- Connect! -->
+    <string name="disconnect">断开</string> <!-- Disconnect! -->
+
+    <!-- HTTP 代理设置 -->
+    <string name="proxyhost">HTTP 代理主机名</string> <!-- HTTP proxy hostname -->
+    <string name="proxyport">HTTP 代理端口</string> <!-- HTTP proxy port -->
+
+    <!-- 应用包设置 -->
+    <string name="packages">应用包名（用逗号分隔）</string> <!-- Packages (comma separated) -->
+    <string name="allowed">允许</string> <!-- Allow -->
+    <string name="disallowed">禁止</string> <!-- Disallow -->
+
+    <!-- VPN 状态提示 -->
+    <string name="connecting">ToyVPN 正在连接...</string> <!-- ToyVPN is connecting... -->
+    <string name="connected">ToyVPN 已连接！</string> <!-- ToyVPN is connected! -->
+    <string name="disconnected">ToyVPN 已断开！</string> <!-- ToyVPN is disconnected! -->
+    <!-- 错误提示 -->
+    <string name="incomplete_proxy_settings">
+        代理设置不完整。HTTP 代理需要同时设置主机名和端口。
+    </string> <!-- Incomplete proxy settings -->
+    <string name="unknown_package_names">
+        指定的部分应用包名不存在于设备中。
+    </string> <!-- Some of the specified package names do not exist -->
+
 </resources>

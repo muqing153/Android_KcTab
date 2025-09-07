@@ -1,5 +1,6 @@
 package com.muqing.kctab.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -30,18 +31,11 @@ import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.ActivityLoginBinding;
 import com.muqing.kctab.databinding.DialogZhouBoxBinding;
-import com.muqing.kctab.databinding.ItemZhouBoxBinding;
-import com.muqing.kctab.databinding.ZhouDialogBinding;
-import com.muqing.kctab.zhouDialog;
 import com.muqing.wj;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,14 +51,22 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             Intent data = result.getData();
             if (data != null) {
                 String token = data.getStringExtra("token");
-                gj.sc("Token:" + token);
-                if (LoginApi.IsToken(token)) {
-                    EndToken(token);
-                }
+                new LoadKc(token) {
+                    @Override
+                    public void yes() {
+                        EndToken();
+                    }
+
+                    @Override
+                    public void error(String error) {
+                        runOnUiThread(() -> {
+                            gj.ts(LoginActivity.this, error);
+                        });
+                    }
+                };
             }
         }
     });
-
 
     public List<Integer> zhouList = new ArrayList<>();
 
@@ -78,7 +80,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         SharedPreferences sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE);
         binding.account.setText(sharedPreferences.getString("account", ""));
         binding.password.setText(sharedPreferences.getString("password", ""));
-
+//        gj.sc(zhouList.size());
         binding.loginButton.setOnClickListener(v -> {
             String account = Objects.requireNonNull(binding.account.getText()).toString();
             String password = Objects.requireNonNull(binding.password.getText()).toString();
@@ -95,17 +97,26 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                 edit.apply();
             }
             try {
-                AlertDialog alertDialog = LoadIng();
                 String encrypt = LoginApi.encrypt(password);
                 new Thread(() -> {
                     LoginApi.Token = LoginApi.Login(account, encrypt);
-                    gj.sc(LoginApi.Token);
                     if (LoginApi.IsToken(LoginApi.Token)) {
-                        EndToken(LoginApi.Token);
+                        new LoadKc(LoginApi.Token) {
+                            @Override
+                            public void yes() {
+                                EndToken();
+                            }
+
+                            @Override
+                            public void error(String error) {
+                                runOnUiThread(() -> {
+                                    gj.ts(LoginActivity.this, error);
+                                });
+                            }
+                        };
                     } else {
                         runOnUiThread(() -> gj.ts(LoginActivity.this, "登陆失败"));
                     }
-                    runOnUiThread(alertDialog::dismiss);
                 }).start();
             } catch (Exception e) {
                 gj.sc(e);
@@ -135,13 +146,24 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             @Override
             public boolean setPositive(View view) {
                 if (LoginApi.IsToken(getEditText())) {
-                    EndToken(getEditText());
+                    new LoadKc(LoginApi.Token) {
+                        @Override
+                        public void yes() {
+                            EndToken();
+                        }
+
+                        @Override
+                        public void error(String error) {
+                            runOnUiThread(() -> {
+                                gj.ts(LoginActivity.this, error);
+                            });
+                        }
+                    };
                     return true;
                 }
                 return false;
             }
         }.setMessage("输入Token(浏览器F12课程表处获取)"));
-
 
         binding.syncButton.setOnClickListener(view -> {
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(LoginActivity.this);
@@ -201,49 +223,84 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
     /**
      * kczip导入
      */
-    ActivityResultLauncher<String[]> fhkczip = registerForActivityResult(new ActivityResultContracts.OpenDocument(),
-            uri -> {
-                if (uri != null) {
-                    try {
-                        InputStream inputStream = getContentResolver().openInputStream(uri);
-                        gj.sc("成功获取文件流"); // 你的回调方法
-                        File outputDir = new File(wj.data, "kchuancun");
-                        if (!outputDir.exists()) outputDir.mkdirs();
-                        boolean b = YourKczipOpenActivity.unzipFromUri(LoginActivity.this, inputStream, outputDir);
-                        if (b) {
-                            List<File> allFiles = wj.getAllFiles(outputDir);
-                                Gson gson = new Gson();
-                            for (File file : allFiles){
-                                try {
-                                    Curriculum curriculum = gson.fromJson(wj.dqwb(file), Curriculum.class);
-                                    KcApi.putjsonkc(curriculum, gson);
-                                } catch (Exception e) {
-                                    gj.sc("这个文件不是正确的数据：" + e);
-                                }
-                            }
-//                            if (files != null && files.length > 0) {
-//                                for (File file : files) {
-//                                    KcApi.putjsonkc(curriculum, gson);
-//                                }
-//                            }
-                            wj.sc(outputDir);
-                            binding.syncButton.setText("kczip");
-                            EndToken(null);
+    ActivityResultLauncher<String[]> fhkczip = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
+        if (uri != null) {
+            try {
+                InputStream inputStream = getContentResolver().openInputStream(uri);
+                gj.sc("成功获取文件流"); // 你的回调方法
+                File outputDir = new File(wj.data, "kchuancun");
+                if (!outputDir.exists()) outputDir.mkdirs();
+                boolean b = YourKczipOpenActivity.unzipFromUri(LoginActivity.this, inputStream, outputDir);
+                if (b) {
+                    List<File> allFiles = wj.getAllFiles(outputDir);
+                    Gson gson = new Gson();
+                    for (File file : allFiles) {
+                        try {
+                            Curriculum curriculum = gson.fromJson(wj.dqwb(file), Curriculum.class);
+                            KcApi.putjsonkc(curriculum, gson);
+                        } catch (Exception e) {
+                            gj.sc("这个文件不是正确的数据：" + e);
                         }
-                    } catch (Exception e) {
-                        gj.sc("文件读取失败: " + e.getMessage());
+                    }
+                    wj.sc(outputDir);
+//                            binding.syncButton.setText("kczip");
+                    EndToken();
+                }
+            } catch (Exception e) {
+                gj.sc("文件读取失败: " + e.getMessage());
+            }
+        }
+    });
+
+
+    private abstract class LoadKc extends Thread {
+
+        public AlertDialog alertDialog;
+
+        public LoadKc(String data) {
+            alertDialog = LoadIng();
+            LoginApi.Token = data;
+            start();
+        }
+
+        @Override
+        public void run() {
+            if (zhouList.isEmpty()) {
+                boolean load = KcApi.Load(LoginApi.Token);
+                if (!load) {
+                    error("加载失败");
+                } else {
+                    yes();
+                }
+            }
+            try {
+                gj.sc(zhouList.size());
+                boolean load = false;
+                for (int i = 0; i < zhouList.size(); i++) {
+//                    gj.sc("开始同步第" + (i + 1) + "周");
+                     load = KcApi.Load(zhouList.get(0));
+                    if (!load) {
+                        error(zhouList.get(0) + "加载失败");
                     }
                 }
-            });
-
-    private void EndToken(String token) {
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("token", token);
-        if (zhouList.isEmpty()) {
-            resultIntent.putExtra("sync", binding.syncButton.getText().toString());
-        } else {
-            resultIntent.putExtra("sync", new Gson().toJson(zhouList));
+                if (load) {
+                    yes();
+                }
+            } catch (Exception e) {
+                gj.sc("同步失败:" + e);
+            }
+//            yes();
+            runOnUiThread(alertDialog::dismiss);
         }
+
+        public abstract void yes();
+
+        public abstract void error(String error);
+    }
+
+    private void EndToken() {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("kc", true);
         setResult(RESULT_OK, resultIntent);
         finish();
     }

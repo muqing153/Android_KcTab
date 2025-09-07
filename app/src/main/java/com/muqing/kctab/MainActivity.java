@@ -1,18 +1,15 @@
 package com.muqing.kctab;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.net.VpnService;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -24,7 +21,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.muqing.AppCompatActivity;
@@ -33,8 +29,9 @@ import com.muqing.kctab.Activity.LoginActivity;
 import com.muqing.kctab.Activity.SettingActivity;
 import com.muqing.kctab.Adapter.KeChengPageAdapter;
 import com.muqing.kctab.databinding.ActivityMainBinding;
-import com.muqing.kctab.databinding.DialogDownloadApkBinding;
 import com.muqing.kctab.fragment.kecheng;
+import com.muqing.kctab.service.ToyVpnClient;
+import com.muqing.kctab.service.ToyVpnService;
 import com.muqing.wj;
 
 import java.io.File;
@@ -188,7 +185,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 binding.menuZhou.setText(String.format("第%s周", position + 1));
-
                 Handler handler = new Handler();
                 handler.postDelayed(() -> {
                     kecheng fragment = pageAdapter.data.get(position);
@@ -213,9 +209,8 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             zhouDialog.zhouAdapter.week = MainActivity.this.binding.viewpage.getCurrentItem() + 1;
         });
         timer.schedule(task, 0, 1000); // 立即开始，每隔1秒执行
-
+//        startActivity(new Intent(this, ToyVpnClient.class));
     }
-
 
     public static class ScheduleItem {
         public String session;
@@ -264,71 +259,22 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();
             if (data != null) {
-                new LoadKc(data) {
-                    @Override
-                    public void error() {
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "同步更新失败", Toast.LENGTH_SHORT).show());
-                    }
-                };
+//                LoadUI();
             }
         }
     });
+
     ActivityResultLauncher<Intent> LoginStart = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();
             if (data != null) {
-                new LoadKc(data) {
-                    @Override
-                    public void error() {
-                        Login();
-                    }
-                };
-                return;
+                boolean kc = data.getBooleanExtra("kc", false);
+                if (kc) {
+                    LoadUI();
+                    return;
+                }
             }
         }
         finish();
     });
-
-    public abstract class LoadKc extends Thread {
-        public Intent data;
-        AlertDialog alertDialog;
-
-        public LoadKc(Intent data) {
-            this.data = data;
-            alertDialog = main.LoadIng(MainActivity.this);
-            start();
-        }
-
-        @Override
-        public void run() {
-            String sycn = data.getStringExtra("sync");
-            String token = data.getStringExtra("token");
-            boolean load = false;
-            if (sycn == null) {
-                return;
-            }
-            if (sycn.equals("ALL")) {
-                load = KcApi.Load(token);
-            } else if (sycn.equals("kczip")) {
-                load = true;
-            } else {
-                List<Integer> o = new Gson().fromJson(sycn, new TypeToken<List<Integer>>() {
-                }.getType());
-                Integer[] array = o.toArray(new Integer[0]);
-                try {
-                    load = KcApi.Load(token, array);
-                } catch (Exception e) {
-                    gj.sc("load = KcApi.Load(token, array); " + e);
-                }
-            }
-            if (load) {
-                runOnUiThread(MainActivity.this::LoadUI);
-            } else {
-                error();
-            }
-            runOnUiThread(() -> alertDialog.dismiss());
-        }
-
-        public abstract void error();
-    }
 }

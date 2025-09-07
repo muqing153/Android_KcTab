@@ -30,6 +30,7 @@ import com.muqing.gj;
 import com.muqing.kctab.databinding.ActivityWebBinding;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
 
@@ -52,11 +53,9 @@ public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
         } else {
             // 没权限，可以提醒用户，或者跳过绑定
             gj.sc("没有权限");
-
         }
         // 刷新完成后，记得取消动画
         binding.swipe.setRefreshing(false);
-
         Intent intent = getIntent();
         if (intent == null) {
             finish();
@@ -67,16 +66,13 @@ public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
         WebSettings webSettings = binding.web.getSettings();
         webSettings.setJavaScriptEnabled(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(binding.web, true);
-
 // 禁用缓存
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 //        binding.web.clearCache(true);
 //        binding.web.clearHistory();
-
         if (url != null) {
             binding.web.loadUrl(url);
         }
-//        binding.web.loadUrl("https://www.muqingcandy.top/");
         // 设置 WebViewClient，以便在 WebView 内部处理链接而不是启动浏览器
         TypedArray array = getTheme().obtainStyledAttributes(new int[]{
                 android.R.attr.colorBackground,
@@ -107,14 +103,26 @@ public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
                 } else {
                     Log.d("Cookies", "没有 Cookies");
                 }
+                gj.sc(url);
+                if (Objects.equals(url, "http://protal.qdpec.edu.cn:19580/favicon.ico")) {
+                    view.loadUrl("https://www.muqingcandy.top/");
 
+                }
             }
 
+//            @Override
+//            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+//                gj.sc(request.getUrl().toString());
+//                return super.shouldOverrideUrlLoading(view, request);
+//            }
+
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                String url = request.getUrl().toString();
+                if (url.equals("http://protal.qdpec.edu.cn:19580/favicon.ico")) {
+                    view.post(() -> view.loadUrl("http://jw.qdpec.edu.cn:8088/njwhd/loginSso"));
+                }
                 // ✅ 打印请求头
                 Map<String, String> headers = request.getRequestHeaders();
-//                String url = request.getUrl().toString();
-//                gj.sc("请求 URL: " + url);
                 for (Map.Entry<String, String> entry : headers.entrySet()) {
 //                    gj.sc(entry.getKey() + ": " + entry.getValue());
                     if (entry.getKey().equals("Token") || entry.getKey().equals("token")) {

@@ -60,7 +60,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         return FragmentKebiaoBinding.inflate(inflater, container, false);
     }
 
-//    public static final MainActivity.ScheduleItem[] schedule = {new MainActivity.ScheduleItem("1.2", "08:20-09:05", "09:15-10:00"),
+    //    public static final MainActivity.ScheduleItem[] schedule = {new MainActivity.ScheduleItem("1.2", "08:20-09:05", "09:15-10:00"),
 //            new MainActivity.ScheduleItem("3.4", "10:10-11:40", "10:30-12:00"),
 //            new MainActivity.ScheduleItem("5.6", "13:30-14:15", "14:25-15:10"),
 //            new MainActivity.ScheduleItem("7.8", "15:20-16:05", "16:15-17:00"),
@@ -74,11 +74,16 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
             new MainActivity.ScheduleItem("9.10", "18:30-19:15", "19:25-20:10")
     };
 
-    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onStart() {
         super.onStart();
         if (isAdded()) {
+            if (FilePath != null) {
+//            gj.sc("启动Fragment UI 读取文件");
+                String dqwb = wj.dqwb(FilePath, "");
+                curriculum = new Gson().fromJson(dqwb, Curriculum.class);
+                curriculum.data.get(0).week = zhou;
+            }
             if (curriculum != null && curriculum.data != null) {
 //            gj.sc("启动Fragment UI 初始化表内容");
                 adapter = new GridAdapter(this.getContext(), GetKcLei(curriculum)) {
@@ -103,11 +108,11 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                     adapter.Load(binding.recyclerview);
                     binding.horizontal.scrollTo(adapter.ItemXY[0], adapter.ItemXY[1]);
                 });
+                toolbar_time();
             }
         }
     }
     public Curriculum curriculum;
-
     public void toolbar_time() {
         if (!isAdded()) return;
         gj.sc("启动Fragment UI 读取时间");
@@ -119,33 +124,6 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
     public void setUI(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         GridLayoutManager layoutManager = new GridLayoutManager(this.getContext(), 8); // 列
         binding.recyclerview.setLayoutManager(layoutManager);
-        if (FilePath != null) {
-//            gj.sc("启动Fragment UI 读取文件");
-            String dqwb = wj.dqwb(FilePath, "");
-            curriculum = new Gson().fromJson(dqwb, Curriculum.class);
-            curriculum.data.get(0).week = zhou;
-        }
-
-        //获取屏幕高度
-//        int heightPixels = Resources.getSystem().getDisplayMetrics().heightPixels;
-//        binding.horizontal.getLayoutParams().height = heightPixels;
-//        binding.horizontal.buildLayer();
-//        binding.horizontal.setBackgroundColor(Color.GRAY);
-    }
-
-    private List<Curriculum.Course> GetListKc(List<List<Curriculum.Course>> dataList) {
-        List<Curriculum.Course> filtered = new ArrayList<>();
-        for (int i = 0; i < dataList.size(); i++) {
-            if (i > 8 && i % 8 != 0) {
-                for (Curriculum.Course course : dataList.get(i)) {
-                    if (course.classTime == null) {
-                        continue;
-                    }
-                    filtered.add(course);
-                }
-            }
-        }
-        return filtered;
 
     }
 
@@ -244,6 +222,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         }
         return true;
     }
+
     public static boolean IsCourse(Curriculum.Course course) {
         if (course.classTime == null || course.endTime == null || course.startTime == null) {
             return false;
