@@ -71,6 +71,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         }
         if (tablestyle.width > -1){
             inflate.line1.getLayoutParams().width = gj.dp2px(context, tablestyle.width);
+            inflate.line2.getLayoutParams().width = gj.dp2px(context, tablestyle.width);
         }
 //        inflate.getRoot().setCardBackgroundColor(ColorNext);
         return inflate;

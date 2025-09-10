@@ -165,6 +165,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             }
         }.setMessage("输入Token(浏览器F12课程表处获取)"));
 
+        Intent intent = getIntent();
         binding.syncButton.setOnClickListener(view -> {
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(LoginActivity.this);
             DialogZhouBoxBinding zhouDialogBinding = DialogZhouBoxBinding.inflate(LayoutInflater.from(LoginActivity.this));
@@ -179,7 +180,10 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             float density = getResources().getDisplayMetrics().density;
             int itemWidthPx = (int) (itemWidthDp * density + 0.5f);
             zhouList.clear();
-            zhouList.add(MainActivity.benzhou);
+            String sync = intent.getStringExtra("sync");
+            if (sync != null) {
+                zhouList.add(Integer.valueOf(sync));
+            }
             zhouDialogBinding.getRoot().post(() -> {
                 int width = zhouDialogBinding.getRoot().getWidth();
                 int spanCount = Math.max(5, width / itemWidthPx);
@@ -188,7 +192,6 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             });
             bottomSheetDialog.show();
         });
-        Intent intent = getIntent();
         if (intent.getStringExtra("sync") != null) {
             binding.syncButton.setEnabled(true);
             zhouList.clear();
@@ -258,9 +261,11 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         public AlertDialog alertDialog;
 
         public LoadKc(String data) {
-            alertDialog = LoadIng();
-            LoginApi.Token = data;
-            start();
+            runOnUiThread(() -> {
+                alertDialog = LoadIng();
+                LoginApi.Token = data;
+                start();
+            });
         }
 
         @Override

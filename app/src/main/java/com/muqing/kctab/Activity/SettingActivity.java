@@ -1,7 +1,6 @@
 package com.muqing.kctab.Activity;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -169,7 +168,7 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
         SharedPreferences kebiao = getSharedPreferences("kebiao", MODE_PRIVATE);
         {
             File file = new File(wj.data, "TabList");
-            String[] list = file.list();
+            String[] list = file.list((file1, s) -> file.isDirectory());
             if (list != null) {
                 Arrays.sort(list);
                 binding.kbXuenian.setMessage(kebiao.getString("xuenian", "null"));

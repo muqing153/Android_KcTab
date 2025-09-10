@@ -24,8 +24,6 @@ import java.util.Optional;
 public class CourseOverviewActivity extends AppCompatActivity<ActivityCourseOverviewBinding> {
 
     List<Curriculum.Course> list = new ArrayList<>();
-
-
     @Override
     public void setOnApplyWindowInsetsListener(Insets systemBars, View v) {
     }

@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,6 +31,7 @@ import com.muqing.gj;
 import com.muqing.kctab.Adapter.GridAdapter;
 import com.muqing.kctab.databinding.ActivityJietuBinding;
 import com.muqing.kctab.databinding.GridItemBinding;
+import com.muqing.kctab.fragment.kecheng;
 import com.muqing.wj;
 
 import java.io.File;
@@ -160,20 +162,18 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
         for (int i = 0; i < itemCount; i++) {
 
             List<Curriculum.Course> item = adapter.dataList.get(i); // 👈 获取数据项
-            if (item.isEmpty() || item.get(0).courseName == null) {
+            if (i > 8 && i % 8 != 0 && (item.isEmpty() || !kecheng.IsCourse(item.get(0)))) {
                 Bitmap emptyBitmap = Bitmap.createBitmap(itemWidth, 1, Bitmap.Config.ARGB_8888); // 高度先设为1，稍后按行最大高度填充
                 itemBitmaps.add(emptyBitmap);
                 continue;
             }
             BaseAdapter.ViewHolder<GridItemBinding> holder = adapter.createViewHolder(recyclerView, adapter.getItemViewType(i));
             adapter.onBindViewHolder(holder, i);
-
             holder.itemView.measure(
                     View.MeasureSpec.makeMeasureSpec(itemWidth, View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             );
             holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
-
             Bitmap itemBitmap = Bitmap.createBitmap(
                     holder.itemView.getMeasuredWidth(),
                     holder.itemView.getMeasuredHeight(),

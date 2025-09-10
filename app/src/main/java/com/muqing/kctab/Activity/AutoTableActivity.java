@@ -20,10 +20,6 @@ import java.util.List;
 public class AutoTableActivity extends AppCompatActivity<ActivityAutoTableBinding> {
 
     public List<TableStyleData> dataList = new ArrayList<>();
-    TableStyleData tableStyleData;
-
-    //    public class TableItemData {
-//    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,12 +31,11 @@ public class AutoTableActivity extends AppCompatActivity<ActivityAutoTableBindin
         d.cardElevation = 0;
         d.cardCornerRadius = 0;
         d.width = 80;
-        d.height = 138;
+        d.height = 127;
         dataList.add(d);
         binding.recyclerview.setLayoutManager(new GridLayoutManager(this, 2));
         binding.recyclerview.setAdapter(new AutoTableAdapter(this, dataList));
     }
-
     @Override
     protected ActivityAutoTableBinding getViewBindingObject(LayoutInflater layoutInflater) {
         return ActivityAutoTableBinding.inflate(layoutInflater);
