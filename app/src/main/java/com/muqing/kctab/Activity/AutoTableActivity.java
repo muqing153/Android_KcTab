@@ -1,18 +1,14 @@
 package com.muqing.kctab.Activity;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 
-import com.google.gson.Gson;
 import com.muqing.AppCompatActivity;
 import com.muqing.kctab.Adapter.AutoTableAdapter;
 import com.muqing.kctab.DataType.TableStyleData;
 import com.muqing.kctab.databinding.ActivityAutoTableBinding;
-import com.muqing.kctab.databinding.ItemTableAutoBinding;
 
 import java.util.ArrayList;
 import java.util.List;
