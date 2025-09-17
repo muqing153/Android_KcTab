@@ -75,12 +75,9 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         super.onCreate(savedInstanceState);
         setContentView();
         setBackToolsBar(binding.toolbar);
-//        String XYIP = getLocalIpAddress();
-//        gj.sc(XYIP);
         SharedPreferences sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE);
         binding.account.setText(sharedPreferences.getString("account", ""));
         binding.password.setText(sharedPreferences.getString("password", ""));
-//        gj.sc(zhouList.size());
         binding.loginButton.setOnClickListener(v -> {
             String account = Objects.requireNonNull(binding.account.getText()).toString();
             String password = Objects.requireNonNull(binding.password.getText()).toString();
@@ -97,9 +94,8 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                 edit.apply();
             }
             try {
-                String encrypt = LoginApi.encrypt(password);
                 new Thread(() -> {
-                    LoginApi.Token = LoginApi.Login(account, encrypt);
+                    LoginApi.Token = LoginApi.Login(account, password);
                     if (LoginApi.IsToken(LoginApi.Token)) {
                         new LoadKc(LoginApi.Token) {
                             @Override
@@ -209,7 +205,9 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             fhkczip.launch(new String[]{"*/*"});
         });
 
-        String text = "使用登陆功能请同意 <a href='https://yourdomain.com/user'>《用户协议》</a> 与 <a href='https://yourdomain.com/privacy'>《隐私政策》</a>";
+        String text = "使用登陆功能请同意 <a href='https://muqingcandy.top/UserAgreement.html#yiyoubiao_user_agreement'>《用户协议》</a> " +
+                "与" +
+                " <a href='https://muqingcandy.top/UserAgreement.html#yiyoubiao_privacy_policy'>《隐私政策》</a>";
         binding.checkbox.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
         binding.checkbox.setMovementMethod(LinkMovementMethod.getInstance());
         boolean xieyi = sharedPreferences.getBoolean("xieyi", false);
@@ -283,7 +281,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                 boolean load = false;
                 for (int i = 0; i < zhouList.size(); i++) {
 //                    gj.sc("开始同步第" + (i + 1) + "周");
-                     load = KcApi.Load(zhouList.get(0));
+                    load = KcApi.Load(zhouList.get(0));
                     if (!load) {
                         error(zhouList.get(0) + "加载失败");
                     }

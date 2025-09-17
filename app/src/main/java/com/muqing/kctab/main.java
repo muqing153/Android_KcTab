@@ -71,8 +71,6 @@ public class main extends Application {
                 break;
         }
     }
-
-
     public static AlertDialog LoadIng(Context context) {
         MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(context);
         dialog.setView(R.layout.load_dialog);

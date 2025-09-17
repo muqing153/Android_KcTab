@@ -229,7 +229,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -254,7 +253,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         }
         return super.onOptionsItemSelected(item);
     }
-
     ActivityResultLauncher<Intent> SyncKc = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();
@@ -263,7 +261,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             }
         }
     });
-
     ActivityResultLauncher<Intent> LoginStart = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();

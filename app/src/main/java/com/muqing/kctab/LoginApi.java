@@ -8,7 +8,6 @@ import com.muqing.gj;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
@@ -25,7 +24,6 @@ import okhttp3.Response;
 public class LoginApi {
     public static String Token;
 
-
     public static boolean IsToken(String token) {
         if (TextUtils.isEmpty(token)) {
             return false;
@@ -34,11 +32,8 @@ public class LoginApi {
         if (token.length() < 100 || token.length() > 200) {
             return false;
         }
-
-
         String[] parts = token.split("\\.");
         if (parts.length != 3) return false;
-
         for (String part : parts) {
             if (!part.matches("^[A-Za-z0-9_-]+$")) {
                 return false;
@@ -46,13 +41,14 @@ public class LoginApi {
         }
         return true;
     }
+
     public static String Login(String account, String password) {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url("http://jw.qdpec.edu.cn:8088/njwhd/login?userNo=" + account + "&pwd=" + password + "&encode=1")
+                .url("http://jw.qdpec.edu.cn:8088/njwhd/login?userNo=" + account + "&pwd=" + encrypt(password) + "&encode=1")
                 .method("POST", body)
                 .addHeader("Accept", "application/json, text/plain, */*")
                 .addHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
@@ -76,22 +72,18 @@ public class LoginApi {
         }
         return null;
     }
-
-    public static String encrypt(String input) throws Exception {
-        String key = "qzkj1kjghd=876&*"; // 16字节密钥
-        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
-
-        @SuppressLint("GetInstance") Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-
-        // JS 中加密的是 JSON.stringify(input)，即："Muqing153@"
-        byte[] encrypted = cipher.doFinal(("\"" + input + "\"").getBytes(StandardCharsets.UTF_8));
-        String s = Base64.getEncoder().encodeToString(encrypted);
-        return Base64.getEncoder().encodeToString(s.getBytes());
+    public static String encrypt(String input) {
+        try {
+            String key = "qzkj1kjghd=876&*"; // 16字节密钥
+            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
+            @SuppressLint("GetInstance") Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            byte[] encrypted = cipher.doFinal(("\"" + input + "\"").getBytes(StandardCharsets.UTF_8));
+            String s = Base64.getEncoder().encodeToString(encrypted);
+            return Base64.getEncoder().encodeToString(s.getBytes());
+        } catch (Exception e) {
+            gj.sc(e);
+        }
+        return input;
     }
-
-
-
-
-
 }
