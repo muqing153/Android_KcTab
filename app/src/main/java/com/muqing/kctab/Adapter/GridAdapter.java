@@ -22,6 +22,7 @@ import com.muqing.kctab.Dialog.KcinfoBottomDialog;
 import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.databinding.GridItemBinding;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -29,13 +30,6 @@ import java.util.Objects;
 import java.util.Random;
 
 public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Course>> {
-
-
-    public final int ColorThis;
-    //当前课的颜色高亮
-    public final int ColorWhen;
-    //下节课的颜色高亮
-    public final int ColorNext;
     public int zhou = 0;
     private final boolean showJie, showInfo;
 
@@ -46,15 +40,10 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         Gson gson = new Gson();
         SharedPreferences a = context.getSharedPreferences("tablestyle", Context.MODE_PRIVATE);
         tablestyle = gson.fromJson(a.getString("tablestyle", gson.toJson(new TableStyleData())), TableStyleData.class);
-
         SharedPreferences sharedPreferences = context.getSharedPreferences("kebiao", Context.MODE_PRIVATE);
         showJie = sharedPreferences.getBoolean("showJie", true);
         showInfo = sharedPreferences.getBoolean("showInfo", true);
-        ColorThis = gj.getThemeColor(context, com.google.android.material.R.attr.colorSurfaceContainerLow);
-        ColorWhen = gj.getThemeColor(context, com.google.android.material.R.attr.colorPrimary);
-        ColorNext = gj.getThemeColor(context, com.google.android.material.R.attr.colorOnPrimary);
     }
-
 
     @Override
     protected GridItemBinding getViewBindingObject(LayoutInflater inflater, ViewGroup parent, int viewType) {
@@ -69,7 +58,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         if (tablestyle.height > -1) {
             inflate.line1.getLayoutParams().height = gj.dp2px(context, tablestyle.height);
         }
-        if (tablestyle.width > -1){
+        if (tablestyle.width > -1) {
             inflate.line1.getLayoutParams().width = gj.dp2px(context, tablestyle.width);
             inflate.line2.getLayoutParams().width = gj.dp2px(context, tablestyle.width);
         }
@@ -126,90 +115,89 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         }
         viewBinding.getRoot().setOnClickListener(v -> {
             if (position > 8 && position % 8 != 0) {
-                ShowKc(data);
+                ShowKc(data, position);
             }
         });
 //        viewBinding.getRoot().setOnLongClickListener(view -> ShowLong(data, view, position));
     }
+
     /**
      * 更新保存课表
      *
      * @param course
      * @return
      */
-    public boolean update(List<List<Curriculum.Course>> course) {
+    public boolean update(List<List<Curriculum.Course>> course, int position) {
         return false;
     }
+
     @SuppressLint("NotifyDataSetChanged")
-    private void ShowKc(List<Curriculum.Course> data) {
+    private void ShowKc(List<Curriculum.Course> data, int position) {
         KcinfoBottomDialog dialog = new KcinfoBottomDialog(context, data);
         dialog.setOnDismissListener(dialogInterface -> {
             if (data != dialog.data) {
                 data.clear();
                 data.addAll(dialog.data);
-                update(dataList);
+                update(dataList, position);
             }
-            notifyDataSetChanged();
         });
     }
-    GridItemBinding ItemBinding, NextItemBinding;
 
+    public GridItemBinding ItemBinding, NextItemBinding;
     public int[] ItemXY = new int[]{0, 0};
+    public int Day = -1;
+
     public void Load(RecyclerView recyclerView) {
-        if (zhou != MainActivity.benzhou) {
-            //不是本周的课程不高亮
-            return;
+        if (Day == -1) {
+            Day = LocalDate.now().getDayOfWeek().getValue();
         }
-        int weekDay = MainActivity.Week; // 获取当前星期
 //        weekDay = 1;
-        String time = MainActivity.Time; // 获取当前时间
+        String time = "08:00";
+        if (Day == LocalDate.now().getDayOfWeek().getValue()) {
+            time = MainActivity.Time; // 获取当前时间
+        }
 //        随机生成时间 每过3S
 //        time = "15:15";
-        for (int x = 1, y = weekDay + 8; x < 6; y += 8, x++) {
+        for (int x = 1, y = Day + 8; x < 6; y += 8, x++) {
             Curriculum.Course data = dataList.get(y).get(0);
             if (data.courseName != null) {
                 if (data.startTime != null && data.endTime != null) {
-                    // 格式化成 HH:mm
-                    // 生成 1~7 之间的随机星期
 //                time是否在Start和End之间
-                    if (time.compareTo(data.startTime) >= 0 && time.compareTo(data.endTime) <= 0 && Objects.equals(data.weekDay, weekDay)) {
+                    if (time.compareTo(data.startTime) >= 0 && time.compareTo(data.endTime) <= 0 && Objects.equals(data.weekDay, Day)) {
                         View viewByPosition = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(y);
                         if (viewByPosition != null) {
-                            if (ItemBinding != null && ItemBinding.getRoot() != viewByPosition) {
-                                ItemBinding.getRoot().setCardBackgroundColor(ColorThis);
+                            if (ItemBinding == null) {
+                                ItemBinding = GridItemBinding.bind(viewByPosition);
+                                ItemBinding.getRoot().setStrokeWidth(3);
+                                ItemBinding.getRoot().getLocationInWindow(ItemXY);
+                            } else if (ItemBinding.getRoot() != viewByPosition) {
+                                ItemBinding.getRoot().setStrokeWidth(0);
+                                ItemBinding = null;
                             }
-                            ItemBinding = GridItemBinding.bind(viewByPosition);
-                            ItemBinding.getRoot().setCardBackgroundColor(ColorWhen);
-                            ItemBinding.getRoot().getLocationInWindow(ItemXY);
-//                            gj.sc("ItemBinding:" + ItemXY[0] + " " + ItemXY[1]);
                             break;
                         }
-                    } else if (ItemBinding != null) {
-                        ItemBinding.getRoot().setCardBackgroundColor(ColorThis);
-                        ItemBinding = null;
                     }
+                    gj.sc("NextItemBinding " + Day + " " + time);
 
-                    if (data.startTime.compareTo(time) > 0 && Objects.equals(data.weekDay, weekDay)) {
+                    if (data.startTime.compareTo(time) > 0 && Objects.equals(data.weekDay, Day)) {
                         View viewByPosition = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(y);
                         if (viewByPosition != null) {
-                            if (NextItemBinding == null){
+                            if (NextItemBinding == null) {
                                 NextItemBinding = GridItemBinding.bind(viewByPosition);
-                                NextItemBinding.getRoot().setCardBackgroundColor(ColorNext);
+                                NextItemBinding.getRoot().setStrokeWidth(3);
                                 NextItemBinding.getRoot().getLocationInWindow(ItemXY);
-                            }else if (NextItemBinding.getRoot() != viewByPosition){
-                                NextItemBinding.getRoot().setCardBackgroundColor(ColorThis);
+                            } else if (NextItemBinding.getRoot() != viewByPosition) {
+                                NextItemBinding.getRoot().setStrokeWidth(0);
                                 NextItemBinding = null;
                             }
+                            break;
                         }
-                        break;
                     }
                 }
             }
         }
-        if (NextItemBinding == null && ItemBinding == null && weekDay + 1 != 8) {
-            MainActivity.Week++;
-            MainActivity.Time = "08:00";
-//            Load(recyclerView);
+        if (NextItemBinding == null && ItemBinding == null && Day + 1 != 8) {
+            Day++;
         }
     }
 }

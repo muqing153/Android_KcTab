@@ -199,7 +199,6 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             Intent intent1 = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent1.addCategory(Intent.CATEGORY_OPENABLE);
             intent1.setType("*/*");
-
             // 可选：限制选择单个文件
             intent1.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
             fhkczip.launch(new String[]{"*/*"});
@@ -255,9 +254,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
 
 
     private abstract class LoadKc extends Thread {
-
         public AlertDialog alertDialog;
-
         public LoadKc(String data) {
             runOnUiThread(() -> {
                 alertDialog = LoadIng();

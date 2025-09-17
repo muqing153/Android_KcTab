@@ -34,12 +34,9 @@ public class YourKczipOpenActivity extends AppCompatActivity<ActivityYourkczipBi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView();
-
         Uri data = getIntent().getData();
-        gj.sc(data);
         if (data != null) {
             try {
-//                gj.sc(inputStream);
                 if (wj.data == null) {
                     wj.data = wj.data(this);
                 }
@@ -50,7 +47,6 @@ public class YourKczipOpenActivity extends AppCompatActivity<ActivityYourkczipBi
                 unzipFromUri(this, inputStream, outputDir);
                 gj.sc(outputDir);
                 finishAndRemoveTask();
-
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(this, "无法读取文件", Toast.LENGTH_SHORT).show();

@@ -1,6 +1,7 @@
 package com.muqing.kctab.fragment;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -20,6 +21,9 @@ import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.FragmentKebiaoBinding;
 import com.muqing.wj;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -50,7 +54,6 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
     public kecheng() {
     }
 
-
     @Override
     protected FragmentKebiaoBinding getViewBindingObject(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return FragmentKebiaoBinding.inflate(inflater, container, false);
@@ -62,6 +65,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
 //            new MainActivity.ScheduleItem("7.8", "15:20-16:05", "16:15-17:00"),
 //            new MainActivity.ScheduleItem("9.10", "18:30-19:15", "19:25-20:10")};
 //
+    public Handler handler;
     public static final MainActivity.ScheduleItem[] schedule = {
             new MainActivity.ScheduleItem("1.2", "08:20-09:05", "09:15-10:00"),
             new MainActivity.ScheduleItem("3.4", "10:20-11:05", "11:15-12:00"),
@@ -80,11 +84,14 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                 curriculum = new Gson().fromJson(dqwb, Curriculum.class);
                 curriculum.data.get(0).week = zhou;
             }
+            if (handler == null && zhou == MainActivity.benzhou) {
+                handler = new Handler();
+            }
             if (curriculum != null && curriculum.data != null) {
 //            gj.sc("启动Fragment UI 初始化表内容");
                 adapter = new GridAdapter(this.getContext(), GetKcLei(curriculum)) {
                     @Override
-                    public boolean update(List<List<Curriculum.Course>> list) {
+                    public boolean update(List<List<Curriculum.Course>> list, int position) {
                         List<Curriculum.Course> q = new ArrayList<>();
                         for (List<Curriculum.Course> a : list) {
                             for (Curriculum.Course c : a) {
@@ -95,23 +102,43 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                         }
                         curriculum.data.get(0).courses = q;
                         wj.xrwb(FilePath, new Gson().toJson(curriculum));
+                        adapter.notifyItemChanged(position);
+
+                        adapter.ItemBinding = null;
+                        adapter.NextItemBinding = null;
+//                        adapter.Day = -1;
                         return false;
                     }
                 };
+                adapter.Day = -1;
                 adapter.zhou = curriculum.data.get(0).week;
                 binding.recyclerview.setAdapter(adapter);
-                binding.recyclerview.post(() -> {
-                    adapter.Load(binding.recyclerview);
-                    binding.horizontal.scrollTo(adapter.ItemXY[0], adapter.ItemXY[1]);
-                });
+                gj.sc(zhou + " " + MainActivity.benzhou);
+                if (zhou == MainActivity.benzhou && handler != null) {
+//                    MainActivity.Week = LocalDate.now().getDayOfWeek().getValue();
+                    LocalTime now = LocalTime.now();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                    MainActivity.Time = now.format(formatter);
+                    handler.post(this::LoadHander);
+                }
+                binding.recyclerview.post(() -> binding.horizontal.scrollTo(adapter.ItemXY[0], adapter.ItemXY[1]));
                 toolbar_time();
             }
         }
     }
+
+    private void LoadHander() {
+        if (isAdded()) {
+//            gj.sc("启动Fragment UI 启动计时器");
+            adapter.Load(binding.recyclerview);
+        }
+        handler.postDelayed(this::LoadHander, 1000);
+    }
+
     public Curriculum curriculum;
+
     public void toolbar_time() {
         if (!isAdded()) return;
-        gj.sc("启动Fragment UI 读取时间");
         TextView viewById = requireActivity().findViewById(R.id.toolbar_time);
         viewById.setText(curriculum.data.get(0).date.get(0).mxrq);
     }
@@ -120,7 +147,6 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
     public void setUI(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         GridLayoutManager layoutManager = new GridLayoutManager(this.getContext(), 8); // 列
         binding.recyclerview.setLayoutManager(layoutManager);
-
     }
 
     private List<List<Curriculum.Course>> GetKcLei(Curriculum curriculum) {

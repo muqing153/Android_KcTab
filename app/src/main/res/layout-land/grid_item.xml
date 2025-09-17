@@ -5,7 +5,10 @@
     style="@style/Widget.Material3.CardView.Elevated"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    app:cardUseCompatPadding="true">
+    app:cardElevation="0dp"
+    app:cardUseCompatPadding="true"
+    app:strokeWidth="0dp"
+    app:strokeColor="?attr/colorPrimaryFixedDim">
 
     <LinearLayout
         android:id="@+id/line1"

@@ -141,31 +141,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     public KeChengPageAdapter pageAdapter;
 
     public void UI() {
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-//                gj.sc("每秒执行一次任务");
-                LocalTime now = LocalTime.now();
-                LocalDate today = LocalDate.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-                Time = now.format(formatter);
-                // 获取当前星期几（1=星期一，7=星期日）
-                Week = today.getDayOfWeek().getValue();
-                // 在主线程更新 UI
-                runOnUiThread(() -> {
-                    try {
-                        int currentItem = binding.viewpage.getCurrentItem();
-                        Fragment fragment = getSupportFragmentManager().findFragmentByTag("f" + currentItem);
-                        if (fragment instanceof kecheng) {
-                            kecheng k = (kecheng) fragment;
-                            k.adapter.Load(k.binding.recyclerview);
-                        }
-                    } catch (Exception e) {
-                        gj.sc("TimerTask " + e);
-                    }
-                });
-            }
-        };
         if (binding == null) {
             setContentView();
             setSupportActionBar(binding.toolbar);
@@ -208,7 +183,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             };
             zhouDialog.zhouAdapter.week = MainActivity.this.binding.viewpage.getCurrentItem() + 1;
         });
-        timer.schedule(task, 0, 1000); // 立即开始，每隔1秒执行
+//        timer.schedule(task, 0, 1000); // 立即开始，每隔1秒执行
 //        startActivity(new Intent(this, ToyVpnClient.class));
     }
 
