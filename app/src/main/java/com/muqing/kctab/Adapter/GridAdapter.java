@@ -27,7 +27,7 @@ import java.util.Objects;
 
 public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Course>> {
     public int zhou = 0;
-    private final boolean showJie, showInfo;
+    public boolean showInfo = true;
 
     TableStyleData tablestyle;
 
@@ -36,9 +36,6 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         Gson gson = new Gson();
         SharedPreferences a = context.getSharedPreferences("tablestyle", Context.MODE_PRIVATE);
         tablestyle = gson.fromJson(a.getString("tablestyle", gson.toJson(new TableStyleData())), TableStyleData.class);
-        SharedPreferences sharedPreferences = context.getSharedPreferences("kebiao", Context.MODE_PRIVATE);
-        showJie = sharedPreferences.getBoolean("showJie", true);
-        showInfo = sharedPreferences.getBoolean("showInfo", true);
     }
 
     @Override
@@ -56,7 +53,6 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         }
         if (tablestyle.width > -1) {
             inflate.line1.getLayoutParams().width = gj.dp2px(context, tablestyle.width);
-//            inflate.line2.getLayoutParams().width = gj.dp2px(context, tablestyle.width);
         }
         return inflate;
     }

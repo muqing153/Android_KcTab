@@ -3,6 +3,7 @@ package com.muqing.kctab;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,11 +11,13 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -25,12 +28,17 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.muqing.AppCompatActivity;
 import com.muqing.BaseAdapter;
 import com.muqing.gj;
 import com.muqing.kctab.Adapter.GridAdapter;
+import com.muqing.kctab.Adapter.TableHAdapter;
+import com.muqing.kctab.Adapter.TableTimeAdapter;
+import com.muqing.kctab.DataType.TableTimeData;
 import com.muqing.kctab.databinding.ActivityJietuBinding;
 import com.muqing.kctab.databinding.GridItemBinding;
+import com.muqing.kctab.databinding.ItemTableHBinding;
 import com.muqing.kctab.fragment.kecheng;
 import com.muqing.wj;
 
@@ -38,16 +46,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
-    public static Bitmap bitmap;
+    public Bitmap bitmap;
 
-    public static void start(Activity activity, Bitmap imageView) {
-        bitmap = imageView;
+    public static void start(Activity activity, Curriculum data) {
 // 创建 Intent 并传递 Bitmap 数据
         Intent intent = new Intent(activity, jietuActivity.class);
+        intent.putExtra("data", new Gson().toJson(data));
         activity.startActivity(intent);
     }
 
@@ -55,29 +64,12 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView();
-        setSupportActionBar(binding.toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        //获取屏幕的宽度
-        boolean tablet = gj.isTablet(this);
-        getResources().getDisplayMetrics();
-        int k;
-        if (tablet) {
-            k = getResources().getDisplayMetrics().heightPixels;
-        } else {
-            k = getResources().getDisplayMetrics().widthPixels;
-        }
-        int originalWidth = bitmap.getWidth();
-        int originalHeight = bitmap.getHeight();
-
-        float scale = (float) k / originalWidth;
-        int targetHeight = (int) (originalHeight * scale);
-        bitmap = Bitmap.createScaledBitmap(bitmap, k, targetHeight, true);
-        ViewGroup.LayoutParams layoutParams = binding.imageView.getLayoutParams();
-        layoutParams.height = targetHeight;
-        layoutParams.width = k;
-//        gj.sc("bitmap:" + bitmap.getWidth() + " " + bitmap.getHeight() + " " + k);
+        setBackToolsBar(binding.toolbar);
+        Intent intent = getIntent();
+        String data = intent.getStringExtra("data");
+        Curriculum curriculum = new Gson().fromJson(data, Curriculum.class);
+        bitmap = recyclerViewToBitmapGrid(curriculum);
         binding.imageView.setImageBitmap(bitmap);
-
     }
 
     @Override
@@ -103,21 +95,19 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
         try {
             // 1. 创建临时文件
             File cachePath = new File(getCacheDir(), "images");
+            gj.sc("缓存目录：" + cachePath.getPath());
             cachePath.mkdirs(); // 创建目录
             File file = new File(cachePath, "shared_image.png");
-
             // 2. 保存 Bitmap 到文件
             FileOutputStream stream = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             stream.close();
-
             // 3. 获取 content:// Uri
             Uri contentUri = FileProvider.getUriForFile(
                     this,
                     getPackageName() + ".fileprovider",
                     file
             );
-
             if (contentUri != null) {
                 // 4. 创建分享 Intent
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -132,94 +122,177 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
             e.printStackTrace();
         }
     }
-
-    @Override
-    public void BackPressed() {
-        super.BackPressed();
-        bitmap = null;
-    }
-
     @Override
     protected ActivityJietuBinding getViewBindingObject(LayoutInflater layoutInflater) {
         return ActivityJietuBinding.inflate(layoutInflater);
     }
+    String[] HList = new String[]{"日期", "一", "二", "三", "四", "五", "六", "日"};
+    public Bitmap recyclerViewToBitmapGrid(Curriculum curriculum) {
+        Paint paint = new Paint();
 
-    public static Bitmap recyclerViewToBitmapGrid(int backcolor,RecyclerView recyclerView) {
-        GridAdapter adapter = (GridAdapter) recyclerView.getAdapter();
-        if (adapter == null) return null;
+        // 渲染 HAdapter (星期标题)
+        TableHAdapter hAdapter = new TableHAdapter(jietuActivity.this, Arrays.asList(HList));
+        Bitmap hBitmap = renderAdapterToBitmapHorizontal(hAdapter);
 
+        // 渲染 TimeAdapter (时间列)
+        TableTimeAdapter timeAdapter = new TableTimeAdapter(jietuActivity.this, Arrays.asList(TableTimeData.tableTimeData));
+        Bitmap timeBitmap = renderAdapterToBitmapVertical(timeAdapter);
+
+        // 渲染每列 GridAdapter（课程格）
+        List<List<List<Curriculum.Course>>> lists = kecheng.GetKcLei(new ArrayList<>(), curriculum);
+        List<Bitmap> gridBitmaps = new ArrayList<>();
+        int gridWidth = hBitmap.getWidth();
+        int gridHeight = timeBitmap.getHeight() + 200;
+        for (List<List<Curriculum.Course>> list : lists) {
+            GridAdapter gridAdapter = new GridAdapter(jietuActivity.this, list);
+            Bitmap bmp = GridTableToBitmap(gridAdapter);
+            gridBitmaps.add(bmp);
+        }
+        Bitmap bigBitmap = Bitmap.createBitmap(gridWidth, gridHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bigBitmap);
+        //设置背景色 获取系统背景色
+        TypedArray array = getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorBackground});
+        int backgroundColor = array.getColor(0, 0xFFF5F5F5);
+        canvas.drawColor(backgroundColor);
+        array.recycle();
+        // 1. 绘制 HAdapter（横向标题），在时间列右侧
+        canvas.drawBitmap(hBitmap, 0f, 0f, paint);
+
+        // 2. 绘制时间列（左侧竖向）
+        canvas.drawBitmap(timeBitmap, 0f, hBitmap.getHeight(), paint);
+        // 3. 绘制 GridAdapter（课程格），右侧并排
+        int xOffset = timeBitmap.getWidth();
+        for (Bitmap bmp : gridBitmaps) {
+            canvas.drawBitmap(bmp, xOffset, hBitmap.getHeight(), paint);
+            xOffset += bmp.getWidth();
+            bmp.recycle();
+        }
+
+        // 回收 HAdapter 和 TimeAdapter
+        hBitmap.recycle();
+        timeBitmap.recycle();
+        return bigBitmap;
+    }
+    private Bitmap renderAdapterToBitmapHorizontal(RecyclerView.Adapter adapter) {
         int itemCount = adapter.getItemCount();
-        int columnCount = 8; // 多少列
-        int rowCount = (int) Math.ceil(itemCount / (float) columnCount);
+        if (itemCount == 0) return null;
 
         List<Bitmap> itemBitmaps = new ArrayList<>();
-        List<Integer> rowHeights = new ArrayList<>();
+        int totalWidth = 0;
+        int maxHeight = 0;
 
-        int totalHeight = 0;
-        int itemWidth = recyclerView.getWidth() / columnCount;
-
-        // 收集每个 item 的 Bitmap
+        // 逐个渲染 item
         for (int i = 0; i < itemCount; i++) {
-
-            List<Curriculum.Course> item = adapter.dataList.get(i); // 👈 获取数据项
-            if (i > 8 && i % 8 != 0 && (item.isEmpty() || !kecheng.IsCourse(item.get(0)))) {
-                Bitmap emptyBitmap = Bitmap.createBitmap(itemWidth, 1, Bitmap.Config.ARGB_8888); // 高度先设为1，稍后按行最大高度填充
-                itemBitmaps.add(emptyBitmap);
-                continue;
-            }
-            BaseAdapter.ViewHolder<GridItemBinding> holder = adapter.createViewHolder(recyclerView, adapter.getItemViewType(i));
+            RecyclerView.ViewHolder holder = adapter.createViewHolder(new FrameLayout(jietuActivity.this), adapter.getItemViewType(i));
             adapter.onBindViewHolder(holder, i);
+
+            // 使用 getRoot() 默认宽度
             holder.itemView.measure(
-                    View.MeasureSpec.makeMeasureSpec(itemWidth, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(holder.itemView.getLayoutParams().width, View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             );
             holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
-            Bitmap itemBitmap = Bitmap.createBitmap(
-                    holder.itemView.getMeasuredWidth(),
-                    holder.itemView.getMeasuredHeight(),
-                    Bitmap.Config.ARGB_8888
-            );
-            Canvas canvas = new Canvas(itemBitmap);
+
+            Bitmap bmp = Bitmap.createBitmap(holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bmp);
             holder.itemView.draw(canvas);
 
-            itemBitmaps.add(itemBitmap);
+            itemBitmaps.add(bmp);
+            totalWidth += holder.itemView.getMeasuredWidth();
+            maxHeight = Math.max(maxHeight, holder.itemView.getMeasuredHeight());
         }
 
-        // 计算每一行的最大高度（网格中，每一行高度由本行中 item 的最大高度决定）
-        for (int row = 0; row < rowCount; row++) {
-            int maxHeight = 0;
-            for (int col = 0; col < columnCount; col++) {
-                int index = row * columnCount + col;
-                if (index >= itemCount) break;
-                Bitmap bmp = itemBitmaps.get(index);
-                maxHeight = Math.max(maxHeight, bmp.getHeight());
+        // 横向拼接
+        Bitmap result = Bitmap.createBitmap(totalWidth, maxHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+        int xOffset = 0;
+        for (Bitmap bmp : itemBitmaps) {
+            canvas.drawBitmap(bmp, xOffset, 0f, null);
+            xOffset += bmp.getWidth();
+            bmp.recycle();
+        }
+
+        return result;
+    }
+    private Bitmap renderAdapterToBitmapVertical(RecyclerView.Adapter adapter) {
+        int itemCount = adapter.getItemCount();
+        if (itemCount == 0) return null;
+
+        List<Bitmap> itemBitmaps = new ArrayList<>();
+        int totalHeight = 0;
+        int columnWidth = 0;
+
+        for (int i = 0; i < itemCount; i++) {
+            RecyclerView.ViewHolder holder = adapter.createViewHolder(new FrameLayout(jietuActivity.this), adapter.getItemViewType(i));
+            adapter.onBindViewHolder(holder, i);
+
+            // 使用 getRoot() 默认宽度
+            holder.itemView.measure(
+                    View.MeasureSpec.makeMeasureSpec(holder.itemView.getLayoutParams().width, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(holder.itemView.getLayoutParams().height, View.MeasureSpec.EXACTLY)
+            );
+            holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
+
+            Bitmap bmp = Bitmap.createBitmap(holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bmp);
+            holder.itemView.draw(canvas);
+
+            itemBitmaps.add(bmp);
+            columnWidth = holder.itemView.getMeasuredWidth();
+            totalHeight += holder.itemView.getMeasuredHeight();
+        }
+
+        Bitmap result = Bitmap.createBitmap(columnWidth, totalHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+        int yOffset = 0;
+        for (Bitmap bmp : itemBitmaps) {
+            canvas.drawBitmap(bmp, 0f, yOffset, null);
+            yOffset += bmp.getHeight();
+            bmp.recycle();
+        }
+
+
+        return result;
+    }
+    private Bitmap GridTableToBitmap(GridAdapter adapter) {
+        int itemCount = adapter.getItemCount();
+        if (itemCount == 0) return null;
+
+        List<Bitmap> itemBitmaps = new ArrayList<>();
+        int totalHeight = 0;
+        int columnWidth = 0;
+        for (int i = 0; i < itemCount; i++) {
+            BaseAdapter.ViewHolder<GridItemBinding> holder = adapter.createViewHolder(new FrameLayout(jietuActivity.this), adapter.getItemViewType(i));
+            adapter.onBindViewHolder(holder, i);
+            holder.itemView.measure(
+                    View.MeasureSpec.makeMeasureSpec(holder.itemView.getLayoutParams().width, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(holder.itemView.getLayoutParams().height * adapter.dataList.get(i).get(0).height, View.MeasureSpec.EXACTLY)
+            );
+            Bitmap bmp = Bitmap.createBitmap(holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bmp);
+            if (!kecheng.IsCourse(adapter.dataList.get(i).get(0))) {
+                bmp = Bitmap.createBitmap(holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+                canvas = new Canvas(bmp);
+            }else{
+
+                holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
             }
-            rowHeights.add(maxHeight);
-            totalHeight += maxHeight;
+            holder.itemView.draw(canvas);
+            itemBitmaps.add(bmp);
+            columnWidth = holder.itemView.getMeasuredWidth();
+            totalHeight += holder.itemView.getMeasuredHeight();
         }
 
-        // 合成整张 Bitmap
-        Bitmap fullBitmap = Bitmap.createBitmap(recyclerView.getWidth(), totalHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(fullBitmap);
-        canvas.drawColor(backcolor);
-        Paint paint = new Paint();
-
-        int y = 0;
-        for (int row = 0; row < rowCount; row++) {
-            int rowHeight = rowHeights.get(row);
-            for (int col = 0; col < columnCount; col++) {
-                int index = row * columnCount + col;
-                if (index >= itemBitmaps.size()) break;
-
-                Bitmap bmp = itemBitmaps.get(index);
-                int x = col * itemWidth;
-                canvas.drawBitmap(bmp, x, y, paint);
-                bmp.recycle(); // 可选：回收内存
-            }
-            y += rowHeight;
+        Bitmap result = Bitmap.createBitmap(columnWidth, totalHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+        int yOffset = 0;
+        for (Bitmap bmp : itemBitmaps) {
+            canvas.drawBitmap(bmp, 0f, yOffset, null);
+            yOffset += bmp.getHeight();
+            bmp.recycle();
         }
 
-        return fullBitmap;
+        return result;
     }
 
 

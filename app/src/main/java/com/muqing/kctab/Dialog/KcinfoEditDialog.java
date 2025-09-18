@@ -97,6 +97,7 @@ public class KcinfoEditDialog extends BaseDialog<DialogKcinfoEditBinding> {
                 course.teacherName = course_static.teacherName;
                 course.ktmc = course_static.ktmc;
                 course.classroomName = course_static.classroomName;
+                gj.sc(course.classTime);
                 setEdit(course);
                 course_static = null;
             } else {

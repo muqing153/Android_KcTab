@@ -32,6 +32,10 @@
 
 ## Windows(开发中)
 请前往[GieHub](https://github.com/muqing153/Windows_KcTab)
+
+## Git 须知
+- 由于本项目使用了格外的辅助库 你需要添加[AndroidMuqing](https://github.com/muqing153/AndroidMuqing)库
+- 完成步骤后才可运行
 ## 贡献者✨
 <a href="https://github.com/muqing153/Android_KcTab/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=muqing153/Android_KcTab"  alt="贡献者"/>

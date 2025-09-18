@@ -204,19 +204,17 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.share) {
             int currentItem = binding.viewpage.getCurrentItem();
             Fragment fragment = getSupportFragmentManager().findFragmentByTag("f" + currentItem);
-//            if (fragment instanceof kecheng) {
-//                kecheng k = (kecheng) fragment;
-//                RecyclerView recyclerView = k.binding.recyclerview;
-//                TypedArray array = getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorBackground, android.R.attr.textColorPrimary,});
-//                int backgroundColor = array.getColor(0, 0xFFF5F5F5);
-//                jietuActivity.start(MainActivity.this, jietuActivity.recyclerViewToBitmapGrid(backgroundColor, recyclerView));
-//            }
+            if (fragment instanceof kecheng) {
+                kecheng k = (kecheng) fragment;
+                jietuActivity.start(MainActivity.this, k.curriculum);
+            }
         } else if (id == R.id.settings) {
             startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.sync) {
@@ -228,6 +226,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         }
         return super.onOptionsItemSelected(item);
     }
+
     ActivityResultLauncher<Intent> SyncKc = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();

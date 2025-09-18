@@ -26,7 +26,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="middle"
             android:gravity="center"
-            android:maxLines="2"
             android:text="一" />
 
         <TextView
