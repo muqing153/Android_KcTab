@@ -1,35 +1,47 @@
 package com.muqing.kctab.fragment;
 
+import static com.muqing.wj.data;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.muqing.Fragment;
 import com.muqing.gj;
 import com.muqing.kctab.Adapter.GridAdapter;
+import com.muqing.kctab.Adapter.TableHAdapter;
+import com.muqing.kctab.Adapter.TableTimeAdapter;
 import com.muqing.kctab.Curriculum;
+import com.muqing.kctab.DataType.TableTimeData;
 import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.FragmentKebiaoBinding;
+import com.muqing.kctab.databinding.GridItemBinding;
 import com.muqing.wj;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class kecheng extends Fragment<FragmentKebiaoBinding> {
-    public GridAdapter adapter;
     private String FilePath;
     private int zhou = 0;
 
@@ -59,20 +71,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         return FragmentKebiaoBinding.inflate(inflater, container, false);
     }
 
-    //    public static final MainActivity.ScheduleItem[] schedule = {new MainActivity.ScheduleItem("1.2", "08:20-09:05", "09:15-10:00"),
-//            new MainActivity.ScheduleItem("3.4", "10:10-11:40", "10:30-12:00"),
-//            new MainActivity.ScheduleItem("5.6", "13:30-14:15", "14:25-15:10"),
-//            new MainActivity.ScheduleItem("7.8", "15:20-16:05", "16:15-17:00"),
-//            new MainActivity.ScheduleItem("9.10", "18:30-19:15", "19:25-20:10")};
-//
     public Handler handler;
-    public static final MainActivity.ScheduleItem[] schedule = {
-            new MainActivity.ScheduleItem("1.2", "08:20-09:05", "09:15-10:00"),
-            new MainActivity.ScheduleItem("3.4", "10:20-11:05", "11:15-12:00"),
-            new MainActivity.ScheduleItem("5.6", "13:30-14:15", "14:25-15:10"),
-            new MainActivity.ScheduleItem("7.8", "15:30-16:15", "16:25-17:10"),
-            new MainActivity.ScheduleItem("9.10", "18:30-19:15", "19:25-20:10")
-    };
 
     @Override
     public void onStart() {
@@ -88,49 +87,105 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                 handler = new Handler();
             }
             if (curriculum != null && curriculum.data != null) {
-//            gj.sc("启动Fragment UI 初始化表内容");
-                adapter = new GridAdapter(this.getContext(), GetKcLei(curriculum)) {
-                    @Override
-                    public boolean update(List<List<Curriculum.Course>> list, int position) {
-                        List<Curriculum.Course> q = new ArrayList<>();
-                        for (List<Curriculum.Course> a : list) {
-                            for (Curriculum.Course c : a) {
+//                HList = new String[]{"日期", "一", "二", "三", "四", "五", "六", "日"};
+                for (int i = 0; i < curriculum.data.get(0).date.size(); i++) {
+                    HList[i + 1] += "(" + curriculum.data.get(0).date.get(i).rq + ")";
+                }
+                GetKcLei(curriculum);
+                for (int i = 0; i < TableList.size(); i++) {
+                    GridAdapter adapter = new GridAdapter(this.getContext(), TableList.get(i)) {
+                        @Override
+                        public boolean update(List<Curriculum.Course> list, Curriculum.Course course
+                                , int position) {
+                            boolean isCourse = false;
+                            for (Curriculum.Course c : list) {
                                 if (IsCourse(c)) {
-                                    q.add(c);
+                                    isCourse = true;
+                                    curriculum.data.get(0).courses.add(c);
                                 }
                             }
+                            if (!isCourse) {
+                                curriculum.data.get(0).courses.remove(course);
+                            }
+                            notifyDataSetChanged();
+                            wj.xrwb(FilePath, new Gson().toJson(curriculum));
+                            return false;
                         }
-                        curriculum.data.get(0).courses = q;
-                        wj.xrwb(FilePath, new Gson().toJson(curriculum));
-                        adapter.notifyItemChanged(position);
-
-                        adapter.ItemBinding = null;
-                        adapter.NextItemBinding = null;
-//                        adapter.Day = -1;
-                        return false;
+                    };
+                    RecyclerView recyclerView = recyclerViews.get(i);
+                    if (recyclerView != null) {
+                        recyclerView.setAdapter(adapter);
                     }
-                };
-                adapter.Day = -1;
-                adapter.zhou = curriculum.data.get(0).week;
-                binding.recyclerview.setAdapter(adapter);
-                gj.sc(zhou + " " + MainActivity.benzhou);
-                if (zhou == MainActivity.benzhou && handler != null) {
-//                    MainActivity.Week = LocalDate.now().getDayOfWeek().getValue();
-                    LocalTime now = LocalTime.now();
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-                    MainActivity.Time = now.format(formatter);
+                }
+                toolbar_time();
+                if (handler != null) {
                     handler.post(this::LoadHander);
                 }
-                binding.recyclerview.post(() -> binding.horizontal.scrollTo(adapter.ItemXY[0], adapter.ItemXY[1]));
-                toolbar_time();
             }
         }
     }
 
+    private int Day = -1;
+    private String time = "08:00";
+
+    private GridItemBinding NextItemBinding;
+
     private void LoadHander() {
         if (isAdded()) {
-//            gj.sc("启动Fragment UI 启动计时器");
-            adapter.Load(binding.recyclerview);
+            if (Day == -1) {
+                //获取当前星期
+                LocalDate now = LocalDate.now();
+                Day = now.getDayOfWeek().getValue();
+//                获取当前时间 08:00
+            }
+//            time="20:00";
+            time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm", Locale.CHINA));
+            for (int i = Day - 1; i < 7; i++) {
+                List<List<Curriculum.Course>> lists = TableList.get(i);
+                for (int y = 0; y < lists.size(); y++) {
+                    Curriculum.Course data = lists.get(y).get(0);
+                    if (IsCourse(data)) {
+                        if (time.compareTo(data.startTime) >= 0 && time.compareTo(data.endTime) <= 0 && Objects.equals(data.weekDay, i + 1)) {
+                            View viewByPosition = Objects.requireNonNull(recyclerViews.get(i).getLayoutManager()).findViewByPosition(y);
+                            if (viewByPosition != null) {
+                                if (NextItemBinding == null) {
+                                    NextItemBinding = GridItemBinding.bind(viewByPosition);
+                                    NextItemBinding.getRoot().setStrokeWidth(3);
+//                                    NextItemBinding.getRoot().getLocationInWindow(ItemXY);
+                                } else if (NextItemBinding.getRoot() != viewByPosition) {
+                                    NextItemBinding.getRoot().setStrokeWidth(0);
+                                    NextItemBinding = null;
+                                }
+                                break;
+                            }
+                        }
+                        if (data.startTime.compareTo(time) > 0 && Objects.equals(data.weekDay, i + 1)) {
+                            View viewByPosition = Objects.requireNonNull(recyclerViews.get(i).getLayoutManager()).findViewByPosition(y);
+//                            gj.sc("B " + i + " " + time);
+                            if (viewByPosition != null) {
+                                if (NextItemBinding == null) {
+                                    NextItemBinding = GridItemBinding.bind(viewByPosition);
+                                    NextItemBinding.getRoot().setStrokeWidth(3);
+//                                    NextItemBinding.getRoot().getLocationInWindow(ItemXY);
+                                } else if (NextItemBinding.getRoot() != viewByPosition) {
+                                    NextItemBinding.getRoot().setStrokeWidth(0);
+                                    NextItemBinding = null;
+                                }
+                                break;
+                            }
+                        }
+//                            View viewByPosition = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(y);
+//                        Curriculum.Course course = list.get(0);
+//                        gj.sc(course.classTime + " " + course.courseName);
+                    }
+                }
+                if (NextItemBinding != null) {
+                    break;
+                }
+                time = "08:00";
+            }
+//            RecyclerView recyclerView = recyclerViews.get(Day);
+//            GridAdapter adapter = (GridAdapter) recyclerView.getAdapter();
         }
         handler.postDelayed(this::LoadHander, 1000);
     }
@@ -143,82 +198,103 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         viewById.setText(curriculum.data.get(0).date.get(0).mxrq);
     }
 
+    List<RecyclerView> recyclerViews = new ArrayList<>();
+
+    String[] HList = new String[]{"日期", "一", "二", "三", "四", "五", "六", "日"};
+
     @Override
     public void setUI(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        GridLayoutManager layoutManager = new GridLayoutManager(this.getContext(), 8); // 列
-        binding.recyclerview.setLayoutManager(layoutManager);
+        binding.recyclerviewH.setLayoutManager(new LinearLayoutManager(this.getContext(), LinearLayoutManager.HORIZONTAL, false));
+        binding.recyclerviewTime.setLayoutManager(new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false));
+//        数组转List
+        TableTimeData[] data = TableTimeData.tableTimeData;
+        binding.recyclerviewTime.setAdapter(new TableTimeAdapter(this.getContext(), Arrays.asList(data)));
+        binding.recyclerviewH.setAdapter(new TableHAdapter(this.getContext(), Arrays.asList(HList)));
+        binding.tablelayout.removeAllViews();
+        recyclerViews.clear();
+        for (int i = 0; i < 7; i++) {
+            RecyclerView recyclerView = new RecyclerView(requireContext());
+            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
+            binding.tablelayout.addView(recyclerView);
+            recyclerViews.add(recyclerView);
+        }
     }
 
-    private List<List<Curriculum.Course>> GetKcLei(Curriculum curriculum) {
-        List<List<Curriculum.Course>> list = new ArrayList<>();
-        for (int row = 0; row < 6; row++) {
-            for (int col = 0; col < 8; col++) {
-                List<Curriculum.Course> a = new ArrayList<>();
-                if (row > 0 && col > 0) {
-                    Curriculum.Course course = new Curriculum.Course();
-                    course.startTime = schedule[row - 1].time1.split("-")[0];
-                    course.endTime = schedule[row - 1].time2.split("-")[1];
-                    course.weekDay = col;
-                    course.classTime = String.format(Locale.CANADA, "%d%02d%02d", col, row, row + 1);
-//                    gj.sc(" " + col + " " + course.classTime);
-                    a.add(course);
-                }
-                list.add(a);
-            }
-        }
-//初始化头部
-        Curriculum.DataItem dataItem = curriculum.data.get(0);
-        {
-            List<Curriculum.Course> arrayList = new ArrayList<>();
-            Curriculum.Course course = new Curriculum.Course();
-            course.courseName = "节/日";
-            arrayList.add(course);
-            list.set(0, arrayList);
-        }
-        for (int i = 0; i < dataItem.date.size(); i++) {
-            List<Curriculum.Course> arrayList = new ArrayList<>();
-            Curriculum.DateInfo dateInfo = dataItem.date.get(i);
-            Curriculum.Course course = new Curriculum.Course();
-            course.courseName = String.format("%s(%s)", dateInfo.xqmc, dateInfo.rq);
-            arrayList.add(course);
-            list.set(i + 1, arrayList);
-        }
-        // 创建节次数据
-        for (int i = 0, j = 8; i < schedule.length; i++, j += 8) {
-            List<Curriculum.Course> arrayList = new ArrayList<>();
-            Curriculum.Course kcLei = new Curriculum.Course();
-            kcLei.courseName = schedule[i].session;
-            kcLei.classroomName = schedule[i].time1 + "\n" + schedule[i].time2;
-//            kcLei.classroomName = schedule[i].time1.split("-")[0] + "\n" + schedule[i].time2.split("-")[1];
-            arrayList.add(kcLei);
-            list.set(j, arrayList);
-        }
+    List<List<List<Curriculum.Course>>> TableList = new ArrayList<>();
 
-//        48
-        // 1. 遍历每个节次，创建行数据
-        for (Curriculum.Course adapter : dataItem.courses) {
-            String classTime = adapter.classTime;
-            // 提取第一个数字字符
-            String part1 = classTime.substring(0, 1); // "1"
-            // 提取第二部分
-            String part2 = classTime.substring(1, 3); // "03"
-            // 提取第三部分
-            String part3 = classTime.substring(3, 5); // "04"
-            // 提取第四部分
-            String part4 = classTime.substring(1, 5);
-            // 转成整数
-            int num1 = Integer.parseInt(part1); // 1
-            int i = GetInt(part4);
-            int p = num1 + 8 * i;
-//            System.out.println(p);
-            List<Curriculum.Course> courses = list.get(p);
-            if (courses.get(0).courseName == null) {
-                courses.clear();
+    public static List<Curriculum.Course> newCourse(int L, int H) {
+        List<Curriculum.Course> a = new ArrayList<>();
+        Curriculum.Course course = new Curriculum.Course();
+        course.startTime = TableTimeData.tableTimeData[H].starttime;
+        course.endTime = TableTimeData.tableTimeData[H].endtime;
+        course.weekDay = L + 1;
+        course.height = 1;
+        course.classTime = String.format(Locale.CANADA, "%d%02d", L + 1, H + 1);
+        a.add(course);
+        return a;
+    }
+
+    private void GetKcLei(Curriculum curriculum) {
+        TableList.clear();
+        for (int L = 0; L < 7; L++) {
+            TableList.add(new ArrayList<>());
+            for (int H = 0; H < TableTimeData.tableTimeData.length; H++) {
+                List<Curriculum.Course> a = newCourse(L, H);
+                TableList.get(L).add(a);
             }
-            courses.add(adapter);
-            list.set(p, courses);
         }
-        return list;
+        Curriculum.DataItem dataItem = curriculum.data.get(0);
+        dataItem.courses.sort((d1, d2) -> {
+            int w1 = d1.weekDay; // 假设取第一个
+            int w2 = d2.weekDay;
+//            gj.sc("比较 " + d1.weekDay + " " + d2.weekDay);
+            return Integer.compare(w1, w2);
+        });
+        // 1. 遍历每个节次，创建行数据
+        int delta = 0;
+        int day = 1;
+        for (Curriculum.Course adapter : dataItem.courses) {
+//            = new ArrayList<>();
+            if (day != adapter.weekDay) {
+                delta = 0;
+                day = adapter.weekDay;
+                gj.sc("换天-----------------------------------------------" + day);
+            }
+            adapter.height = 1;
+            String classTime = adapter.classTime;//101020304...
+            List<Number> parts = GetParts(classTime);
+            List<List<Curriculum.Course>> lists = TableList.get(parts.get(0).intValue() - 1);
+//            parts.remove(0);
+            adapter.height = parts.size() - 1;
+            int addp = parts.get(1).intValue() - 1 - delta;
+            List<Curriculum.Course> courses = lists.get(
+                    addp
+            );
+            courses.clear();
+            courses.add(adapter);
+            gj.sc("添加课程的位置 " + addp);
+            for (int i = 2; i < parts.size(); i++) {
+                delta++;
+                addp++;
+                gj.sc("删除 " + classTime + " 删除位置 " + addp);
+                lists.remove(addp);
+            }
+        }
+//        return list;
+    }
+
+    public static List<Number> GetParts(String classTime) {
+        List<Number> parts = new ArrayList<>();
+        int index = 0;
+// 第一个字符，取 1 位
+        parts.add(Integer.parseInt(classTime.substring(index, index + 1)));
+        index += 1;
+// 后续每次取 2 位，直到结束 不准重复
+        while (index + 2 <= classTime.length()) {
+            parts.add(Integer.parseInt(classTime.substring(index, index + 2)));
+            index += 2;
+        }
+        return parts;
     }
 
     private static final String[] classTime = {

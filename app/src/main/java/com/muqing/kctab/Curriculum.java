@@ -41,6 +41,7 @@ public class Curriculum {
     }
 
     public static class Course {
+        public int height = 1;
         @SerializedName("classWeek")
         public String classWeek;
 

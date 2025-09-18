@@ -51,6 +51,7 @@ public class KcinfoEditDialog extends BaseDialog<DialogKcinfoEditBinding> {
             data.add(new Curriculum.Course());
         }
         course = data.get(position - 1);
+        gj.sc(course.classTime + " " + course.height);
         // 课程名
         binding.kc.setText(course.courseName == null ? "" : course.courseName);
         // 教师
@@ -112,7 +113,10 @@ public class KcinfoEditDialog extends BaseDialog<DialogKcinfoEditBinding> {
                             c.weekDay = course.weekDay;
                             c.startTime = course.startTime;
                             c.endTime = course.endTime;
-                            c.classTime = course.classTime;
+                            List<Number> numbers = kecheng.GetParts(course.classTime);
+                            c.classTime = String.format(Locale.getDefault(), "%d%02d", numbers.get(0).intValue(), numbers.get(1).intValue());
+//                            c.classTime = course.classTime;
+                            c.height = 1;
 //                            course = c;
                             data.remove(course);
                             data.add(c);
@@ -125,7 +129,7 @@ public class KcinfoEditDialog extends BaseDialog<DialogKcinfoEditBinding> {
                 data.remove(position - 1);
                 position--;
                 next();
-            }else{
+            } else {
                 data.remove(position - 1);
                 previous();
             }

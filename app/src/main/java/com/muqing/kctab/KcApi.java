@@ -1,6 +1,7 @@
 package com.muqing.kctab;
 
 import static com.muqing.kctab.LoginApi.Token;
+import static com.muqing.kctab.MainActivity.extractDate;
 
 import android.util.Log;
 
@@ -17,6 +18,10 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,20 +39,10 @@ public class KcApi {
         if (kbjcmsid == null) {
             kbjcmsid = "";
         }
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody body = RequestBody.create(mediaType, "");
-        Request request = new Request.Builder()
-                .url(api + "/njwhd/student/curriculum?week=" + week + "&kbjcmsid=" + kbjcmsid)
-                .method("POST", body)
-                .addHeader("Pragma", "no-cache")
-                .addHeader("token", Token)
-                .addHeader("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
-                .addHeader("Accept", "*/*")
-                .addHeader("Host", "jw.qdpec.edu.cn:8088")
-                .addHeader("Connection", "keep-alive")
-                .build();
+        Request request = new Request.Builder().url(api + "/njwhd/student/curriculum?week=" + week + "&kbjcmsid=" + kbjcmsid).method("POST", body).addHeader("Pragma", "no-cache").addHeader("token", Token).addHeader("User-Agent", "Apifox/1.0.0 (https://apifox.com)").addHeader("Accept", "*/*").addHeader("Host", "jw.qdpec.edu.cn:8088").addHeader("Connection", "keep-alive").build();
         Response response = client.newCall(request).execute();
         if (!response.isSuccessful()) {
             gj.sc("GetCurriculum: 请求错误");
@@ -59,7 +54,6 @@ public class KcApi {
             return null;
         }
     }
-
 
     /**
      * 获取当前周数
@@ -103,23 +97,10 @@ public class KcApi {
         try {
             LoginApi.Token = Token;
             Gson gson = new Gson();
-            OkHttpClient client = new OkHttpClient().newBuilder()
-                    .build();
+            OkHttpClient client = new OkHttpClient().newBuilder().build();
             MediaType mediaType = MediaType.parse("text/plain");
             RequestBody body = RequestBody.create(mediaType, "");
-            Request request = new Request.Builder()
-                    .url("http://jw.qdpec.edu.cn:8088/njwhd/teachingWeek")
-                    .method("POST", body)
-                    .addHeader("Accept", "application/json, text/plain, */*")
-                    .addHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
-                    .addHeader("Cache-Control", "no-cache")
-                    .addHeader("Connection", "keep-alive")
-                    .addHeader("Origin", "http://jw.qdpec.edu.cn:8088")
-                    .addHeader("Referer", "http://jw.qdpec.edu.cn:8088/")
-                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0")
-                    .addHeader("token", Token)
-                    .addHeader("Host", "jw.qdpec.edu.cn:8088")
-                    .build();
+            Request request = new Request.Builder().url("http://jw.qdpec.edu.cn:8088/njwhd/teachingWeek").method("POST", body).addHeader("Accept", "application/json, text/plain, */*").addHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8").addHeader("Cache-Control", "no-cache").addHeader("Connection", "keep-alive").addHeader("Origin", "http://jw.qdpec.edu.cn:8088").addHeader("Referer", "http://jw.qdpec.edu.cn:8088/").addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0").addHeader("token", Token).addHeader("Host", "jw.qdpec.edu.cn:8088").build();
             Response response = client.newCall(request).execute();
             if (!response.isSuccessful()) {
                 gj.sc("Load: 获取失败");
@@ -222,8 +203,7 @@ public class KcApi {
 
     public static Curriculum GetCurriculumFile(String path) {
         int i = 1;
-        for (String s :
-                MainActivity.TabList) {
+        for (String s : MainActivity.TabList) {
             if (s.equals(path)) {
                 break;
             }
@@ -233,6 +213,34 @@ public class KcApi {
         Curriculum curriculum = new Gson().fromJson(dqwb, Curriculum.class);
         curriculum.data.get(0).week = i;
         return curriculum;
+    }
+
+    public static List<String> GetPathFileList(File dirpath) {
+        List<String> list = new ArrayList<>();
+        Pattern datePattern = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}.*");
+        File[] files = dirpath.listFiles((dir, name) -> datePattern.matcher(name).matches());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        Arrays.sort(files, (f1, f2) -> {
+            LocalDate d1 = extractDate(f1.getName(), datePattern, formatter);
+            LocalDate d2 = extractDate(f2.getName(), datePattern, formatter);
+            return d1.compareTo(d2); // 升序；改成 d2.compareTo(d1) 为降序
+        });
+        for (int i = 0; i < files.length; i++) {
+            File file = files[i];
+            if (file.isFile()) {
+                try {
+                    String dqwb = wj.dqwb(file);
+                    Curriculum curriculum = new Gson().fromJson(dqwb, Curriculum.class);
+                    curriculum.data.get(0).week = i + 1;
+                    wj.xrwb(file, new Gson().toJson(curriculum));
+                    list.add(file.getPath());
+                } catch (Exception e) {
+                    gj.sc(e);
+                }
+            }
+        }
+        return list;
     }
 
 

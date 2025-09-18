@@ -35,6 +35,7 @@ public class KcinfoBottomDialog extends BaseBottomDialog<KcinfoDialogBinding> {
         binding.recyclerview.setAdapter(new KcInfoAdapter(getContext(), data));
         DividerItemDecoration decoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         binding.recyclerview.addItemDecoration(decoration);
+//        gj.sc("KcinfoDialog " + data.get(0).height + " " + data.get(0).classTime);
 //        编辑当前课程
         binding.editView.setOnClickListener(view -> new KcinfoEditDialog(getContext(), data) {
             @Override

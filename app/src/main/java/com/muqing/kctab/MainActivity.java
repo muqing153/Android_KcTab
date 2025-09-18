@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     }
 
     @Nullable
-    private static LocalDate extractDate(String text, Pattern pattern, DateTimeFormatter formatter) {
+    public static LocalDate extractDate(String text, Pattern pattern, DateTimeFormatter formatter) {
         Matcher matcher = pattern.matcher(text);
         if (matcher.find()) {
             return LocalDate.parse(matcher.group(), formatter);
@@ -210,13 +210,13 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         if (id == R.id.share) {
             int currentItem = binding.viewpage.getCurrentItem();
             Fragment fragment = getSupportFragmentManager().findFragmentByTag("f" + currentItem);
-            if (fragment instanceof kecheng) {
-                kecheng k = (kecheng) fragment;
-                RecyclerView recyclerView = k.binding.recyclerview;
-                TypedArray array = getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorBackground, android.R.attr.textColorPrimary,});
-                int backgroundColor = array.getColor(0, 0xFFF5F5F5);
-                jietuActivity.start(MainActivity.this, jietuActivity.recyclerViewToBitmapGrid(backgroundColor, recyclerView));
-            }
+//            if (fragment instanceof kecheng) {
+//                kecheng k = (kecheng) fragment;
+//                RecyclerView recyclerView = k.binding.recyclerview;
+//                TypedArray array = getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorBackground, android.R.attr.textColorPrimary,});
+//                int backgroundColor = array.getColor(0, 0xFFF5F5F5);
+//                jietuActivity.start(MainActivity.this, jietuActivity.recyclerViewToBitmapGrid(backgroundColor, recyclerView));
+//            }
         } else if (id == R.id.settings) {
             startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.sync) {

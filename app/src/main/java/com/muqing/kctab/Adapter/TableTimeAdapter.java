@@ -1,0 +1,28 @@
+package com.muqing.kctab.Adapter;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
+import com.muqing.BaseAdapter;
+import com.muqing.kctab.DataType.TableTimeData;
+import com.muqing.kctab.databinding.ItemTableTimeBinding;
+
+import java.util.List;
+
+public class TableTimeAdapter extends BaseAdapter<ItemTableTimeBinding, TableTimeData> {
+    public TableTimeAdapter(Context context, List<TableTimeData> dataList) {
+        super(context, dataList);
+    }
+    @Override
+    protected ItemTableTimeBinding getViewBindingObject(LayoutInflater inflater, ViewGroup parent, int viewType) {
+        return ItemTableTimeBinding.inflate(inflater, parent, false);
+    }
+
+    @Override
+    protected void onBindView(TableTimeData data, ItemTableTimeBinding viewBinding, ViewHolder<ItemTableTimeBinding> viewHolder, int position) {
+        viewBinding.title.setText(data.title);
+        viewBinding.starttime.setText(data.starttime);
+        viewBinding.endtime.setText(data.endtime);
+    }
+}
