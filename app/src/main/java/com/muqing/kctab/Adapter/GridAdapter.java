@@ -95,7 +95,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
 
         }
         viewBinding.getRoot().setOnClickListener(v -> {
-            gj.sc(position + "--" + (position + 1) + "--" + data.get(0).classTime);
+//            gj.sc(position + "--" + (position + 1) + "--" + data.get(0).classTime);
             KcinfoBottomDialog dialog = new KcinfoBottomDialog(context, data);
             dialog.setOnDismissListener(dialogInterface -> {
                 if (data != dialog.data) {

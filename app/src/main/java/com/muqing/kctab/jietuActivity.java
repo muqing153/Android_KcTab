@@ -95,7 +95,7 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
         try {
             // 1. 创建临时文件
             File cachePath = new File(getCacheDir(), "images");
-            gj.sc("缓存目录：" + cachePath.getPath());
+//            gj.sc("缓存目录：" + cachePath.getPath());
             cachePath.mkdirs(); // 创建目录
             File file = new File(cachePath, "shared_image.png");
             // 2. 保存 Bitmap 到文件
@@ -114,7 +114,6 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
                 shareIntent.setType("image/*");
                 shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
                 // 5. 启动分享
                 startActivity(Intent.createChooser(shareIntent, "分享图片"));
             }
@@ -294,6 +293,4 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
 
         return result;
     }
-
-
 }
