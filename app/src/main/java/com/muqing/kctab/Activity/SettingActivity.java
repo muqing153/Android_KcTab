@@ -167,8 +167,8 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
     private void UIKb() {
         SharedPreferences kebiao = getSharedPreferences("kebiao", MODE_PRIVATE);
         {
-            File file = new File(wj.data, "TabList");
-            String[] list = file.list((file1, s) -> file.isDirectory());
+            String[] list = new File(wj.data, "TabList")
+                    .list((dir, name) -> new File(dir, name).isDirectory());
             if (list != null) {
                 Arrays.sort(list);
                 binding.kbXuenian.setMessage(kebiao.getString("xuenian", "null"));
@@ -190,6 +190,7 @@ public class SettingActivity extends AppCompatActivity<ActivitySettingBinding> {
         binding.kbShowInfo.setOnCheckedChangeListener((compoundButton, b) -> kebiao.edit().putBoolean("showInfo", b).apply());
         binding.kbStzdy.setOnClickListener(view -> startActivity(new Intent(SettingActivity.this, AutoTableActivity.class)));
     }
+
     @Override
     public void setOnApplyWindowInsetsListener(Insets systemBars, View v) {
 //        binding.toolbar.setPadding(0, systemBars.top, 0, 0);
