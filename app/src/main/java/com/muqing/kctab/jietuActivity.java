@@ -68,8 +68,10 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
         Intent intent = getIntent();
         String data = intent.getStringExtra("data");
         Curriculum curriculum = new Gson().fromJson(data, Curriculum.class);
-        bitmap = recyclerViewToBitmapGrid(curriculum);
-        binding.imageView.setImageBitmap(bitmap);
+        new Thread(() -> {
+            bitmap = recyclerViewToBitmapGrid(curriculum);
+            runOnUiThread(() -> binding.imageView.setImageBitmap(bitmap));
+        }).start();
     }
 
     @Override

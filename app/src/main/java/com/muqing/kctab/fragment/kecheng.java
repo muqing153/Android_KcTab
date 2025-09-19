@@ -3,16 +3,20 @@ package com.muqing.kctab.fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +32,7 @@ import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.FragmentKebiaoBinding;
 import com.muqing.kctab.databinding.GridItemBinding;
+import com.muqing.kctab.databinding.ItemTableHBinding;
 import com.muqing.wj;
 
 import java.time.LocalDate;
@@ -128,24 +133,35 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                 }
                 toolbar_time();
                 if (handler != null) {
-                    handler.post(this::LoadHander);
+
+                    handler.post(() -> {
+                        LoadHander();
+                        binding.horizontal.scrollTo(ItemXY[0], 0);
+                        binding.scrollview.scrollTo(0, ItemXY[1]);
+                    });
                 }
             }
         }
     }
 
-    private int Day = -1;
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+            NextItemBinding = null;
+        }
+    }
+
     private GridItemBinding NextItemBinding;
 
+    public int[] ItemXY = new int[]{0, 0};
     private void LoadHander() {
+//        gj.sc("开始加载课程表");
         if (isAdded()) {
-            if (Day == -1) {
-                //获取当前星期
-                LocalDate now = LocalDate.now();
-                Day = now.getDayOfWeek().getValue();
-//                获取当前时间 08:00
-            }
-//            time="20:00";
+            int Day;
+            LocalDate now = LocalDate.now();
+            Day = now.getDayOfWeek().getValue();
             String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm", Locale.CHINA));
             for (int i = Day - 1; i < 7; i++) {
                 List<List<Curriculum.Course>> lists = TableList.get(i);
@@ -158,7 +174,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                                 if (NextItemBinding == null) {
                                     NextItemBinding = GridItemBinding.bind(viewByPosition);
                                     NextItemBinding.getRoot().setStrokeWidth(3);
-//                                    NextItemBinding.getRoot().getLocationInWindow(ItemXY);
+                                    NextItemBinding.getRoot().getLocationInWindow(ItemXY);
                                 } else if (NextItemBinding.getRoot() != viewByPosition) {
                                     NextItemBinding.getRoot().setStrokeWidth(0);
                                     NextItemBinding = null;
@@ -168,12 +184,11 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                         }
                         if (data.startTime.compareTo(time) > 0 && Objects.equals(data.weekDay, i + 1)) {
                             View viewByPosition = Objects.requireNonNull(recyclerViews.get(i).getLayoutManager()).findViewByPosition(y);
-//                            gj.sc("B " + i + " " + time);
                             if (viewByPosition != null) {
                                 if (NextItemBinding == null) {
                                     NextItemBinding = GridItemBinding.bind(viewByPosition);
                                     NextItemBinding.getRoot().setStrokeWidth(3);
-//                                    NextItemBinding.getRoot().getLocationInWindow(ItemXY);
+                                    NextItemBinding.getRoot().getLocationInWindow(ItemXY);
                                 } else if (NextItemBinding.getRoot() != viewByPosition) {
                                     NextItemBinding.getRoot().setStrokeWidth(0);
                                     NextItemBinding = null;
@@ -217,10 +232,10 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         for (int i = 0; i < 7; i++) {
             RecyclerView recyclerView = new RecyclerView(requireContext());
             recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
-            binding.tablelayout.addView(recyclerView);
 //            recyclerView 禁止滚动
             recyclerView.setNestedScrollingEnabled(false);
             recyclerViews.add(recyclerView);
+            binding.tablelayout.addView(recyclerView);
         }
     }
 
@@ -277,12 +292,10 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         }
         int day = 1;
         for (List<List<Curriculum.Course>> list : TableList) {
-//            gj.sc("行------------" + day++);
             for (int i = 0; i < list.size(); i++) {
                 Curriculum.Course s = list.get(i).get(0);
                 for (int j = 1; j < s.height; j++) {
-//                    gj.sc("节 " + i + "---删除 " + (i + j) + " 高度 " + s.height);
-                    list.remove(i + j);
+                    list.remove(i + 1);
                 }
             }
 //            return;

@@ -129,5 +129,4 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     public boolean update(List<Curriculum.Course> data, Curriculum.Course course, int position) {
         return false;
     }
-    public int[] ItemXY = new int[]{0, 0};
 }
