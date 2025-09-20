@@ -156,12 +156,12 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
     private GridItemBinding NextItemBinding;
 
     public int[] ItemXY = new int[]{0, 0};
+
     private void LoadHander() {
 //        gj.sc("开始加载课程表");
         if (isAdded()) {
-            int Day;
             LocalDate now = LocalDate.now();
-            Day = now.getDayOfWeek().getValue();
+            int Day = now.getDayOfWeek().getValue();
             String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm", Locale.CHINA));
             for (int i = Day - 1; i < 7; i++) {
                 List<List<Curriculum.Course>> lists = TableList.get(i);

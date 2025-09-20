@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,9 +60,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
 
                     @Override
                     public void error(String error) {
-                        runOnUiThread(() -> {
-                            gj.ts(LoginActivity.this, error);
-                        });
+                        runOnUiThread(() -> gj.ts(LoginActivity.this, error));
                     }
                 };
             }
@@ -83,8 +82,10 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             String password = Objects.requireNonNull(binding.password.getText()).toString();
             if (account.isEmpty()) {
                 binding.account.setError("账号不能为空");
+                return;
             } else if (password.isEmpty()) {
                 binding.password.setError("密码不能为空");
+                return;
             } else if (binding.isApbox.isChecked()) {
                 binding.account.setError(null);
                 binding.password.setError(null);
@@ -94,26 +95,17 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                 edit.apply();
             }
             try {
-                new Thread(() -> {
-                    LoginApi.Token = LoginApi.Login(account, password);
-                    if (LoginApi.IsToken(LoginApi.Token)) {
-                        new LoadKc(LoginApi.Token) {
-                            @Override
-                            public void yes() {
-                                EndToken();
-                            }
-
-                            @Override
-                            public void error(String error) {
-                                runOnUiThread(() -> {
-                                    gj.ts(LoginActivity.this, error);
-                                });
-                            }
-                        };
-                    } else {
-                        runOnUiThread(() -> gj.ts(LoginActivity.this, "登陆失败"));
+                new LoadKc(account, password) {
+                    @Override
+                    public void yes() {
+                        EndToken();
                     }
-                }).start();
+
+                    @Override
+                    public void error(String error) {
+                        runOnUiThread(() -> gj.ts(LoginActivity.this, error));
+                    }
+                };
             } catch (Exception e) {
                 gj.sc(e);
             }
@@ -188,11 +180,14 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             });
             bottomSheetDialog.show();
         });
-        if (intent.getStringExtra("sync") != null) {
-            binding.syncButton.setEnabled(true);
-            zhouList.clear();
-            zhouList.add(MainActivity.benzhou);
-            binding.syncButton.setText(intent.getStringExtra("sync"));
+        {
+            String sync = intent.getStringExtra("sync");
+            if (sync != null) {
+                binding.syncButton.setEnabled(true);
+                zhouList.clear();
+                zhouList.add(Integer.valueOf(sync));
+                binding.syncButton.setText(sync);
+            }
         }
 
         binding.other4.setOnClickListener(view -> {
@@ -255,16 +250,30 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
 
     private abstract class LoadKc extends Thread {
         public AlertDialog alertDialog;
-        public LoadKc(String data) {
+        public String user, password;
+
+        public LoadKc(String user, String password) {
+            this.user = user;
+            this.password = password;
             runOnUiThread(() -> {
                 alertDialog = LoadIng();
-                LoginApi.Token = data;
+                start();
+            });
+        }
+
+        public LoadKc(String token) {
+            LoginApi.Token = token;
+            runOnUiThread(() -> {
+                alertDialog = LoadIng();
                 start();
             });
         }
 
         @Override
         public void run() {
+            if (KcApi.teachingWeek() == 0) {
+                LoginApi.Token = LoginApi.Login(user, password);
+            }
             if (zhouList.isEmpty()) {
                 boolean load = KcApi.Load(LoginApi.Token);
                 if (!load) {
@@ -272,24 +281,24 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                 } else {
                     yes();
                 }
-            }
-            try {
-                gj.sc(zhouList.size());
-                boolean load = false;
-                for (int i = 0; i < zhouList.size(); i++) {
-//                    gj.sc("开始同步第" + (i + 1) + "周");
-                    load = KcApi.Load(zhouList.get(0));
-                    if (!load) {
-                        error(zhouList.get(0) + "加载失败");
+            } else {
+                try {
+                    boolean load = false;
+                    for (int i = 0; i < zhouList.size(); i++) {
+//                        gj.sc("开始同步第" + zhouList.get(i) + "周");
+                        load = KcApi.Load(zhouList.get(i));
+                        if (!load) {
+                            error(zhouList.get(0) + "加载失败");
+                        }
                     }
+                    if (load) {
+                        yes();
+                    }
+                } catch (Exception e) {
+                    error(zhouList.get(0) + "加载失败");
+                    gj.sc("同步失败:" + e);
                 }
-                if (load) {
-                    yes();
-                }
-            } catch (Exception e) {
-                gj.sc("同步失败:" + e);
             }
-//            yes();
             runOnUiThread(alertDialog::dismiss);
         }
 

@@ -93,29 +93,39 @@ public class KcApi {
         return 0;
     }
 
+    public static int teachingWeek() {
+        try {
+            OkHttpClient client = new OkHttpClient().newBuilder().build();
+            MediaType mediaType = MediaType.parse("text/plain");
+            RequestBody body = RequestBody.create(mediaType, "");
+            Request request = new Request.Builder().url("http://jw.qdpec.edu.cn:8088/njwhd/teachingWeek")
+                    .method("POST", body).addHeader("Accept", "application/json, text/plain, */*")
+                    .addHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8").addHeader("Cache-Control", "no-cache")
+                    .addHeader("Connection", "keep-alive")
+                    .addHeader("Origin", "http://jw.qdpec.edu.cn:8088")
+                    .addHeader("Referer", "http://jw.qdpec.edu.cn:8088/")
+                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0")
+                    .addHeader("token", Token)
+                    .addHeader("Host", "jw.qdpec.edu.cn:8088").build();
+            Response response = client.newCall(request).execute();
+            String teachingWeek = response.body().string();
+            JSONObject jsonObject = new JSONObject(teachingWeek);
+            int code = jsonObject.getInt("code");
+            JSONArray data = jsonObject.getJSONArray("data");
+            return data.length();
+        } catch (Exception e) {
+            gj.sc(e);
+        }
+        return 0;
+    }
+
     public static boolean Load(String Token) {
         try {
             LoginApi.Token = Token;
             Gson gson = new Gson();
-            OkHttpClient client = new OkHttpClient().newBuilder().build();
-            MediaType mediaType = MediaType.parse("text/plain");
-            RequestBody body = RequestBody.create(mediaType, "");
-            Request request = new Request.Builder().url("http://jw.qdpec.edu.cn:8088/njwhd/teachingWeek").method("POST", body).addHeader("Accept", "application/json, text/plain, */*").addHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8").addHeader("Cache-Control", "no-cache").addHeader("Connection", "keep-alive").addHeader("Origin", "http://jw.qdpec.edu.cn:8088").addHeader("Referer", "http://jw.qdpec.edu.cn:8088/").addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0").addHeader("token", Token).addHeader("Host", "jw.qdpec.edu.cn:8088").build();
-            Response response = client.newCall(request).execute();
-            if (!response.isSuccessful()) {
-                gj.sc("Load: 获取失败");
-                return false;
-            }
-            if (response.body() != null) {
-                String teachingWeek = response.body().string();
-                JSONObject jsonObject = new JSONObject(teachingWeek);
-                int code = jsonObject.getInt("code");
-                JSONArray data = jsonObject.getJSONArray("data");
-                if (code != 1) {
-                    gj.sc("Load: 获取失败");
-                    return false;
-                }
-                for (int i = 1; i <= data.length(); i++) {
+            int length = teachingWeek();
+            if (length > 0) {
+                for (int i = 1; i <= length; i++) {
                     String value = GetCurriculum(String.valueOf(i), "");
 //                gj.sc(""+value);
                     if (value == null) {
