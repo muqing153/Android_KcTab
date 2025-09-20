@@ -3,20 +3,16 @@ package com.muqing.kctab.fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,7 +28,6 @@ import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.FragmentKebiaoBinding;
 import com.muqing.kctab.databinding.GridItemBinding;
-import com.muqing.kctab.databinding.ItemTableHBinding;
 import com.muqing.wj;
 
 import java.time.LocalDate;
@@ -290,7 +285,6 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                 gj.sc(e);
             }
         }
-        int day = 1;
         for (List<List<Curriculum.Course>> list : TableList) {
             for (int i = 0; i < list.size(); i++) {
                 Curriculum.Course s = list.get(i).get(0);
@@ -298,7 +292,6 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                     list.remove(i + 1);
                 }
             }
-//            return;
         }
         return TableList;
     }
