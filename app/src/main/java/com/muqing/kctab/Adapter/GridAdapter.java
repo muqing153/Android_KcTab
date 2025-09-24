@@ -41,19 +41,19 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     @Override
     protected GridItemBinding getViewBindingObject(LayoutInflater inflater, ViewGroup parent, int viewType) {
         GridItemBinding inflate = GridItemBinding.inflate(inflater, parent, false);
-        inflate.getRoot().setUseCompatPadding(tablestyle.cardUseCompatPadding);
+//        inflate.getRoot().setUseCompatPadding(tablestyle.cardUseCompatPadding);
         if (tablestyle.cardElevation > -1) {
             inflate.getRoot().setCardElevation(tablestyle.cardElevation);
         }
         if (tablestyle.cardCornerRadius > -1) {
             inflate.getRoot().setRadius(tablestyle.cardCornerRadius);
         }
-        if (tablestyle.height > -1) {
-            inflate.line1.getLayoutParams().height = gj.dp2px(context, tablestyle.height);
-        }
-        if (tablestyle.width > -1) {
-            inflate.line1.getLayoutParams().width = gj.dp2px(context, tablestyle.width);
-        }
+//        if (tablestyle.height > -1) {
+//            inflate.line1.getLayoutParams().height = gj.dp2px(context, tablestyle.height);
+//        }
+//        if (tablestyle.width > -1) {
+//            inflate.line1.getLayoutParams().width = gj.dp2px(context, tablestyle.width);
+//        }
         return inflate;
     }
 

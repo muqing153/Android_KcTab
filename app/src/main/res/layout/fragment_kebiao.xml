@@ -4,32 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <com.muqing.kctab.SmartHorizontalScrollView
-        android:id="@+id/horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:scrollbars="none"
-        tools:ignore="UselessParent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
-            <androidx.recyclerview.widget.RecyclerView
+            <LinearLayout
                 android:id="@+id/recyclerview_h"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:itemCount="1"
-                tools:listitem="@layout/item_table_h" />
-
+                tools:layout_height="60dp"
+                android:orientation="horizontal">
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/scrollview"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -37,11 +30,10 @@
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerview_time"
-                        android:layout_width="wrap_content"
+                        android:layout_width="35dp"
                         android:layout_height="match_parent"
                         android:overScrollMode="never"
-                        tools:itemCount="6"
-                        tools:listitem="@layout/grid_item" />
+                        tools:listitem="@layout/item_table_time" />
 
                     <LinearLayout
                         android:id="@+id/tablelayout"
@@ -49,17 +41,15 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="horizontal">
-
                         <androidx.recyclerview.widget.RecyclerView
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:overScrollMode="never"
-                            tools:itemCount="6"
                             tools:listitem="@layout/grid_item" />
                     </LinearLayout>
 
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
         </LinearLayout>
-    </com.muqing.kctab.SmartHorizontalScrollView>
+<!--    </com.muqing.kctab.SmartHorizontalScrollView>-->
 </FrameLayout>

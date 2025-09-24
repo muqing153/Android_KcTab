@@ -3,11 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Widget.Material3.CardView.Elevated"
-    android:layout_width="80dp"
+    android:layout_width="match_parent"
     android:layout_height="120dp"
     app:cardElevation="0dp"
-    app:cardUseCompatPadding="true"
-    app:strokeColor="?attr/colorPrimaryFixedDim">
+    app:cardCornerRadius="0dp"
+    app:cardBackgroundColor="#00000000"
+    app:strokeWidth="0.1dp"
+    app:strokeColor="#80646464">
 
     <LinearLayout
         android:id="@+id/line1"

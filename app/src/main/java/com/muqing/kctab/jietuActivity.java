@@ -1,46 +1,33 @@
 package com.muqing.kctab;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.muqing.AppCompatActivity;
 import com.muqing.BaseAdapter;
-import com.muqing.gj;
 import com.muqing.kctab.Adapter.GridAdapter;
 import com.muqing.kctab.Adapter.TableHAdapter;
 import com.muqing.kctab.Adapter.TableTimeAdapter;
 import com.muqing.kctab.DataType.TableTimeData;
 import com.muqing.kctab.databinding.ActivityJietuBinding;
 import com.muqing.kctab.databinding.GridItemBinding;
-import com.muqing.kctab.databinding.ItemTableHBinding;
 import com.muqing.kctab.fragment.kecheng;
-import com.muqing.wj;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,7 +35,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
     public Bitmap bitmap;

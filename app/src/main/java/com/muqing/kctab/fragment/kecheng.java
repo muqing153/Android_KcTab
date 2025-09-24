@@ -3,12 +3,14 @@ package com.muqing.kctab.fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,6 +30,7 @@ import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.FragmentKebiaoBinding;
 import com.muqing.kctab.databinding.GridItemBinding;
+import com.muqing.kctab.databinding.ItemTableHBinding;
 import com.muqing.wj;
 
 import java.time.LocalDate;
@@ -93,10 +96,13 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                     timeAdapter.showJie = sharedPreferences.getBoolean("showJie", true);
                     timeAdapter.notifyDataSetChanged();
                 }
+                HList = new String[]{"日期", "一", "二", "三", "四", "五", "六", "日"};
                 boolean showInfo = sharedPreferences.getBoolean("showInfo", true);
                 for (int i = 0; i < curriculum.data.get(0).date.size(); i++) {
-                    HList[i + 1] += "(" + curriculum.data.get(0).date.get(i).rq + ")";
+                    recyclerHViews.get(i).titleRi2.setText(curriculum.data.get(0).date.get(i).rq);
+                    recyclerHViews.get(i).titleRi2.setVisibility(View.VISIBLE);
                 }
+//                binding.recyclerviewH.setAdapter(new TableHAdapter(this.getContext(), Arrays.asList(HList)));
                 GetKcLei(TableList, curriculum);
                 for (int i = 0; i < TableList.size(); i++) {
                     GridAdapter adapter = new GridAdapter(this.getContext(), TableList.get(i)) {
@@ -128,10 +134,9 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                 }
                 toolbar_time();
                 if (handler != null) {
-
                     handler.post(() -> {
                         LoadHander();
-                        binding.horizontal.scrollTo(ItemXY[0], 0);
+//                        binding.horizontal.scrollTo(ItemXY[0], 0);
                         binding.scrollview.scrollTo(0, ItemXY[1]);
                     });
                 }
@@ -152,6 +157,8 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
 
     public int[] ItemXY = new int[]{0, 0};
 
+    private int ThisColor = 0;
+
     private void LoadHander() {
 //        gj.sc("开始加载课程表");
         if (isAdded()) {
@@ -168,10 +175,12 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                             if (viewByPosition != null) {
                                 if (NextItemBinding == null) {
                                     NextItemBinding = GridItemBinding.bind(viewByPosition);
+                                    NextItemBinding.getRoot().setStrokeColor(ThisColor);
                                     NextItemBinding.getRoot().setStrokeWidth(3);
                                     NextItemBinding.getRoot().getLocationInWindow(ItemXY);
                                 } else if (NextItemBinding.getRoot() != viewByPosition) {
-                                    NextItemBinding.getRoot().setStrokeWidth(0);
+                                    NextItemBinding.getRoot().setStrokeColor(Color.parseColor("#80646464"));
+                                    NextItemBinding.getRoot().setStrokeWidth(1);
                                     NextItemBinding = null;
                                 }
                                 break;
@@ -182,10 +191,12 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                             if (viewByPosition != null) {
                                 if (NextItemBinding == null) {
                                     NextItemBinding = GridItemBinding.bind(viewByPosition);
-                                    NextItemBinding.getRoot().setStrokeWidth(3);
+                                    NextItemBinding.getRoot().setStrokeColor(ThisColor);
                                     NextItemBinding.getRoot().getLocationInWindow(ItemXY);
+                                    NextItemBinding.getRoot().setStrokeWidth(3);
                                 } else if (NextItemBinding.getRoot() != viewByPosition) {
-                                    NextItemBinding.getRoot().setStrokeWidth(0);
+                                    NextItemBinding.getRoot().setStrokeColor(Color.parseColor("#80646464"));
+                                    NextItemBinding.getRoot().setStrokeWidth(1);
                                     NextItemBinding = null;
                                 }
                                 break;
@@ -211,26 +222,45 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
     }
 
     List<RecyclerView> recyclerViews = new ArrayList<>();
+    List<ItemTableHBinding> recyclerHViews = new ArrayList<>();
 
-    String[] HList = new String[]{"日期", "一", "二", "三", "四", "五", "六", "日"};
+    private String[] HList = new String[]{"一", "二", "三", "四", "五", "六", "日"};
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void setUI(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding.recyclerviewH.setLayoutManager(new LinearLayoutManager(this.getContext(), LinearLayoutManager.HORIZONTAL, false));
+        this.ThisColor = gj.getThemeColor(requireContext(), com.google.android.material.R.attr.colorPrimaryFixedDim);
         binding.recyclerviewTime.setLayoutManager(new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false));
 //        数组转List
         TableTimeData[] data = TableTimeData.tableTimeData;
         binding.recyclerviewTime.setAdapter(new TableTimeAdapter(this.getContext(), Arrays.asList(data)));
-        binding.recyclerviewH.setAdapter(new TableHAdapter(this.getContext(), Arrays.asList(HList)));
         binding.tablelayout.removeAllViews();
         recyclerViews.clear();
+        binding.recyclerviewH.removeAllViews();
+        {
+            ItemTableHBinding tableHBinding = ItemTableHBinding.inflate(inflater, binding.recyclerviewH, false);
+            tableHBinding.getRoot().getLayoutParams().width = gj.dp2px(requireContext(), 35);
+            //获取今天几号
+            LocalDate now = LocalDate.now();
+            tableHBinding.titleRi.setText(String.valueOf(now.getDayOfMonth()));
+            tableHBinding.titleRi2.setText("Day");
+            tableHBinding.titleRi2.setVisibility(View.VISIBLE);
+            binding.recyclerviewH.addView(tableHBinding.getRoot());
+        }
         for (int i = 0; i < 7; i++) {
             RecyclerView recyclerView = new RecyclerView(requireContext());
             recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
 //            recyclerView 禁止滚动
             recyclerView.setNestedScrollingEnabled(false);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
+            layoutParams.weight = 1;
+            ItemTableHBinding tableHBinding = ItemTableHBinding.inflate(inflater, binding.recyclerviewH, false);
+            tableHBinding.titleRi.setText(HList[i]);
+//            tableHBinding.getRoot().setCardBackgroundColor(Color.TRANSPARENT);
+            binding.recyclerviewH.addView(tableHBinding.getRoot(), layoutParams);
+            recyclerHViews.add(tableHBinding);
             recyclerViews.add(recyclerView);
-            binding.tablelayout.addView(recyclerView);
+            binding.tablelayout.addView(recyclerView, layoutParams);
         }
     }
 
@@ -332,5 +362,4 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                 && !TextUtils.isEmpty(course.getClassroomName())
                 && !TextUtils.isEmpty(course.ktmc);
     }
-
 }

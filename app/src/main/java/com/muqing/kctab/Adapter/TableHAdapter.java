@@ -28,8 +28,7 @@ public class TableHAdapter extends BaseAdapter<ItemTableHBinding, String> {
     @Override
     protected void onBindView(String data, ItemTableHBinding viewBinding, ViewHolder<ItemTableHBinding> viewHolder, int position) {
         if (position == 0) {
-            int width = viewBinding.getRoot().getLayoutParams().width;
-            viewBinding.getRoot().getLayoutParams().width = width / 2 + gj.dp2px(context, 10);
+            viewBinding.getRoot().getLayoutParams().width = gj.dp2px(context, 35);
         }
         viewBinding.titleRi.setText(data);
     }

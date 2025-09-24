@@ -106,7 +106,6 @@ public class WebActivity extends AppCompatActivity<ActivityWebBinding> {
                 gj.sc(url);
                 if (Objects.equals(url, "http://protal.qdpec.edu.cn:19580/favicon.ico")) {
                     view.loadUrl("https://www.muqingcandy.top/");
-
                 }
             }
 

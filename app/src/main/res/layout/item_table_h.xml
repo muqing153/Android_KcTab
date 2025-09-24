@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Widget.Material3.CardView.Elevated"
-    android:layout_width="80dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardElevation="0dp"
-    app:cardUseCompatPadding="true"
-    app:strokeColor="?attr/colorPrimaryFixedDim">
+    app:cardCornerRadius="0dp"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardElevation="0dp">
 
     <LinearLayout
         android:id="@+id/line2"
@@ -16,6 +16,7 @@
         android:layout_gravity="center"
         android:layout_margin="1dp"
         android:gravity="center"
+        android:orientation="vertical"
         tools:visibility="visible">
 
         <TextView
@@ -24,5 +25,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="星期一" />
+
+        <TextView
+            android:id="@+id/title_ri_2"
+            style="@style/TextAppearance.Material3.BodyLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text="()" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
