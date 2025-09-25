@@ -2,27 +2,19 @@ package com.muqing.kctab;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.TypedArray;
-import android.net.VpnService;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.graphics.Insets;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.muqing.AppCompatActivity;
 import com.muqing.gj;
 import com.muqing.kctab.Activity.LoginActivity;
@@ -30,25 +22,19 @@ import com.muqing.kctab.Activity.SettingActivity;
 import com.muqing.kctab.Adapter.KeChengPageAdapter;
 import com.muqing.kctab.databinding.ActivityMainBinding;
 import com.muqing.kctab.fragment.kecheng;
-import com.muqing.kctab.service.ToyVpnClient;
-import com.muqing.kctab.service.ToyVpnService;
 import com.muqing.wj;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
-    public static String Time = "08:00";//当前时间xx:xx
-    public static int Week;// 当前日期 1234567
     public static int benzhou = 0;
     public static List<String> TabList = new ArrayList<>();
 
@@ -70,9 +56,12 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
 
     public static File fileTabList = new File(wj.data, "TabList");
 
+    public static int ThisColor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity.ThisColor = gj.getThemeColor(this, com.google.android.material.R.attr.colorPrimaryFixedDim);
         SharedPreferences kebiao = getSharedPreferences("kebiao", MODE_PRIVATE);
         fileTabList = new File(wj.data, "TabList");
         String schoolYearTerm = main.getSchoolYearTerm(LocalDate.now());
@@ -96,8 +85,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     }
 
     private void LoadUI() {
-        pageAdapter = null;
-        pageAdapter = new KeChengPageAdapter(this);
+//        pageAdapter = null;
         File[] list = fileTabList.listFiles();
         TabList.clear();
         if (list != null) {
@@ -114,7 +102,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             return date1.compareTo(date2);
         });
         UI();
-
     }
 
     @Nullable
@@ -146,10 +133,12 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             setSupportActionBar(binding.toolbar);
         }
         int i = 1;
+        pageAdapter = new KeChengPageAdapter(getSupportFragmentManager(), getLifecycle());
         for (String s : TabList) {
             pageAdapter.addPage(kecheng.newInstance(s, i));
             i++;
         }
+        binding.viewpage.setSaveEnabled(false);
         binding.viewpage.setAdapter(pageAdapter);
         int week = KcApi.getWeek();
         MainActivity.benzhou = week;
@@ -160,31 +149,17 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 binding.menuZhou.setText(String.format("第%s周", position + 1));
-                Handler handler = new Handler();
-                handler.postDelayed(() -> {
-                    kecheng fragment = pageAdapter.data.get(position);
-                    if (fragment != null && fragment.isAdded() && fragment.isVisible()) {
-                        fragment.toolbar_time();
-                    }
-                }, 500);
             }
         });
-        binding.menuZhou.setOnClickListener(view -> {
+        binding.title.setOnClickListener(view -> {
             zhouDialog zhouDialog = new zhouDialog(MainActivity.this) {
                 @Override
                 public void click(int position) {
                     MainActivity.this.binding.viewpage.setCurrentItem(position, false);
-
-                    kecheng fragment = pageAdapter.data.get(position);
-                    if (fragment != null && fragment.isAdded() && fragment.isVisible()) {
-                        fragment.toolbar_time();
-                    }
                 }
             };
             zhouDialog.zhouAdapter.week = MainActivity.this.binding.viewpage.getCurrentItem() + 1;
         });
-//        timer.schedule(task, 0, 1000); // 立即开始，每隔1秒执行
-//        startActivity(new Intent(this, ToyVpnClient.class));
     }
 
     public static class ScheduleItem {
@@ -230,9 +205,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     ActivityResultLauncher<Intent> SyncKc = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();
-            if (data != null) {
-//                LoadUI();
-            }
+            //                LoadUI();
         }
     });
     ActivityResultLauncher<Intent> LoginStart = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {

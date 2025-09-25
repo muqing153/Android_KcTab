@@ -1,11 +1,14 @@
 package com.muqing.kctab.fragment;
 
+import static java.lang.Thread.sleep;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,52 +67,78 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         }
     }
 
-    public kecheng() {
-    }
-
     @Override
     protected FragmentKebiaoBinding getViewBindingObject(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return FragmentKebiaoBinding.inflate(inflater, container, false);
     }
 
     public Handler handler;
+    TableTimeAdapter timeAdapter;
 
-    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onStart() {
         super.onStart();
-        if (isAdded()) {
-            if (FilePath != null) {
-//            gj.sc("启动Fragment UI 读取文件");
-                String dqwb = wj.dqwb(FilePath, "");
-                curriculum = new Gson().fromJson(dqwb, Curriculum.class);
-                curriculum.data.get(0).week = zhou;
+        if (isAdded() && isVisible()) {
+            binding.recyclerviewH.removeAllViews();
+            binding.tablelayout.removeAllViews();
+            recyclerViews.clear();
+            recyclerHViews.clear();
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
+            layoutParams.weight = 1;
+            {
+                ItemTableHBinding tableHBinding = ItemTableHBinding.inflate(getLayoutInflater(), binding.recyclerviewH, false);
+                LocalDate now = LocalDate.now();
+                tableHBinding.titleRi.setText(String.valueOf(now.getDayOfMonth()));
+                tableHBinding.titleRi2.setText("Day");
+                binding.recyclerviewH.addView(tableHBinding.getRoot(),
+                        new LinearLayout.LayoutParams(gj.dp2px(requireActivity(), 35), ViewGroup.LayoutParams.MATCH_PARENT));
             }
-            if (handler == null && zhou == MainActivity.benzhou) {
-                handler = new Handler();
+            for (int i = 0; i < 7; i++) {
+                RecyclerView recyclerView = new RecyclerView(requireActivity());
+                recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false));
+//            recyclerView 禁止滚动
+                recyclerView.setNestedScrollingEnabled(false);
+                ItemTableHBinding tableHBinding = ItemTableHBinding.inflate(getLayoutInflater(), binding.recyclerviewH, false);
+                tableHBinding.titleRi.setText(HList[i]);
+                recyclerHViews.add(tableHBinding);
+                recyclerViews.add(recyclerView);
+                binding.recyclerviewH.addView(tableHBinding.getRoot(), layoutParams);
+                binding.tablelayout.addView(recyclerView, layoutParams);
             }
-            if (curriculum != null && curriculum.data != null) {
+            Load();
+        }
+    }
 
-                SharedPreferences sharedPreferences = requireContext().getSharedPreferences("kebiao", Context.MODE_PRIVATE);
-                TableTimeAdapter timeAdapter = (TableTimeAdapter) binding.recyclerviewTime.getAdapter();
-                if (timeAdapter != null) {
-                    timeAdapter.showJie = sharedPreferences.getBoolean("showJie", true);
-                    timeAdapter.notifyDataSetChanged();
-                }
-                HList = new String[]{"日期", "一", "二", "三", "四", "五", "六", "日"};
-                boolean showInfo = sharedPreferences.getBoolean("showInfo", true);
-                for (int i = 0; i < curriculum.data.get(0).date.size(); i++) {
-                    recyclerHViews.get(i).titleRi2.setText(curriculum.data.get(0).date.get(i).rq);
-                    recyclerHViews.get(i).titleRi2.setVisibility(View.VISIBLE);
-                }
-//                binding.recyclerviewH.setAdapter(new TableHAdapter(this.getContext(), Arrays.asList(HList)));
-                GetKcLei(TableList, curriculum);
-                for (int i = 0; i < TableList.size(); i++) {
+    @SuppressLint("NotifyDataSetChanged")
+    private void Load() {
+        if (FilePath != null && curriculum == null) {
+            String dqwb = wj.dqwb(FilePath, "");
+            curriculum = new Gson().fromJson(dqwb, Curriculum.class);
+            curriculum.data.get(0).week = zhou;
+        }
+        if (handler == null && zhou == MainActivity.benzhou) {
+            handler = new Handler(Looper.getMainLooper());
+        }
+        toolbar_time();
+        if (curriculum != null && curriculum.data != null) {
+            SharedPreferences sharedPreferences = requireContext().getSharedPreferences("kebiao", Context.MODE_PRIVATE);
+            if (timeAdapter != null) {
+                timeAdapter.showJie = sharedPreferences.getBoolean("showJie", true);
+                timeAdapter.notifyDataSetChanged();
+            }
+            boolean showInfo = sharedPreferences.getBoolean("showInfo", true);
+            for (int i = 0; i < curriculum.data.get(0).date.size(); i++) {
+                recyclerHViews.get(i).titleRi2.setText(curriculum.data.get(0).date.get(i).rq);
+                recyclerHViews.get(i).titleRi2.setVisibility(View.VISIBLE);
+            }
+            GetKcLei(TableList, curriculum);
+            for (int i = 0; i < TableList.size(); i++) {
+                RecyclerView recyclerView = recyclerViews.get(i);
+                if (recyclerView != null) {
                     GridAdapter adapter = new GridAdapter(this.getContext(), TableList.get(i)) {
                         @SuppressLint("NotifyDataSetChanged")
                         @Override
-                        public boolean update(List<Curriculum.Course> list, Curriculum.Course course
-                                , int position) {
+                        public boolean update(List<Curriculum.Course> list, Curriculum.Course course, int position) {
                             List<Curriculum.Course> coursesData = curriculum.data.get(0).courses;
                             coursesData.clear();
                             for (List<List<Curriculum.Course>> listList : TableList) {
@@ -127,19 +156,11 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                         }
                     };
                     adapter.showInfo = showInfo;
-                    RecyclerView recyclerView = recyclerViews.get(i);
-                    if (recyclerView != null) {
-                        recyclerView.setAdapter(adapter);
-                    }
+                    recyclerView.setAdapter(adapter);
                 }
-                toolbar_time();
-                if (handler != null) {
-                    handler.post(() -> {
-                        LoadHander();
-//                        binding.horizontal.scrollTo(ItemXY[0], 0);
-                        binding.scrollview.scrollTo(0, ItemXY[1]);
-                    });
-                }
+            }
+            if (handler != null) {
+                handler.post(this::LoadHander);
             }
         }
     }
@@ -155,13 +176,9 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
 
     private GridItemBinding NextItemBinding;
 
-    public int[] ItemXY = new int[]{0, 0};
-
-    private int ThisColor = 0;
-
     private void LoadHander() {
 //        gj.sc("开始加载课程表");
-        if (isAdded()) {
+        if (isAdded() && isVisible()) {
             LocalDate now = LocalDate.now();
             int Day = now.getDayOfWeek().getValue();
             String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm", Locale.CHINA));
@@ -170,29 +187,13 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                 for (int y = 0; y < lists.size(); y++) {
                     Curriculum.Course data = lists.get(y).get(0);
                     if (IsCourse(data)) {
-                        if (time.compareTo(data.startTime) >= 0 && time.compareTo(data.endTime) <= 0 && Objects.equals(data.weekDay, i + 1)) {
+                        if ((time.compareTo(data.startTime) >= 0 && time.compareTo(data.endTime) <= 0 || data.startTime.compareTo(time) > 0)
+                                && Objects.equals(data.weekDay, i + 1)) {
                             View viewByPosition = Objects.requireNonNull(recyclerViews.get(i).getLayoutManager()).findViewByPosition(y);
                             if (viewByPosition != null) {
                                 if (NextItemBinding == null) {
                                     NextItemBinding = GridItemBinding.bind(viewByPosition);
-                                    NextItemBinding.getRoot().setStrokeColor(ThisColor);
-                                    NextItemBinding.getRoot().setStrokeWidth(3);
-                                    NextItemBinding.getRoot().getLocationInWindow(ItemXY);
-                                } else if (NextItemBinding.getRoot() != viewByPosition) {
-                                    NextItemBinding.getRoot().setStrokeColor(Color.parseColor("#80646464"));
-                                    NextItemBinding.getRoot().setStrokeWidth(1);
-                                    NextItemBinding = null;
-                                }
-                                break;
-                            }
-                        }
-                        if (data.startTime.compareTo(time) > 0 && Objects.equals(data.weekDay, i + 1)) {
-                            View viewByPosition = Objects.requireNonNull(recyclerViews.get(i).getLayoutManager()).findViewByPosition(y);
-                            if (viewByPosition != null) {
-                                if (NextItemBinding == null) {
-                                    NextItemBinding = GridItemBinding.bind(viewByPosition);
-                                    NextItemBinding.getRoot().setStrokeColor(ThisColor);
-                                    NextItemBinding.getRoot().getLocationInWindow(ItemXY);
+                                    NextItemBinding.getRoot().setStrokeColor(MainActivity.ThisColor);
                                     NextItemBinding.getRoot().setStrokeWidth(3);
                                 } else if (NextItemBinding.getRoot() != viewByPosition) {
                                     NextItemBinding.getRoot().setStrokeColor(Color.parseColor("#80646464"));
@@ -216,9 +217,10 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
     public Curriculum curriculum;
 
     public void toolbar_time() {
-        if (!isAdded()) return;
-        TextView viewById = requireActivity().findViewById(R.id.toolbar_time);
-        viewById.setText(curriculum.data.get(0).date.get(0).mxrq);
+        if (isAdded() && isVisible() && curriculum != null) {
+            TextView viewById = requireActivity().findViewById(R.id.toolbar_time);
+            viewById.setText(curriculum.data.get(0).date.get(0).mxrq);
+        }
     }
 
     List<RecyclerView> recyclerViews = new ArrayList<>();
@@ -229,39 +231,10 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
     @SuppressLint("SetTextI18n")
     @Override
     public void setUI(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        this.ThisColor = gj.getThemeColor(requireContext(), com.google.android.material.R.attr.colorPrimaryFixedDim);
-        binding.recyclerviewTime.setLayoutManager(new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false));
 //        数组转List
-        TableTimeData[] data = TableTimeData.tableTimeData;
-        binding.recyclerviewTime.setAdapter(new TableTimeAdapter(this.getContext(), Arrays.asList(data)));
-        binding.tablelayout.removeAllViews();
-        recyclerViews.clear();
-        binding.recyclerviewH.removeAllViews();
-        {
-            ItemTableHBinding tableHBinding = ItemTableHBinding.inflate(inflater, binding.recyclerviewH, false);
-            tableHBinding.getRoot().getLayoutParams().width = gj.dp2px(requireContext(), 35);
-            //获取今天几号
-            LocalDate now = LocalDate.now();
-            tableHBinding.titleRi.setText(String.valueOf(now.getDayOfMonth()));
-            tableHBinding.titleRi2.setText("Day");
-            tableHBinding.titleRi2.setVisibility(View.VISIBLE);
-            binding.recyclerviewH.addView(tableHBinding.getRoot());
-        }
-        for (int i = 0; i < 7; i++) {
-            RecyclerView recyclerView = new RecyclerView(requireContext());
-            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
-//            recyclerView 禁止滚动
-            recyclerView.setNestedScrollingEnabled(false);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
-            layoutParams.weight = 1;
-            ItemTableHBinding tableHBinding = ItemTableHBinding.inflate(inflater, binding.recyclerviewH, false);
-            tableHBinding.titleRi.setText(HList[i]);
-//            tableHBinding.getRoot().setCardBackgroundColor(Color.TRANSPARENT);
-            binding.recyclerviewH.addView(tableHBinding.getRoot(), layoutParams);
-            recyclerHViews.add(tableHBinding);
-            recyclerViews.add(recyclerView);
-            binding.tablelayout.addView(recyclerView, layoutParams);
-        }
+        binding.recyclerviewTime.setAdapter(timeAdapter = new TableTimeAdapter(this.requireActivity(), Arrays.asList(TableTimeData.tableTimeData)));
+        //获取今天几号
+//        Load();
     }
 
     List<List<List<Curriculum.Course>>> TableList = new ArrayList<>();
@@ -357,9 +330,6 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         if (course.weekDay < 0 || course.weekDay > 7) {
             return false;
         }
-        return !TextUtils.isEmpty(course.courseName)
-                && !TextUtils.isEmpty(course.teacherName)
-                && !TextUtils.isEmpty(course.getClassroomName())
-                && !TextUtils.isEmpty(course.ktmc);
+        return !TextUtils.isEmpty(course.courseName) && !TextUtils.isEmpty(course.teacherName) && !TextUtils.isEmpty(course.getClassroomName()) && !TextUtils.isEmpty(course.ktmc);
     }
 }

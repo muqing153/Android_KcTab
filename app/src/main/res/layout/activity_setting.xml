@@ -80,14 +80,15 @@
                     android:id="@+id/kb_daochu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:message="导出你所有学期的课表"
                     app:title="导出课表" />
 
                 <com.muqing.ViewUI.SettingTextView
                     android:id="@+id/kb_zhengli"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:message="功能性测试"
-                    app:title="整理课表课程" />
+                    app:message="查看本学期所有的课程"
+                    app:title="课程总览" />
 
                 <com.muqing.ViewUI.SettingTextView
                     android:id="@+id/kb_stzdy"
