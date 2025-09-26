@@ -1,5 +1,6 @@
 package com.muqing.kctab;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,11 +16,13 @@ import androidx.core.graphics.Insets;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.gson.Gson;
 import com.muqing.AppCompatActivity;
 import com.muqing.gj;
 import com.muqing.kctab.Activity.LoginActivity;
 import com.muqing.kctab.Activity.SettingActivity;
 import com.muqing.kctab.Adapter.KeChengPageAdapter;
+import com.muqing.kctab.DataType.TableStyleData;
 import com.muqing.kctab.databinding.ActivityMainBinding;
 import com.muqing.kctab.fragment.kecheng;
 import com.muqing.wj;
@@ -126,12 +129,15 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     }
 
     public KeChengPageAdapter pageAdapter;
-
+public static TableStyleData TableStyle;
     public void UI() {
         if (binding == null) {
             setContentView();
             setSupportActionBar(binding.toolbar);
         }
+        Gson gson = new Gson();
+        SharedPreferences a =getSharedPreferences("tablestyle", Context.MODE_PRIVATE);
+        TableStyle = gson.fromJson(a.getString("tablestyle", gson.toJson(new TableStyleData())), TableStyleData.class);
         int i = 1;
         pageAdapter = new KeChengPageAdapter(getSupportFragmentManager(), getLifecycle());
         for (String s : TabList) {

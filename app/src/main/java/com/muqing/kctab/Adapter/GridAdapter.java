@@ -29,48 +29,30 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     public int zhou = 0;
     public boolean showInfo = true;
 
-    TableStyleData tablestyle;
 
     public GridAdapter(Context context, List<List<Curriculum.Course>> dataList) {
         super(context, dataList);
-        Gson gson = new Gson();
-        SharedPreferences a = context.getSharedPreferences("tablestyle", Context.MODE_PRIVATE);
-        tablestyle = gson.fromJson(a.getString("tablestyle", gson.toJson(new TableStyleData())), TableStyleData.class);
     }
 
     @Override
     protected GridItemBinding getViewBindingObject(LayoutInflater inflater, ViewGroup parent, int viewType) {
         GridItemBinding inflate = GridItemBinding.inflate(inflater, parent, false);
 //        inflate.getRoot().setUseCompatPadding(tablestyle.cardUseCompatPadding);
-        if (tablestyle.cardElevation > -1) {
-            inflate.getRoot().setCardElevation(tablestyle.cardElevation);
+        if (MainActivity.TableStyle.cardElevation > -1) {
+            inflate.getRoot().setCardElevation(MainActivity.TableStyle.cardElevation);
         }
-        if (tablestyle.cardCornerRadius > -1) {
-            inflate.getRoot().setRadius(tablestyle.cardCornerRadius);
+        if (MainActivity.TableStyle.cardCornerRadius > -1) {
+            inflate.getRoot().setRadius(MainActivity.TableStyle.cardCornerRadius);
         }
-//        if (tablestyle.height > -1) {
-//            inflate.line1.getLayoutParams().height = gj.dp2px(context, tablestyle.height);
-//        }
-//        if (tablestyle.width > -1) {
-//            inflate.line1.getLayoutParams().width = gj.dp2px(context, tablestyle.width);
-//        }
         return inflate;
     }
-
-    private int height = 0;
-
     @Override
     protected void onBindView(List<Curriculum.Course> data, GridItemBinding viewBinding, ViewHolder<GridItemBinding> viewHolder, int position) {
         Curriculum.Course course = data.get(0);
         int maxLines = viewBinding.title.getMaxLines();
-        viewBinding.getRoot().post(() -> {
-            if (height == 0) {
-                height = viewBinding.getRoot().getHeight();
-            }
-//            gj.sc("height" + height + " " + course.height);
-            viewBinding.getRoot().getLayoutParams().height = height * course.height;
-            viewBinding.getRoot().requestLayout();
-        });
+        viewBinding.getRoot().getLayoutParams().height = (int) (MainActivity.TableStyle.getHeight(context) * course.height);
+
+        viewBinding.getRoot().requestLayout();
         maxLines *= course.height;
         viewBinding.title.setMaxLines(maxLines);
         viewBinding.message.setMaxLines(maxLines);
@@ -120,6 +102,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         });
 //        viewBinding.getRoot().setOnLongClickListener(view -> ShowLong(data, view, position));
     }
+
     /**
      * 更新保存课表
      *

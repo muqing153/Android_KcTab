@@ -27,7 +27,7 @@ public class AutoTableActivity extends AppCompatActivity<ActivityAutoTableBindin
         d.cardElevation = 0;
         d.cardCornerRadius = 0;
         d.width = 80;
-        d.height = 127;
+        d.setHeight(this, 127);
         dataList.add(d);
         binding.recyclerview.setLayoutManager(new GridLayoutManager(this, 2));
         binding.recyclerview.setAdapter(new AutoTableAdapter(this, dataList));

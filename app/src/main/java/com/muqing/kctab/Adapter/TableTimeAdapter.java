@@ -1,5 +1,4 @@
 package com.muqing.kctab.Adapter;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +6,7 @@ import android.view.ViewGroup;
 
 import com.muqing.BaseAdapter;
 import com.muqing.kctab.DataType.TableTimeData;
+import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.databinding.ItemTableTimeBinding;
 
 import java.util.List;
@@ -22,9 +22,11 @@ public class TableTimeAdapter extends BaseAdapter<ItemTableTimeBinding, TableTim
     protected ItemTableTimeBinding getViewBindingObject(LayoutInflater inflater, ViewGroup parent, int viewType) {
         return ItemTableTimeBinding.inflate(inflater, parent, false);
     }
-
     @Override
     protected void onBindView(TableTimeData data, ItemTableTimeBinding viewBinding, ViewHolder<ItemTableTimeBinding> viewHolder, int position) {
+        viewBinding.getRoot().getLayoutParams().height = (int) MainActivity.TableStyle.getHeight(context);
+        viewBinding.getRoot().requestLayout();
+
         viewBinding.title.setVisibility(showJie ? View.VISIBLE : View.GONE);
         viewBinding.title.setText(data.title);
         viewBinding.starttime.setText(data.starttime);

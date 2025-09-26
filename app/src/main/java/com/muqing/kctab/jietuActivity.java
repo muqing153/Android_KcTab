@@ -2,31 +2,41 @@ package com.muqing.kctab;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.muqing.AppCompatActivity;
 import com.muqing.BaseAdapter;
+import com.muqing.gj;
 import com.muqing.kctab.Adapter.GridAdapter;
 import com.muqing.kctab.Adapter.TableHAdapter;
 import com.muqing.kctab.Adapter.TableTimeAdapter;
 import com.muqing.kctab.DataType.TableTimeData;
 import com.muqing.kctab.databinding.ActivityJietuBinding;
 import com.muqing.kctab.databinding.GridItemBinding;
+import com.muqing.kctab.databinding.ItemTableHBinding;
 import com.muqing.kctab.fragment.kecheng;
 
 import java.io.File;
@@ -38,6 +48,7 @@ import java.util.List;
 
 public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
     public Bitmap bitmap;
+    private int width, height;
 
     public static void start(Activity activity, Curriculum data) {
 // 创建 Intent 并传递 Bitmap 数据
@@ -109,176 +120,65 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
             e.printStackTrace();
         }
     }
+
     @Override
     protected ActivityJietuBinding getViewBindingObject(LayoutInflater layoutInflater) {
         return ActivityJietuBinding.inflate(layoutInflater);
     }
-    String[] HList = new String[]{"日期", "一", "二", "三", "四", "五", "六", "日"};
+
+    String[] HList = new String[]{"一", "二", "三", "四", "五", "六", "日"};
+
     public Bitmap recyclerViewToBitmapGrid(Curriculum curriculum) {
-        Paint paint = new Paint();
-
-        // 渲染 HAdapter (星期标题)
-        TableHAdapter hAdapter = new TableHAdapter(jietuActivity.this, Arrays.asList(HList));
-        Bitmap hBitmap = renderAdapterToBitmapHorizontal(hAdapter);
-
-        // 渲染 TimeAdapter (时间列)
-        TableTimeAdapter timeAdapter = new TableTimeAdapter(jietuActivity.this, Arrays.asList(TableTimeData.tableTimeData));
-        Bitmap timeBitmap = renderAdapterToBitmapVertical(timeAdapter);
-
-        // 渲染每列 GridAdapter（课程格）
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        width = displayMetrics.widthPixels;
+        height = displayMetrics.heightPixels;
+        // 1. 创建根布局（竖直 LinearLayout）
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        // 2. 添加表头（横向 LinearLayout）
+        LinearLayout headerRow = new LinearLayout(this);
+        headerRow.setOrientation(LinearLayout.HORIZONTAL);
+        {
+            ItemTableHBinding tvBinding = ItemTableHBinding.inflate(LayoutInflater.from(this));
+            tvBinding.titleRi.setText("Day");
+            headerRow.addView(tvBinding.getRoot(), new LinearLayout.LayoutParams(gj.dp2px(this, 35), ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+        for (String h : HList) {
+            ItemTableHBinding tvBinding = ItemTableHBinding.inflate(LayoutInflater.from(this));
+            tvBinding.titleRi.setText(h);
+            headerRow.addView(tvBinding.getRoot(), new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        }
+        root.addView(headerRow);
         List<List<List<Curriculum.Course>>> lists = kecheng.GetKcLei(new ArrayList<>(), curriculum);
-        List<Bitmap> gridBitmaps = new ArrayList<>();
-        int gridWidth = hBitmap.getWidth();
-        int gridHeight = timeBitmap.getHeight() + 200;
-        for (List<List<Curriculum.Course>> list : lists) {
-            GridAdapter gridAdapter = new GridAdapter(jietuActivity.this, list);
-            Bitmap bmp = GridTableToBitmap(gridAdapter);
-            gridBitmaps.add(bmp);
+        LinearLayout rowLayout = new LinearLayout(this);
+        rowLayout.setOrientation(LinearLayout.HORIZONTAL);
+        {
+            RecyclerView recyclerView = new RecyclerView(this);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            rowLayout.addView(recyclerView, new LinearLayout.LayoutParams(gj.dp2px(this, 35), ViewGroup.LayoutParams.MATCH_PARENT));
+            recyclerView.setAdapter(new TableTimeAdapter(this, Arrays.asList(TableTimeData.tableTimeData)));
         }
-        Bitmap bigBitmap = Bitmap.createBitmap(gridWidth, gridHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bigBitmap);
-        //设置背景色 获取系统背景色
-        TypedArray array = getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorBackground});
-        int backgroundColor = array.getColor(0, 0xFFF5F5F5);
-        canvas.drawColor(backgroundColor);
-        array.recycle();
-        // 1. 绘制 HAdapter（横向标题），在时间列右侧
-        canvas.drawBitmap(hBitmap, 0f, 0f, paint);
-
-        // 2. 绘制时间列（左侧竖向）
-        canvas.drawBitmap(timeBitmap, 0f, hBitmap.getHeight(), paint);
-        // 3. 绘制 GridAdapter（课程格），右侧并排
-        int xOffset = timeBitmap.getWidth();
-        for (Bitmap bmp : gridBitmaps) {
-            canvas.drawBitmap(bmp, xOffset, hBitmap.getHeight(), paint);
-            xOffset += bmp.getWidth();
-            bmp.recycle();
+        // 3. 添加数据行
+        for (List<List<Curriculum.Course>> row : lists) {
+            RecyclerView recyclerView = new RecyclerView(this);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(new GridAdapter(this, row));
+            rowLayout.addView(recyclerView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
         }
+        root.addView(rowLayout);
+        // 4. 手动测量 & 布局
+        int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        root.measure(widthSpec, heightSpec);
+        root.layout(0, 0, root.getMeasuredWidth(), root.getMeasuredHeight());
 
-        // 回收 HAdapter 和 TimeAdapter
-        hBitmap.recycle();
-        timeBitmap.recycle();
-        return bigBitmap;
+        // 5. 创建 Bitmap 并绘制
+        Bitmap bitmap = Bitmap.createBitmap(root.getMeasuredWidth(), root.getMeasuredHeight(), Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+        //绘制背景色
+        canvas.drawColor(gj.getbackgroundColor(this));
+        root.draw(canvas);
+        return bitmap;
     }
-    private Bitmap renderAdapterToBitmapHorizontal(RecyclerView.Adapter adapter) {
-        int itemCount = adapter.getItemCount();
-        if (itemCount == 0) return null;
 
-        List<Bitmap> itemBitmaps = new ArrayList<>();
-        int totalWidth = 0;
-        int maxHeight = 0;
-
-        // 逐个渲染 item
-        for (int i = 0; i < itemCount; i++) {
-            RecyclerView.ViewHolder holder = adapter.createViewHolder(new FrameLayout(jietuActivity.this), adapter.getItemViewType(i));
-            adapter.onBindViewHolder(holder, i);
-
-            // 使用 getRoot() 默认宽度
-            holder.itemView.measure(
-                    View.MeasureSpec.makeMeasureSpec(holder.itemView.getLayoutParams().width, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-            );
-            holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
-
-            Bitmap bmp = Bitmap.createBitmap(holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bmp);
-            holder.itemView.draw(canvas);
-
-            itemBitmaps.add(bmp);
-            totalWidth += holder.itemView.getMeasuredWidth();
-            maxHeight = Math.max(maxHeight, holder.itemView.getMeasuredHeight());
-        }
-
-        // 横向拼接
-        Bitmap result = Bitmap.createBitmap(totalWidth, maxHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(result);
-        int xOffset = 0;
-        for (Bitmap bmp : itemBitmaps) {
-            canvas.drawBitmap(bmp, xOffset, 0f, null);
-            xOffset += bmp.getWidth();
-            bmp.recycle();
-        }
-
-        return result;
-    }
-    private Bitmap renderAdapterToBitmapVertical(RecyclerView.Adapter adapter) {
-        int itemCount = adapter.getItemCount();
-        if (itemCount == 0) return null;
-
-        List<Bitmap> itemBitmaps = new ArrayList<>();
-        int totalHeight = 0;
-        int columnWidth = 0;
-
-        for (int i = 0; i < itemCount; i++) {
-            RecyclerView.ViewHolder holder = adapter.createViewHolder(new FrameLayout(jietuActivity.this), adapter.getItemViewType(i));
-            adapter.onBindViewHolder(holder, i);
-
-            // 使用 getRoot() 默认宽度
-            holder.itemView.measure(
-                    View.MeasureSpec.makeMeasureSpec(holder.itemView.getLayoutParams().width, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(holder.itemView.getLayoutParams().height, View.MeasureSpec.EXACTLY)
-            );
-            holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
-
-            Bitmap bmp = Bitmap.createBitmap(holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bmp);
-            holder.itemView.draw(canvas);
-
-            itemBitmaps.add(bmp);
-            columnWidth = holder.itemView.getMeasuredWidth();
-            totalHeight += holder.itemView.getMeasuredHeight();
-        }
-
-        Bitmap result = Bitmap.createBitmap(columnWidth, totalHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(result);
-        int yOffset = 0;
-        for (Bitmap bmp : itemBitmaps) {
-            canvas.drawBitmap(bmp, 0f, yOffset, null);
-            yOffset += bmp.getHeight();
-            bmp.recycle();
-        }
-
-
-        return result;
-    }
-    private Bitmap GridTableToBitmap(GridAdapter adapter) {
-        int itemCount = adapter.getItemCount();
-        if (itemCount == 0) return null;
-
-        List<Bitmap> itemBitmaps = new ArrayList<>();
-        int totalHeight = 0;
-        int columnWidth = 0;
-        for (int i = 0; i < itemCount; i++) {
-            BaseAdapter.ViewHolder<GridItemBinding> holder = adapter.createViewHolder(new FrameLayout(jietuActivity.this), adapter.getItemViewType(i));
-            adapter.onBindViewHolder(holder, i);
-            holder.itemView.measure(
-                    View.MeasureSpec.makeMeasureSpec(holder.itemView.getLayoutParams().width, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(holder.itemView.getLayoutParams().height * adapter.dataList.get(i).get(0).height, View.MeasureSpec.EXACTLY)
-            );
-            Bitmap bmp = Bitmap.createBitmap(holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bmp);
-            if (!kecheng.IsCourse(adapter.dataList.get(i).get(0))) {
-                bmp = Bitmap.createBitmap(holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-                canvas = new Canvas(bmp);
-            }else{
-
-                holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
-            }
-            holder.itemView.draw(canvas);
-            itemBitmaps.add(bmp);
-            columnWidth = holder.itemView.getMeasuredWidth();
-            totalHeight += holder.itemView.getMeasuredHeight();
-        }
-
-        Bitmap result = Bitmap.createBitmap(columnWidth, totalHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(result);
-        int yOffset = 0;
-        for (Bitmap bmp : itemBitmaps) {
-            canvas.drawBitmap(bmp, 0f, yOffset, null);
-            yOffset += bmp.getHeight();
-            bmp.recycle();
-        }
-
-        return result;
-    }
 }

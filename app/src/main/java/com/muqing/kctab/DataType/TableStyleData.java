@@ -1,5 +1,10 @@
 package com.muqing.kctab.DataType;
 
+import android.content.Context;
+
+import com.muqing.gj;
+import com.muqing.kctab.MainActivity;
+
 import java.util.Objects;
 
 public class TableStyleData {
@@ -11,18 +16,30 @@ public class TableStyleData {
     public float cardElevation;
     public float cardCornerRadius;
     public float width;
-    public float height;
+    private float height;
+
 
     public TableStyleData() {
         name = "默认";
         style = true;
         cardUseCompatPadding = true;
         width = -1;
-        height = -1;
+        height = 120;
         cardElevation = -1;
         cardCornerRadius = -1;
     }
 
+    public float getHeight(Context context) {
+        if (height < 1) {
+            height = gj.dp2px(context, 120);
+        }
+        return gj.dp2px(context, height);
+    }
+
+    public void setHeight(Context context, float height) {
+        height = gj.dp2px(context, height);
+        this.height = height;
+    }
 
     @Override
     public boolean equals(Object o) {

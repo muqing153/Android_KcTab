@@ -14,32 +14,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
+        <Button
             android:id="@+id/all"
+            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="9dp"
-            android:layout_weight="1"
-            android:gravity="center"
             android:text="全选"
             tools:ignore="HardcodedText" />
 
-        <TextView
-            android:id="@+id/clear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="9dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="取消" />
-
-        <TextView
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+        <Button
             android:id="@+id/benzhou"
+            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="9dp"
-            android:layout_weight="1"
-            android:gravity="center"
             android:text="本周" />
     </LinearLayout>
 
@@ -48,8 +41,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
         android:focusableInTouchMode="false"
-        android:nestedScrollingEnabled="false"
-        android:layout_marginBottom="16dp" />
+        android:nestedScrollingEnabled="false" />
 
 </LinearLayout>

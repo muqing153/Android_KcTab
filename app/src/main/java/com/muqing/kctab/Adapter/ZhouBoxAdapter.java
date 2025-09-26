@@ -24,10 +24,6 @@ public class ZhouBoxAdapter extends BaseAdapter<ItemZhouBoxBinding, String> {
     public ZhouBoxAdapter(Context context, List<String> dataList, DialogZhouBoxBinding dialogZhouBoxBinding, List<Integer> zhou) {
         super(context, dataList);
         this.zhou = zhou;
-        dialogZhouBoxBinding.clear.setOnClickListener(view -> {
-            zhou.clear();
-            notifyDataSetChanged();
-        });
         dialogZhouBoxBinding.all.setOnClickListener(view -> {
             zhou.clear();
             for (int i = 0; i < dataList.size(); i++) {
