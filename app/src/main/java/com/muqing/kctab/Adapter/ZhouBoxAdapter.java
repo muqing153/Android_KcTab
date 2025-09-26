@@ -16,9 +16,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ZhouBoxAdapter extends BaseAdapter<ItemZhouBoxBinding, String> {
-
-
-
     public List<Integer> zhou;
     @SuppressLint("NotifyDataSetChanged")
     public ZhouBoxAdapter(Context context, List<String> dataList, DialogZhouBoxBinding dialogZhouBoxBinding, List<Integer> zhou) {
