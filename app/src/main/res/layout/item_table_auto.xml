@@ -2,32 +2,53 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardUseCompatPadding="true">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="9dp"
         android:gravity="center_vertical"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tableHLayout"
+            style="@style/Widget.Material3.CardView.Elevated"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_margin="1dp"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tableHtitle"
+                    style="@style/TextAppearance.Material3.BodyLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Day" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="1dp"
+            android:orientation="horizontal">
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card"
+                android:id="@+id/tableTimeLayout"
                 style="@style/Widget.Material3.CardView.Elevated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:cardUseCompatPadding="true">
+                android:layout_width="35dp"
+                android:layout_height="match_parent">
 
                 <LinearLayout
-                    android:id="@+id/line1"
-                    android:layout_width="80dp"
-                    android:layout_height="100dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_marginHorizontal="1dp"
                     android:layout_marginVertical="2dp"
                     android:gravity="center"
@@ -35,7 +56,52 @@
                     tools:ignore="UselessParent">
 
                     <TextView
-                        android:id="@+id/title"
+                        android:id="@+id/tableTimetitle"
+                        style="@style/TextAppearance.Material3.BodyLarge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="middle"
+                        android:gravity="center"
+                        android:text="1" />
+
+
+                    <TextView
+                        android:id="@+id/starttime"
+                        style="@style/TextAppearance.Material3.BodySmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:text="08:00" />
+
+                    <TextView
+                        android:id="@+id/endtime"
+                        style="@style/TextAppearance.Material3.BodySmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:text="10:00" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/tableLayout"
+                style="@style/Widget.Material3.CardView.Elevated"
+                android:layout_width="match_parent"
+                android:layout_height="120dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="1dp"
+                    android:layout_marginVertical="2dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    tools:ignore="UselessParent">
+
+                    <TextView
+                        android:id="@+id/tabletitle"
                         style="@style/TextAppearance.Material3.BodyLarge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -45,7 +111,7 @@
                         android:text="课程名称" />
 
                     <TextView
-                        android:id="@+id/message"
+                        android:id="@+id/tablemessage"
                         style="@style/TextAppearance.Material3.BodySmall"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -64,37 +130,14 @@
                     android:text="- -" />
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card2"
-                style="@style/Widget.Material3.CardView.Elevated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:cardUseCompatPadding="true">
-
-                <LinearLayout
-                    android:id="@+id/line2"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="1dp"
-                    android:gravity="center">
-
-                    <TextView
-                        android:id="@+id/title_ri"
-                        style="@style/TextAppearance.Material3.BodyLarge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="节/期" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/useButton"
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="center"
             android:text="使用" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

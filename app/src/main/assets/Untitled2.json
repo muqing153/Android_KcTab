@@ -1,0 +1,48 @@
+{
+    "tableTime": {
+        "tableTimetitle": {
+            "text": "1"
+        },
+        "starttime": {
+            "text": "08:00"
+        },
+        "endtime": {
+            "text": "09:00"
+        },
+        "appAttrs": {
+            "cardBackgroundColor": "#50F0F8FF",
+            "cardElevation": 0,
+            "cardCornerRadius": 0
+        },
+        "height": 120
+    },
+    "tableH": {
+        "tableHtitle": {
+            "text": "Day"
+        },
+        "appAttrs": {
+            "cardBackgroundColor": "#50F0F8FF",
+            "cardElevation": 0,
+            "cardCornerRadius": 0
+        }
+    },
+    "table": {
+        "tabletitle": {
+            "text": "官方表格"
+        },
+        "tablemessage": {
+            "text": "冬季主题-冻死我了QWQ"
+        },
+        "list_size": {
+            "text": "❄"
+        },
+        "appAttrs": {
+            "cardBackgroundColor": "#50F0F8FF",
+            "cardElevation": 0,
+            "cardCornerRadius": 0,
+            "strokeWidth": 1,
+            "strokeColor": "#90F0F8FF"
+        },
+        "height": 120
+    }
+}

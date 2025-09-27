@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/settings"
-        android:icon="@drawable/widgets_24px"
-        android:title="应用"
-        android:tooltipText="应用"
+        android:id="@+id/add"
+        android:icon="@drawable/add_24px"
+        android:title="添加"
+        android:tooltipText="添加自定义配置"
         app:showAsAction="ifRoom" />
 </menu>

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.muqing.BaseAdapter;
 import com.muqing.gj;
+import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.databinding.ItemTableHBinding;
 
 import java.time.LocalDate;
@@ -22,7 +23,11 @@ public class TableHAdapter extends BaseAdapter<ItemTableHBinding, String> {
 
     @Override
     protected ItemTableHBinding getViewBindingObject(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        return ItemTableHBinding.inflate(inflater, parent, false);
+        ItemTableHBinding inflate = ItemTableHBinding.inflate(inflater, parent, false);
+        if (MainActivity.TableStyle != null) {
+            AutoTableAdapter.bindView(MainActivity.TableStyle, inflate.getRoot(), true);
+        }
+        return inflate;
     }
 
     @Override
@@ -30,6 +35,6 @@ public class TableHAdapter extends BaseAdapter<ItemTableHBinding, String> {
         if (position == 0) {
             viewBinding.getRoot().getLayoutParams().width = gj.dp2px(context, 35);
         }
-        viewBinding.titleRi.setText(data);
+        viewBinding.tableHtitle.setText(data);
     }
 }

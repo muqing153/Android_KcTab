@@ -2,15 +2,15 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tableHLayout"
     style="@style/Widget.Material3.CardView.Elevated"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="0dp"
     app:cardBackgroundColor="@android:color/transparent"
+    app:cardCornerRadius="0dp"
     app:cardElevation="0dp">
 
     <LinearLayout
-        android:id="@+id/line2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
@@ -20,7 +20,7 @@
         tools:visibility="visible">
 
         <TextView
-            android:id="@+id/title_ri"
+            android:id="@+id/tableHtitle"
             style="@style/TextAppearance.Material3.BodyLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

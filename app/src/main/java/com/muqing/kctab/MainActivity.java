@@ -21,6 +21,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.gson.Gson;
 import com.muqing.AppCompatActivity;
 import com.muqing.gj;
+import com.muqing.kctab.Activity.AutoTableActivity;
 import com.muqing.kctab.Activity.LoginActivity;
 import com.muqing.kctab.Activity.SettingActivity;
 import com.muqing.kctab.Adapter.KeChengPageAdapter;
@@ -138,8 +139,9 @@ public static TableStyleData TableStyle;
             setSupportActionBar(binding.toolbar);
         }
         Gson gson = new Gson();
-        SharedPreferences a =getSharedPreferences("tablestyle", Context.MODE_PRIVATE);
-        TableStyle = gson.fromJson(a.getString("tablestyle", gson.toJson(new TableStyleData())), TableStyleData.class);
+        SharedPreferences a = getSharedPreferences("tablestyle", Context.MODE_PRIVATE);
+        TableStyle = gson.fromJson(a.getString("tablestyle", gson.toJson(null)), TableStyleData.class);
+        gj.sc(TableStyle);
         int i = 1;
         pageAdapter = new KeChengPageAdapter(getSupportFragmentManager(), getLifecycle());
         for (String s : TabList) {
@@ -205,6 +207,8 @@ public static TableStyleData TableStyle;
             kecheng kecheng = pageAdapter.data.get(currentItem);
             intent.putExtra("sync", kecheng.curriculum == null ? "ALL" : String.valueOf(kecheng.curriculum.data.get(0).week));
             SyncKc.launch(intent);
+        }else {
+            startActivity(new Intent(this, AutoTableActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

@@ -37,22 +37,22 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     @Override
     protected GridItemBinding getViewBindingObject(LayoutInflater inflater, ViewGroup parent, int viewType) {
         GridItemBinding inflate = GridItemBinding.inflate(inflater, parent, false);
-//        inflate.getRoot().setUseCompatPadding(tablestyle.cardUseCompatPadding);
-        if (MainActivity.TableStyle.cardElevation > -1) {
-            inflate.getRoot().setCardElevation(MainActivity.TableStyle.cardElevation);
-        }
-        if (MainActivity.TableStyle.cardCornerRadius > -1) {
-            inflate.getRoot().setRadius(MainActivity.TableStyle.cardCornerRadius);
+        if (MainActivity.TableStyle != null) {
+            AutoTableAdapter.bindView(MainActivity.TableStyle, inflate.getRoot(), true);
         }
         return inflate;
     }
+
     @Override
     protected void onBindView(List<Curriculum.Course> data, GridItemBinding viewBinding, ViewHolder<GridItemBinding> viewHolder, int position) {
         Curriculum.Course course = data.get(0);
+        if (MainActivity.TableStyle != null) {
+        }
         int maxLines = viewBinding.title.getMaxLines();
-        viewBinding.getRoot().getLayoutParams().height = (int) (MainActivity.TableStyle.getHeight(context) * course.height);
 
-        viewBinding.getRoot().requestLayout();
+        viewBinding.getRoot().getLayoutParams().height = (MainActivity.TableStyle == null ? gj.dp2px(context, 120) :
+                MainActivity.TableStyle.table.getHeight(context)) * course.height;
+//        viewBinding.getRoot().requestLayout();
         maxLines *= course.height;
         viewBinding.title.setMaxLines(maxLines);
         viewBinding.message.setMaxLines(maxLines);
@@ -62,28 +62,26 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
             viewBinding.message.setVisibility(View.VISIBLE);
             viewBinding.message.setText(course.getClassroomName());
         }
-
-        viewBinding.line1.setVisibility(View.VISIBLE);
+        CharSequence text = viewBinding.listSize.getText();
         if (data.size() > 1) {
             StringBuffer stringBuffer = new StringBuffer();
             for (int i = 0; i < data.size(); i++) {
-                stringBuffer.append('-');
+                stringBuffer.append(text);
                 if (i != data.size() - 1) {
                     stringBuffer.append(' ');
                 }
             }
             viewBinding.listSize.setText(stringBuffer);
             viewBinding.listSize.setVisibility(View.VISIBLE);
-
+        }else {
+            viewBinding.listSize.setVisibility(View.GONE);
         }
         viewBinding.getRoot().setOnClickListener(v -> {
-//            gj.sc(position + "--" + (position + 1) + "--" + data.get(0).classTime);
             KcinfoBottomDialog dialog = new KcinfoBottomDialog(context, data);
             dialog.setOnDismissListener(dialogInterface -> {
                 if (data != dialog.data) {
                     data.clear();
                     data.addAll(dialog.data);
-//                    gj.sc(data.get(0).classTime );
                     String classTime = data.get(0).classTime;
                     notifyItemChanged(position);
                     if (!kecheng.IsCourseList(data)) {

@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.muqing.Fragment;
 import com.muqing.gj;
+import com.muqing.kctab.Adapter.AutoTableAdapter;
 import com.muqing.kctab.Adapter.GridAdapter;
 import com.muqing.kctab.Adapter.TableHAdapter;
 import com.muqing.kctab.Adapter.TableTimeAdapter;
@@ -88,7 +89,10 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
             {
                 ItemTableHBinding tableHBinding = ItemTableHBinding.inflate(getLayoutInflater(), binding.recyclerviewH, false);
                 LocalDate now = LocalDate.now();
-                tableHBinding.titleRi.setText(String.valueOf(now.getDayOfMonth()));
+                if (MainActivity.TableStyle != null) {
+                    AutoTableAdapter.bindView(MainActivity.TableStyle, tableHBinding.getRoot(), true);
+                }
+                tableHBinding.tableHtitle.setText(String.valueOf(now.getDayOfMonth()));
                 tableHBinding.titleRi2.setText("Day");
                 binding.recyclerviewH.addView(tableHBinding.getRoot(),
                         new LinearLayout.LayoutParams(gj.dp2px(requireActivity(), 35), ViewGroup.LayoutParams.MATCH_PARENT));
@@ -99,9 +103,12 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
 //            recyclerView 禁止滚动
                 recyclerView.setNestedScrollingEnabled(false);
                 ItemTableHBinding tableHBinding = ItemTableHBinding.inflate(getLayoutInflater(), binding.recyclerviewH, false);
-                tableHBinding.titleRi.setText(HList[i]);
+                tableHBinding.tableHtitle.setText(HList[i]);
                 recyclerHViews.add(tableHBinding);
                 recyclerViews.add(recyclerView);
+                if (MainActivity.TableStyle != null) {
+                    AutoTableAdapter.bindView(MainActivity.TableStyle, tableHBinding.getRoot(), true);
+                }
                 binding.recyclerviewH.addView(tableHBinding.getRoot(), layoutParams);
                 binding.tablelayout.addView(recyclerView, layoutParams);
             }

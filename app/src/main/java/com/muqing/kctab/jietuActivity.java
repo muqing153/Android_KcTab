@@ -30,6 +30,7 @@ import com.google.gson.Gson;
 import com.muqing.AppCompatActivity;
 import com.muqing.BaseAdapter;
 import com.muqing.gj;
+import com.muqing.kctab.Adapter.AutoTableAdapter;
 import com.muqing.kctab.Adapter.GridAdapter;
 import com.muqing.kctab.Adapter.TableHAdapter;
 import com.muqing.kctab.Adapter.TableTimeAdapter;
@@ -140,12 +141,18 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
         headerRow.setOrientation(LinearLayout.HORIZONTAL);
         {
             ItemTableHBinding tvBinding = ItemTableHBinding.inflate(LayoutInflater.from(this));
-            tvBinding.titleRi.setText("Day");
+            if (MainActivity.TableStyle != null) {
+                AutoTableAdapter.bindView(MainActivity.TableStyle, tvBinding.getRoot(), true);
+            }
+            tvBinding.tableHtitle.setText("Day");
             headerRow.addView(tvBinding.getRoot(), new LinearLayout.LayoutParams(gj.dp2px(this, 35), ViewGroup.LayoutParams.WRAP_CONTENT));
         }
         for (String h : HList) {
             ItemTableHBinding tvBinding = ItemTableHBinding.inflate(LayoutInflater.from(this));
-            tvBinding.titleRi.setText(h);
+            if (MainActivity.TableStyle != null) {
+                AutoTableAdapter.bindView(MainActivity.TableStyle, tvBinding.getRoot(), true);
+            }
+            tvBinding.tableHtitle.setText(h);
             headerRow.addView(tvBinding.getRoot(), new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         }
         root.addView(headerRow);

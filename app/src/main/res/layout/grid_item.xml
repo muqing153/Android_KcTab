@@ -9,10 +9,10 @@
     app:cardCornerRadius="0dp"
     app:cardBackgroundColor="#00000000"
     app:strokeWidth="0.1dp"
+    android:id="@+id/tableLayout"
     app:strokeColor="#80646464">
 
     <LinearLayout
-        android:id="@+id/line1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginHorizontal="1dp"
