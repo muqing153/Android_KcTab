@@ -30,8 +30,6 @@
             android:id="@+id/title_ri_2"
             style="@style/TextAppearance.Material3.BodyLarge"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:text="()" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

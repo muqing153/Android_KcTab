@@ -115,7 +115,6 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             String url = "http://protal.qdpec.edu.cn:19580/tp_wp/h5?act=wp/wxH5/appSquare/383304265056256#act=wp/wxH5/appSquare/383304265056256";
             Intent intent = new Intent(LoginActivity.this, WebActivity.class);
             intent.putExtra("url", url);
-//            startActivity(intent);
             resultLauncher.launch(intent);
         });
 
@@ -152,14 +151,13 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                 return false;
             }
         }.setMessage("输入Token(浏览器F12课程表处获取)"));
-
         Intent intent = getIntent();
+
         binding.syncButton.setOnClickListener(view -> {
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(LoginActivity.this);
             DialogZhouBoxBinding zhouDialogBinding = DialogZhouBoxBinding.inflate(LayoutInflater.from(LoginActivity.this));
 //            zhouDialogBinding.fh.setText("同步课程表");
             bottomSheetDialog.setContentView(zhouDialogBinding.getRoot());
-
             ArrayList<String> objects = new ArrayList<>();
             for (int i = 0; i < MainActivity.TabList.size(); i++) {
                 objects.add(String.valueOf(i + 1));
@@ -167,11 +165,6 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             int itemWidthDp = 100;
             float density = getResources().getDisplayMetrics().density;
             int itemWidthPx = (int) (itemWidthDp * density + 0.5f);
-            zhouList.clear();
-            String sync = intent.getStringExtra("sync");
-            if (sync != null) {
-                zhouList.add(Integer.valueOf(sync));
-            }
             zhouDialogBinding.getRoot().post(() -> {
                 int width = zhouDialogBinding.getRoot().getWidth();
                 int spanCount = Math.max(5, width / itemWidthPx);
@@ -271,33 +264,30 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
 
         @Override
         public void run() {
-            if (KcApi.teachingWeek() == 0) {
-                LoginApi.Token = LoginApi.Login(user, password);
-            }
-            if (zhouList.isEmpty()) {
-                boolean load = KcApi.Load(LoginApi.Token);
-                if (!load) {
-                    error("加载失败");
-                } else {
-                    yes();
+            try {
+                if (KcApi.teachingWeek() == 0) {
+                    LoginApi.Token = LoginApi.Login(user, password);
                 }
-            } else {
-                try {
-                    boolean load = false;
+                if (LoginApi.Token == null) {
+                    throw new Exception("登陆失败Token为空");
+                }
+                if (zhouList.isEmpty()) {
+                    boolean load = KcApi.Load(LoginApi.Token);
+                    if (!load) {
+                        throw new Exception("加载失败ALL");
+                    }
+                    yes();
+                } else {
                     for (int i = 0; i < zhouList.size(); i++) {
-//                        gj.sc("开始同步第" + zhouList.get(i) + "周");
-                        load = KcApi.Load(zhouList.get(i));
+                        boolean load = KcApi.Load(zhouList.get(i));
                         if (!load) {
-                            error(zhouList.get(0) + "加载失败");
+                            throw new Exception("加载失败 课程" + i + 1);
                         }
                     }
-                    if (load) {
-                        yes();
-                    }
-                } catch (Exception e) {
-                    error(zhouList.get(0) + "加载失败");
-                    gj.sc("同步失败:" + e);
+                    yes();
                 }
+            } catch (Exception e) {
+                error("加载失败:" + e);
             }
             runOnUiThread(alertDialog::dismiss);
         }
@@ -324,7 +314,6 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             show.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
         return show;
-
     }
 
     private void setXieyi(boolean xieyi) {
