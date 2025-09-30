@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -26,12 +27,11 @@ public abstract class zhouDialog extends BaseBottomDialog<ZhouDialogBinding> {
         ViewGroup.LayoutParams params = binding.getRoot().getLayoutParams();
         params.height = (int) (Resources.getSystem().getDisplayMetrics().heightPixels * 0.5);
         binding.getRoot().setLayoutParams(params);
-        binding.slider.addOnChangeListener((slider, value, fromUser) -> {
-            binding.starttext.setText(String.valueOf(Math.round(value)));
-        });
-        int length = (int) MainActivity.TabList.size();
+        binding.slider.addOnChangeListener((slider, value, fromUser) -> binding.starttext.setText(String.valueOf(Math.round(value))));
+        int length = MainActivity.TabList.size();
         binding.starttext.setText(String.valueOf(type));
         binding.endtext.setText(String.valueOf(length));
+        binding.fh.setOnClickListener(view -> binding.slider.setValue(type));
         show();
     }
 
@@ -52,6 +52,7 @@ public abstract class zhouDialog extends BaseBottomDialog<ZhouDialogBinding> {
     protected ZhouDialogBinding getViewBindingObject(LayoutInflater inflater, ViewGroup parent, int viewType) {
         return ZhouDialogBinding.inflate(inflater, parent, false);
     }
+
     public abstract void click(int position);
 
 }
