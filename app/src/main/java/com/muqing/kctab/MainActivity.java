@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -27,6 +28,7 @@ import com.muqing.kctab.Activity.SettingActivity;
 import com.muqing.kctab.Adapter.KeChengPageAdapter;
 import com.muqing.kctab.DataType.TableStyleData;
 import com.muqing.kctab.databinding.ActivityMainBinding;
+import com.muqing.kctab.databinding.ZhouDialogBinding;
 import com.muqing.kctab.fragment.kecheng;
 import com.muqing.wj;
 
@@ -132,7 +134,8 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     }
 
     public KeChengPageAdapter pageAdapter;
-public static TableStyleData TableStyle;
+    public static TableStyleData TableStyle;
+
     public void UI() {
         if (binding == null) {
             setContentView();
@@ -162,13 +165,14 @@ public static TableStyleData TableStyle;
             }
         });
         binding.title.setOnClickListener(view -> {
-            zhouDialog zhouDialog = new zhouDialog(MainActivity.this) {
+            //获取当前viewpage展示的页面位置
+            int position = MainActivity.this.binding.viewpage.getCurrentItem();
+            new zhouDialog(MainActivity.this, position + 1) {
                 @Override
                 public void click(int position) {
                     MainActivity.this.binding.viewpage.setCurrentItem(position, false);
                 }
             };
-            zhouDialog.zhouAdapter.week = MainActivity.this.binding.viewpage.getCurrentItem() + 1;
         });
     }
 
@@ -189,6 +193,7 @@ public static TableStyleData TableStyle;
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -207,7 +212,7 @@ public static TableStyleData TableStyle;
             kecheng kecheng = pageAdapter.data.get(currentItem);
             intent.putExtra("sync", kecheng.curriculum == null ? "ALL" : String.valueOf(kecheng.curriculum.data.get(0).week));
             SyncKc.launch(intent);
-        }else {
+        } else {
             startActivity(new Intent(this, AutoTableActivity.class));
         }
         return super.onOptionsItemSelected(item);

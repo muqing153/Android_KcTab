@@ -1,7 +1,5 @@
 package com.muqing.kctab.fragment;
 
-import static java.lang.Thread.sleep;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -26,7 +24,6 @@ import com.muqing.Fragment;
 import com.muqing.gj;
 import com.muqing.kctab.Adapter.AutoTableAdapter;
 import com.muqing.kctab.Adapter.GridAdapter;
-import com.muqing.kctab.Adapter.TableHAdapter;
 import com.muqing.kctab.Adapter.TableTimeAdapter;
 import com.muqing.kctab.Curriculum;
 import com.muqing.kctab.DataType.TableTimeData;
@@ -103,12 +100,12 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
 //            recyclerView 禁止滚动
                 recyclerView.setNestedScrollingEnabled(false);
                 ItemTableHBinding tableHBinding = ItemTableHBinding.inflate(getLayoutInflater(), binding.recyclerviewH, false);
-                tableHBinding.tableHtitle.setText(HList[i]);
-                recyclerHViews.add(tableHBinding);
-                recyclerViews.add(recyclerView);
                 if (MainActivity.TableStyle != null) {
                     AutoTableAdapter.bindView(MainActivity.TableStyle, tableHBinding.getRoot(), true);
                 }
+                tableHBinding.tableHtitle.setText(HList[i]);
+                recyclerHViews.add(tableHBinding);
+                recyclerViews.add(recyclerView);
                 binding.recyclerviewH.addView(tableHBinding.getRoot(), layoutParams);
                 binding.tablelayout.addView(recyclerView, layoutParams);
             }
@@ -233,7 +230,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
     List<RecyclerView> recyclerViews = new ArrayList<>();
     List<ItemTableHBinding> recyclerHViews = new ArrayList<>();
 
-    private String[] HList = new String[]{"一", "二", "三", "四", "五", "六", "日"};
+    private final String[] HList = new String[]{"一", "二", "三", "四", "五", "六", "日"};
 
     @SuppressLint("SetTextI18n")
     @Override

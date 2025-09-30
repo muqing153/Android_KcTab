@@ -10,8 +10,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal" />
 
-    <TextView
+    <Button
         android:id="@+id/fh"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
@@ -20,12 +21,37 @@
         android:text="返回本周"
         tools:ignore="RtlSymmetry" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview"
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:focusableInTouchMode="false"
-        android:nestedScrollingEnabled="false" />
+        android:value="10.0"
+        android:valueFrom="1.0"
+        android:stepSize="1.0"
+        android:valueTo="20.0" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="13dp">
+
+        <TextView
+            android:id="@+id/starttext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="min" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/endtext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="max" />
+    </LinearLayout>
 
 </LinearLayout>

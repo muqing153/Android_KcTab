@@ -5,6 +5,7 @@
         android:id="@+id/zdyst"
         android:icon="@drawable/settings_24px"
         android:title="自定义视图"
+        android:visible="false"
         android:tooltipText="自定义视图"/>
     <item
         android:id="@+id/sync"

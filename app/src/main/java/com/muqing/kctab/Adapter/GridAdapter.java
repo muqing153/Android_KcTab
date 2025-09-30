@@ -1,29 +1,20 @@
 package com.muqing.kctab.Adapter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.gson.Gson;
 import com.muqing.BaseAdapter;
 import com.muqing.gj;
 import com.muqing.kctab.Curriculum;
-import com.muqing.kctab.DataType.TableStyleData;
 import com.muqing.kctab.Dialog.KcinfoBottomDialog;
 import com.muqing.kctab.MainActivity;
 import com.muqing.kctab.databinding.GridItemBinding;
 import com.muqing.kctab.fragment.kecheng;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Course>> {
     public int zhou = 0;
@@ -46,13 +37,11 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     @Override
     protected void onBindView(List<Curriculum.Course> data, GridItemBinding viewBinding, ViewHolder<GridItemBinding> viewHolder, int position) {
         Curriculum.Course course = data.get(0);
-        if (MainActivity.TableStyle != null) {
-        }
         int maxLines = viewBinding.title.getMaxLines();
 
         viewBinding.getRoot().getLayoutParams().height = (MainActivity.TableStyle == null ? gj.dp2px(context, 120) :
                 MainActivity.TableStyle.table.getHeight(context)) * course.height;
-//        viewBinding.getRoot().requestLayout();
+        viewBinding.getRoot().requestLayout();
         maxLines *= course.height;
         viewBinding.title.setMaxLines(maxLines);
         viewBinding.message.setMaxLines(maxLines);
@@ -73,7 +62,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
             }
             viewBinding.listSize.setText(stringBuffer);
             viewBinding.listSize.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             viewBinding.listSize.setVisibility(View.GONE);
         }
         viewBinding.getRoot().setOnClickListener(v -> {
