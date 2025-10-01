@@ -176,18 +176,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         });
     }
 
-    public static class ScheduleItem {
-        public String session;
-        public String time1;
-        public String time2;
-
-        public ScheduleItem(String session, String time1, String time2) {
-            this.session = session;
-            this.time1 = time1;
-            this.time2 = time2;
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
