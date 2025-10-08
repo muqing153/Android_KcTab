@@ -31,7 +31,7 @@ public class TableTimeAdapter extends BaseAdapter<ItemTableTimeBinding, TableTim
     protected void onBindView(TableTimeData data, ItemTableTimeBinding viewBinding, ViewHolder<ItemTableTimeBinding> viewHolder, int position) {
 //        viewBinding.getRoot().getLayoutParams().height = (int) MainActivity.TableStyle.getHeight(context);
 
-        viewBinding.getRoot().getLayoutParams().height = gj.dp2px(context, 120);
+        viewBinding.getRoot().getLayoutParams().height = gj.dp2px(context, 70);
         viewBinding.getRoot().requestLayout();
 
         viewBinding.title.setVisibility(showJie ? View.VISIBLE : View.GONE);

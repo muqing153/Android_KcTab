@@ -3,6 +3,7 @@ package com.muqing.kctab;
 import static com.muqing.kctab.LoginApi.Token;
 import static com.muqing.kctab.MainActivity.extractDate;
 
+import android.icu.text.SimpleDateFormat;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -17,11 +18,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,40 +60,31 @@ public class KcApi {
 
     /**
      * 获取当前周数
+     * 根据开学日期和当前日期计算第几周
      *
-     * @return
+     * @param startDate 开学日期（格式：yyyy-MM-dd）
+     * @param endDate   当前日期（格式：yyyy-MM-dd）
+     * @return 当前是第几周
      */
-    public static int getWeek() {
-        // 获取当前日期（格式为 yyyy-MM-dd）
-        LocalDate currentDate = LocalDate.now();
-        // 正则表达式，用于匹配字符串中的日期格式
-        Pattern pattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
-        // 初始化周数计数器，从第1周开始
-        int i = 1;
-        // 遍历 TabList 列表
-        for (String s : MainActivity.TabList) {
-            String fileName = s.substring(s.lastIndexOf("/") + 1);
-            // 在字符串中查找符合日期格式的部分
-            Matcher matcher = pattern.matcher(fileName);
-            if (matcher.find()) {
-                // 解析找到的日期字符串
-                String dateStr = matcher.group();
-                LocalDate date2 = LocalDate.parse(dateStr);
-//                gj.sc("当前日期" + currentDate + " " + "date2:" + date2);
-                // 如果当前日期在找到的日期之前
-                if (currentDate.isBefore(date2) || currentDate.isEqual(date2)) {
-                    // 返回解析后的课程表对象
-                    return i;
-                }
-            }
-            // 周数递增
-            i++;
+    public static int getWeek(String startDate, String endDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            long start = sdf.parse(startDate).getTime();
+            long end = sdf.parse(endDate).getTime();
+
+            // 计算相差天数
+            long diffDays = TimeUnit.DAYS.convert(end - start, TimeUnit.MILLISECONDS);
+
+            // 计算第几周（从第1周开始算）
+            int week = (int) (diffDays / 7) + 1;
+
+            // 如果未到开学日期，则返回 1
+            return Math.max(week, 1);
+
+        } catch (ParseException e) {
+            gj.sc(e);
+            return 1;
         }
-        if (i > 0) {
-            return MainActivity.TabList.size();
-        }
-        // 如果遍历结束没有找到符合条件的数据，返回 null
-        return 0;
     }
 
     public static int teachingWeek() {
@@ -119,22 +113,23 @@ public class KcApi {
         return 0;
     }
 
-    public static boolean Load(String Token) {
+    public static boolean Load() {
         try {
-            LoginApi.Token = Token;
             Gson gson = new Gson();
             int length = teachingWeek();
             if (length > 0) {
+                Curriculum curriculum = new Curriculum();
                 for (int i = 1; i <= length; i++) {
                     String value = GetCurriculum(String.valueOf(i), "");
 //                gj.sc(""+value);
                     if (value == null) {
                         return false;
                     }
-                    Curriculum curriculum = gson.fromJson(value, Curriculum.class);
-                    curriculum.data.get(0).week = i;
-                    putjsonkc(curriculum, gson);
+                    Curriculum.JieXi(value, curriculum);
+//                    curriculum.data.get(0).week = i;
+
                 }
+                putjsonkc(curriculum, gson);
             }
             return true;
         } catch (Exception e) {
@@ -144,12 +139,12 @@ public class KcApi {
     }
 
     public static void putjsonkc(Curriculum curriculum, Gson gson) {
-        int length = curriculum.data.get(0).date.size();
-        String zc = curriculum.data.get(0).date.get(length - 1).mxrq;
-        String semesterId = curriculum.data.get(0).topInfo.get(0).semesterId;
-        File file = new File(wj.data, "TabList/" + semesterId);
+//        int length = curriculum.data.get(0).date.size();
+//        String zc = curriculum.data.get(0).date.get(length - 1).mxrq;
+//        String semesterId = curriculum.data.get(0).topInfo.get(0).semesterId;
+//        File file = new File(wj.data, "TabList/" + semesterId);
 //        gj.sc(file.toString());
-        wj.xrwb(new File(file, zc + ".txt"), gson.toJson(curriculum));
+        wj.xrwb(MainActivity.fileTabList, new Gson().toJson(curriculum));
     }
 
     public static boolean Load(int week) throws Exception {
@@ -159,22 +154,14 @@ public class KcApi {
             return false;
         }
         Curriculum curriculum = gson.fromJson(value, Curriculum.class);
-        curriculum.data.get(0).week = week;
+//        curriculum.data.get(0).week = week;
         putjsonkc(curriculum, gson);
         return true;
     }
 
     public static Curriculum GetCurriculumFile(String path) {
-        int i = 1;
-        for (String s : MainActivity.TabList) {
-            if (s.equals(path)) {
-                break;
-            }
-            i++;
-        }
         String dqwb = wj.dqwb(path);
         Curriculum curriculum = new Gson().fromJson(dqwb, Curriculum.class);
-        curriculum.data.get(0).week = i;
         return curriculum;
     }
 
@@ -195,7 +182,7 @@ public class KcApi {
                 try {
                     String dqwb = wj.dqwb(file);
                     Curriculum curriculum = new Gson().fromJson(dqwb, Curriculum.class);
-                    curriculum.data.get(0).week = i + 1;
+//                    curriculum.data.get(0).week = i + 1;
                     wj.xrwb(file, new Gson().toJson(curriculum));
                     list.add(file.getPath());
                 } catch (Exception e) {

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.Gson;
 import com.muqing.BaseAdapter;
 import com.muqing.gj;
 import com.muqing.kctab.Curriculum;
@@ -37,12 +38,12 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     @Override
     protected void onBindView(List<Curriculum.Course> data, GridItemBinding viewBinding, ViewHolder<GridItemBinding> viewHolder, int position) {
         Curriculum.Course course = data.get(0);
+        int[] section = kecheng.getSection(course.weekNoteDetail);
         int maxLines = viewBinding.title.getMaxLines();
-
-        viewBinding.getRoot().getLayoutParams().height = (MainActivity.TableStyle == null ? gj.dp2px(context, 120) :
-                MainActivity.TableStyle.table.getHeight(context)) * course.height;
+        viewBinding.getRoot().getLayoutParams().height = (MainActivity.TableStyle == null ? gj.dp2px(context, 70) :
+                MainActivity.TableStyle.table.getHeight(context)) * section.length;
         viewBinding.getRoot().requestLayout();
-        maxLines *= course.height;
+        maxLines *= section.length;
         viewBinding.title.setMaxLines(maxLines);
         viewBinding.message.setMaxLines(maxLines);
         viewBinding.message.setVisibility(View.GONE);
@@ -68,26 +69,14 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
         viewBinding.getRoot().setOnClickListener(v -> {
             KcinfoBottomDialog dialog = new KcinfoBottomDialog(context, data);
             dialog.setOnDismissListener(dialogInterface -> {
-                if (data != dialog.data) {
-                    data.clear();
-                    data.addAll(dialog.data);
-                    String classTime = data.get(0).classTime;
-                    notifyItemChanged(position);
-                    if (!kecheng.IsCourseList(data)) {
-                        List<Number> numbers = kecheng.GetParts(classTime);
-                        if (numbers.size() > 1) {
-                            for (int j = 1; j < numbers.size(); j++) {
-                                dataList.add(position + j, kecheng.newCourse(numbers.get(0).intValue() - 1, numbers.get(j).intValue()
-                                ));
-                            }
-                        }
-                    }
-                    update(data, course, position);
-//                    notifyDataSetChanged();
-                }
+//                if (!new Gson().toJson(data).equals(new Gson().toJson(dialog.data))) {
+//                    data.clear();
+//                    data.addAll(dialog.data);
+//                    notifyItemChanged(position);
+//                    update(data, course, position);
+//                }
             });
         });
-//        viewBinding.getRoot().setOnLongClickListener(view -> ShowLong(data, view, position));
     }
 
     /**

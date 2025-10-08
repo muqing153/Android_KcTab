@@ -159,9 +159,9 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
 //            zhouDialogBinding.fh.setText("同步课程表");
             bottomSheetDialog.setContentView(zhouDialogBinding.getRoot());
             ArrayList<String> objects = new ArrayList<>();
-            for (int i = 0; i < MainActivity.TabList.size(); i++) {
-                objects.add(String.valueOf(i + 1));
-            }
+//            for (int i = 0; i < MainActivity.TabList.size(); i++) {
+//                objects.add(String.valueOf(i + 1));
+//            }
             int itemWidthDp = 100;
             float density = getResources().getDisplayMetrics().density;
             int itemWidthPx = (int) (itemWidthDp * density + 0.5f);
@@ -221,16 +221,17 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                 boolean b = YourKczipOpenActivity.unzipFromUri(LoginActivity.this, inputStream, outputDir);
                 if (b) {
                     List<File> allFiles = wj.getAllFiles(outputDir);
-                    Gson gson = new Gson();
+                    Curriculum curriculum = new Curriculum();
                     for (File file : allFiles) {
                         try {
-                            Curriculum curriculum = gson.fromJson(wj.dqwb(file), Curriculum.class);
-                            KcApi.putjsonkc(curriculum, gson);
+                            Curriculum.JieXi(wj.dqwb(file), curriculum);
                         } catch (Exception e) {
                             gj.sc("这个文件不是正确的数据：" + e);
                         }
                     }
-                    wj.sc(outputDir);
+                    MainActivity.curriculum = curriculum;
+                    wj.xrwb(new File(wj.data, "debug.json"), new Gson().toJson(curriculum));
+//                    wj.sc(outputDir);
 //                            binding.syncButton.setText("kczip");
                     EndToken();
                 }
@@ -272,7 +273,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                     throw new Exception("登陆失败Token为空");
                 }
                 if (zhouList.isEmpty()) {
-                    boolean load = KcApi.Load(LoginApi.Token);
+                    boolean load = KcApi.Load();
                     if (!load) {
                         throw new Exception("加载失败ALL");
                     }

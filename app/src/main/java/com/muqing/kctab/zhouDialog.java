@@ -28,9 +28,10 @@ public abstract class zhouDialog extends BaseBottomDialog<ZhouDialogBinding> {
         params.height = (int) (Resources.getSystem().getDisplayMetrics().heightPixels * 0.5);
         binding.getRoot().setLayoutParams(params);
         binding.slider.addOnChangeListener((slider, value, fromUser) -> binding.starttext.setText(String.valueOf(Math.round(value))));
-        int length = MainActivity.TabList.size();
+//        int length = MainActivity.TabList.size();
         binding.starttext.setText(String.valueOf(type));
-        binding.endtext.setText(String.valueOf(length));
+        binding.endtext.setText(String.valueOf(MainActivity.MaxZhou));
+        binding.slider.setValue(type);
         binding.fh.setOnClickListener(view -> binding.slider.setValue(MainActivity.benzhou));
         show();
     }

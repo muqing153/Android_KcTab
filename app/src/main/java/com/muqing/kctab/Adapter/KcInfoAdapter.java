@@ -4,10 +4,14 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import com.google.gson.Gson;
 import com.muqing.BaseAdapter;
+import com.muqing.gj;
 import com.muqing.kctab.Curriculum;
+import com.muqing.kctab.DataType.TableTimeData;
 import com.muqing.kctab.databinding.ItemKcinfoDialogBinding;
 import com.muqing.kctab.databinding.KcinfoDialogBinding;
+import com.muqing.kctab.fragment.kecheng;
 
 import java.util.List;
 import java.util.Locale;
@@ -56,11 +60,15 @@ public class KcInfoAdapter extends BaseAdapter<ItemKcinfoDialogBinding, Curricul
         );
 
 // 时间
-        String start = data.startTime == null ? "" : data.startTime;
-        String end = data.endTime == null ? "" : data.endTime;
-        viewBinding.time.setText(
-                String.format(Locale.getDefault(), "%s-%s", start, end)
-        );
+        String weekNoteDetail = data.weekNoteDetail;
+        if (weekNoteDetail != null && !weekNoteDetail.isEmpty()) {
+            int[] section = kecheng.getSection(weekNoteDetail);
+            gj.sc(new Gson().toJson( section));
+            String format = String.format(Locale.getDefault(), "%s-%s", TableTimeData.tableTimeData[section[0] - 1].starttime
+                    , TableTimeData.tableTimeData[section[section.length - 1] - 1].endtime);
+            viewBinding.time.setText(format);
+
+        }
 
     }
 }

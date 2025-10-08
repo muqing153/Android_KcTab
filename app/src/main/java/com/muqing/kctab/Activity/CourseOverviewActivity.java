@@ -34,45 +34,45 @@ public class CourseOverviewActivity extends AppCompatActivity<ActivityCourseOver
         setContentView();
         setBackToolsBar(binding.toolbar);
         int i = 1;
-        for (String s : MainActivity.TabList) {
-            String dqwb = wj.dqwb(s, "");
-            Curriculum c = new Gson().fromJson(dqwb, Curriculum.class);
-            c.data.get(0).week = i;
-            for (Curriculum.Course course : c.data.get(0).courses) {
-                boolean b = kecheng.IsCourse(course);
-                if (b) {
-                    boolean exists = false;
-                    for (Curriculum.Course added : list) {
-                        if (added.courseName != null
-                                && added.courseName.equals(course.courseName)) {
-                            if (!added.getClassroomName().contains(course.getClassroomName())) {
-                                added.classroomName += "/" + course.getClassroomName();
-                            }
-                            if (!added.Time.contains(course.startTime + "-" + course.endTime)) {
-                                added.Time += "/" + course.startTime + "-" + course.endTime;
-                            }
-                            if (!added.Zhou.contains(String.valueOf(i))) {
-                                added.Zhou += "/" + i;
-                            }
-                            exists = true;
-                            break;
-                        }
-                    }
-                    if (!exists) {
-                        if (course.Time == null) {
-                            course.Time = course.startTime + "-" + course.endTime;
-                        }
-                        if (course.Zhou == null) {
-                            course.Zhou = String.valueOf(i);
-                        }
-                        list.add(course);
-                    }
-                }
-            }
-            i++;
-        }
-        binding.recyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        binding.recyclerview.setAdapter(new CourseOverviewAdapter(this, list));
+//        for (String s : MainActivity.TabList) {
+//            String dqwb = wj.dqwb(s, "");
+//            Curriculum c = new Gson().fromJson(dqwb, Curriculum.class);
+//            c.data.get(0).week = i;
+//            for (Curriculum.Course course : c.data.get(0).courses) {
+//                boolean b = kecheng.IsCourse(course);
+//                if (b) {
+//                    boolean exists = false;
+//                    for (Curriculum.Course added : list) {
+//                        if (added.courseName != null
+//                                && added.courseName.equals(course.courseName)) {
+//                            if (!added.getClassroomName().contains(course.getClassroomName())) {
+//                                added.classroomName += "/" + course.getClassroomName();
+//                            }
+//                            if (!added.Time.contains(course.startTime + "-" + course.endTime)) {
+//                                added.Time += "/" + course.startTime + "-" + course.endTime;
+//                            }
+//                            if (!added.Zhou.contains(String.valueOf(i))) {
+//                                added.Zhou += "/" + i;
+//                            }
+//                            exists = true;
+//                            break;
+//                        }
+//                    }
+//                    if (!exists) {
+//                        if (course.Time == null) {
+//                            course.Time = course.startTime + "-" + course.endTime;
+//                        }
+//                        if (course.Zhou == null) {
+//                            course.Zhou = String.valueOf(i);
+//                        }
+//                        list.add(course);
+//                    }
+//                }
+//            }
+//            i++;
+//        }
+//        binding.recyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+//        binding.recyclerview.setAdapter(new CourseOverviewAdapter(this, list));
     }
 
     @Override
