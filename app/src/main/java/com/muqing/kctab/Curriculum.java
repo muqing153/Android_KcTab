@@ -2,6 +2,8 @@ package com.muqing.kctab;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -41,6 +43,7 @@ public class Curriculum {
 
     private static final JmesPath<JsonElement> jmespath = new GsonRuntime();
 
+    @NonNull
     public static Curriculum JieXi(String json, Curriculum curriculum) {
         if (curriculum == null) {
             curriculum = new Curriculum();
@@ -103,16 +106,40 @@ public class Curriculum {
         return curriculum;
     }
 
-//    private static Course findCourse(List<Course> list, String name) {
-//        if (list == null) return null;
-//        for (Course c : list) {
-//            if (name != null && name.equals(c.classroomName)) {
-//                return c;
-//            }
-//        }
-//        return new Course();
-//    }
 
+    public static String getCurrentSemester() {
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
+        int month = now.getMonthValue();
+
+        // 上半年（1~6月） → 去年-今年-2
+        if (month >= 1 && month <= 6) {
+            return String.format("%d-%d-2", year - 1, year);
+        }
+        // 下半年（7~12月） → 今年-明年-1
+        else {
+            return String.format("%d-%d-1", year, year + 1);
+        }
+    }
+
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    public static String getSemesterStartDate() {
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
+        int month = now.getMonthValue();
+        LocalDate startDate;
+
+        if (month >= 1 && month <= 6) {
+            // 上半年 → 第二学期：次年2月20日
+            startDate = LocalDate.of(year, 2, 20);
+        } else {
+            // 下半年 → 第一学期：当年9月1日
+            startDate = LocalDate.of(year, 9, 1);
+        }
+
+        return startDate.format(FORMATTER);
+    }
     private static String getSearch(JsonElement json, String expr) {
         if (expr == null || expr.isEmpty()) return null;
         try {
@@ -161,6 +188,16 @@ public class Curriculum {
             days[i] = weekStart.plusDays(i).format(fmt);
         }
         return days;
+    }
+
+    /**
+     * 获取今天几月几日
+     * @return yyyy-mm-dd
+     */
+    public static String getToday() {
+        LocalDate now = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return now.format(formatter);
     }
 
     public static class Course {

@@ -31,41 +31,36 @@ import com.muqing.wj;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
-    public static int benzhou = 1,MaxZhou = 20,ValueZhou = 1;
+    public static int benzhou = 1, MaxZhou = 20, ValueZhou = 1;
     public static Curriculum curriculum;
+
     @Override
     protected ActivityMainBinding getViewBindingObject(LayoutInflater layoutInflater) {
         return ActivityMainBinding.inflate(layoutInflater);
     }
+
     @Override
     public void setOnApplyWindowInsetsListener(Insets systemBars, View v) {
 //        binding.appbar.setPadding(0, systemBars.top, 0, 0);
     }
+
     private void Login() {
         Intent intent = new Intent(this, LoginActivity.class);
         LoginStart.launch(intent);
     }
 
     public static File fileTabList = new File(wj.data);
-
-
     public static int ThisColor;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MainActivity.ThisColor = gj.getThemeColor(this, com.google.android.material.R.attr.colorPrimaryFixedDim);
-        SharedPreferences kebiao = getSharedPreferences("kebiao", MODE_PRIVATE);
-        fileTabList = new File(wj.data, "debug.json");
-        MainActivity.curriculum = new Gson().fromJson(wj.dqwb(fileTabList), Curriculum.class);
 //        gj.sc(new Gson().toJson(MainActivity.curriculum));
-
 //        String schoolYearTerm = main.getSchoolYearTerm(LocalDate.now());
 //        String xuenian = kebiao.getString("xuenian", null);
 //        if (xuenian == null) {
@@ -89,6 +84,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     private void LoadUI() {
         UI();
     }
+
     @Nullable
     public static LocalDate extractDate(String text, Pattern pattern, DateTimeFormatter formatter) {
         Matcher matcher = pattern.matcher(text);
@@ -120,14 +116,40 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         }
         Gson gson = new Gson();
         SharedPreferences a = getSharedPreferences("tablestyle", Context.MODE_PRIVATE);
-        TableStyle = gson.fromJson(a.getString("tablestyle", gson.toJson(null)), TableStyleData.class);
+//        TableStyle = gson.fromJson(a.getString("tablestyle", gson.toJson(null)), TableStyleData.class);
+        SharedPreferences kebiao = getSharedPreferences("userData", MODE_PRIVATE);
+        String account = kebiao.getString("account", null);
+        if (account != null) {
+            File file = new File(wj.data, account + ".json");
+            if (file.exists()) {
+                fileTabList = file;
+                MainActivity.curriculum = new Gson().fromJson(wj.dqwb(fileTabList), Curriculum.class);
+            }
+        }
+        if (MainActivity.curriculum == null){
+            MainActivity.curriculum = new Curriculum();
+        }
+        gj.sc(gson.toJson(MainActivity.curriculum));
+        if (MainActivity.curriculum.startDate == null) {
+            MainActivity.curriculum.startDate = Curriculum.getSemesterStartDate();
+        }
+        if (MainActivity.curriculum.nian == null) {
+            MainActivity.curriculum.nian = Curriculum.getCurrentSemester();
+        }
+        if (MainActivity.curriculum.zhouInt == null) {
+            MainActivity.curriculum.zhouInt = 20;
+        }
+        MainActivity.MaxZhou= MainActivity.curriculum.zhouInt;
         pageAdapter = new KeChengPageAdapter(getSupportFragmentManager(), getLifecycle());
         for (int i = 1; i <= MaxZhou; i++) {
             pageAdapter.addPage(kecheng.newInstance(i));
         }
-//        binding.viewpage.setSaveEnabled(false);
+        binding.viewpage.setSaveEnabled(false);
         binding.viewpage.setAdapter(pageAdapter);
-        int week = KcApi.getWeek("2025-09-01", "2025-10-08");
+        int week = KcApi.getWeek(MainActivity.curriculum.startDate, Curriculum.getToday());
+        if (week > MaxZhou) {
+            week = MaxZhou;
+        }
         MainActivity.benzhou = week;
         MainActivity.ValueZhou = week;
         binding.viewpage.setCurrentItem(week - 1, false);
@@ -138,11 +160,11 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
                 super.onPageSelected(position);
                 MainActivity.ValueZhou = position + 1;
                 binding.menuZhou.setText(String.format("第%s周", MainActivity.ValueZhou));
-                String weekDate = Curriculum.getWeekDates("2025-09-01", MainActivity.ValueZhou)[0];
+                String weekDate = Curriculum.getWeekDates(curriculum.startDate, MainActivity.ValueZhou)[0];
                 binding.toolbarTime.setText(weekDate);
             }
         });
-        String weekDate = Curriculum.getWeekDates("2025-09-01", MainActivity.ValueZhou)[0];
+        String weekDate = Curriculum.getWeekDates(curriculum.startDate, MainActivity.ValueZhou)[0];
         binding.toolbarTime.setText(weekDate);
         binding.title.setOnClickListener(view -> {
             //获取当前viewpage展示的页面位置

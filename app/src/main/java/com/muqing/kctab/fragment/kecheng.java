@@ -1,8 +1,5 @@
 package com.muqing.kctab.fragment;
-
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,14 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 import com.muqing.Fragment;
 import com.muqing.gj;
@@ -29,7 +22,6 @@ import com.muqing.kctab.Adapter.TableTimeAdapter;
 import com.muqing.kctab.Curriculum;
 import com.muqing.kctab.DataType.TableTimeData;
 import com.muqing.kctab.MainActivity;
-import com.muqing.kctab.R;
 import com.muqing.kctab.databinding.FragmentKebiaoBinding;
 import com.muqing.kctab.databinding.GridItemBinding;
 import com.muqing.kctab.databinding.ItemTableHBinding;

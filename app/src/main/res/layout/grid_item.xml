@@ -2,15 +2,15 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tableLayout"
     style="@style/Widget.Material3.CardView.Elevated"
     android:layout_width="match_parent"
     android:layout_height="70dp"
-    app:cardElevation="0dp"
-    app:cardCornerRadius="0dp"
     app:cardBackgroundColor="#00000000"
-    app:strokeWidth="0.1dp"
-    android:id="@+id/tableLayout"
-    app:strokeColor="#80646464">
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#80646464"
+    app:strokeWidth="0.1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,35 +23,42 @@
             style="@style/TextAppearance.Material3.BodyLarge"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_weight="1"
             android:ellipsize="middle"
             android:gravity="center_horizontal"
-            android:layout_weight="1"
             android:maxLines="2"
             android:padding="1dp"
             android:text="Debug" />
 
 
-        <TextView
-            android:id="@+id/message"
-            style="@style/TextAppearance.Material3.BodySmall"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="start"
-            android:gravity="center"
-            android:padding="1dp"
-            android:maxLines="2"
             android:background="#4D646464"
-            android:text="Debug" />
+            android:padding="1dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/message"
+                style="@style/TextAppearance.Material3.BodySmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="start"
+                android:gravity="center_horizontal"
+                android:maxLines="2"
+                android:text="Debug" />
+
+            <TextView
+                android:id="@+id/list_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:gravity="center_horizontal"
+                android:maxWidth="80dp"
+                android:maxLines="1"
+                android:text="-"
+                android:visibility="visible" />
+        </LinearLayout>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/list_size"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:gravity="center_horizontal"
-        android:maxWidth="80dp"
-        android:maxLines="1"
-        android:text="-"
-        android:visibility="gone" />
 </com.google.android.material.card.MaterialCardView>

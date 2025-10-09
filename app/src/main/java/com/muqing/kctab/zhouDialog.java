@@ -32,6 +32,7 @@ public abstract class zhouDialog extends BaseBottomDialog<ZhouDialogBinding> {
         binding.starttext.setText(String.valueOf(type));
         binding.endtext.setText(String.valueOf(MainActivity.MaxZhou));
         binding.slider.setValue(type);
+        binding.slider.setValueTo(MainActivity.MaxZhou);
         binding.fh.setOnClickListener(view -> binding.slider.setValue(MainActivity.benzhou));
         show();
     }

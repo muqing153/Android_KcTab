@@ -1,6 +1,6 @@
 package com.muqing.kctab.Activity;
 
-import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -46,7 +46,6 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         return ActivityLoginBinding.inflate(layoutInflater);
     }
 
-
     ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();
@@ -68,17 +67,19 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
     });
 
     public List<Integer> zhouList = new ArrayList<>();
+    public String account;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView();
         setBackToolsBar(binding.toolbar);
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE);
-        binding.account.setText(sharedPreferences.getString("account", ""));
-        binding.password.setText(sharedPreferences.getString("password", ""));
+        SharedPreferences userData = getSharedPreferences("userData", MODE_PRIVATE);
+        binding.account.setText(account = userData.getString("account", ""));
+        binding.password.setText(userData.getString("password", ""));
         binding.loginButton.setOnClickListener(v -> {
-            String account = Objects.requireNonNull(binding.account.getText()).toString();
+            account = Objects.requireNonNull(binding.account.getText()).toString();
             String password = Objects.requireNonNull(binding.password.getText()).toString();
             if (account.isEmpty()) {
                 binding.account.setError("账号不能为空");
@@ -89,7 +90,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
             } else if (binding.isApbox.isChecked()) {
                 binding.account.setError(null);
                 binding.password.setError(null);
-                SharedPreferences.Editor edit = sharedPreferences.edit();
+                SharedPreferences.Editor edit = userData.edit();
                 edit.putString("account", account);
                 edit.putString("password", password);
                 edit.apply();
@@ -141,9 +142,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
 
                         @Override
                         public void error(String error) {
-                            runOnUiThread(() -> {
-                                gj.ts(LoginActivity.this, error);
-                            });
+                            runOnUiThread(() -> gj.ts(LoginActivity.this, error));
                         }
                     };
                     return true;
@@ -184,12 +183,32 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
         }
 
         binding.other4.setOnClickListener(view -> {
-            Intent intent1 = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent1.addCategory(Intent.CATEGORY_OPENABLE);
-            intent1.setType("*/*");
-            // 可选：限制选择单个文件
-            intent1.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
-            fhkczip.launch(new String[]{"*/*"});
+            DialogEditText dialogEditText = new DialogEditText(LoginActivity.this, "请输入保存文件的账号") {
+                @Override
+                public boolean setNegative(View view) {
+                    return true;
+                }
+
+                @Override
+                public boolean setPositive(View view) {
+                    if (TextUtils.isEmpty(getEditText())) {
+                        gj.ts(LoginActivity.this, "请输入账号");
+                        return false;
+                    }
+                    SharedPreferences sp = getSharedPreferences("userData", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putString("account", account = getEditText());
+                    editor.apply();
+                    Intent intent1 = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent1.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent1.setType("*/*");
+                    // 可选：限制选择单个文件
+                    intent1.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+                    fhkczip.launch(new String[]{"*/*"});
+                    return true;
+                }
+            };
+            dialogEditText.viewBind.editview.setText(account);
         });
 
         String text = "使用登陆功能请同意 <a href='https://muqingcandy.top/UserAgreement.html#yiyoubiao_user_agreement'>《用户协议》</a> " +
@@ -197,9 +216,9 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                 " <a href='https://muqingcandy.top/UserAgreement.html#yiyoubiao_privacy_policy'>《隐私政策》</a>";
         binding.checkbox.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
         binding.checkbox.setMovementMethod(LinkMovementMethod.getInstance());
-        boolean xieyi = sharedPreferences.getBoolean("xieyi", false);
+        boolean xieyi = userData.getBoolean("xieyi", false);
         binding.checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            SharedPreferences.Editor edit = sharedPreferences.edit();
+            SharedPreferences.Editor edit = userData.edit();
             edit.putBoolean("xieyi", isChecked);
             edit.apply();
             setXieyi(isChecked);
@@ -230,9 +249,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                         }
                     }
                     MainActivity.curriculum = curriculum;
-                    wj.xrwb(new File(wj.data, "debug.json"), new Gson().toJson(curriculum));
-//                    wj.sc(outputDir);
-//                            binding.syncButton.setText("kczip");
+                    wj.xrwb(new File(wj.data, account + ".json"), new Gson().toJson(curriculum));
                     EndToken();
                 }
             } catch (Exception e) {
