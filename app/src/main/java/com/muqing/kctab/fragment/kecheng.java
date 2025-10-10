@@ -1,4 +1,5 @@
 package com.muqing.kctab.fragment;
+
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,10 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.gson.Gson;
 import com.muqing.Fragment;
 import com.muqing.gj;
@@ -159,7 +162,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                     String startTime = TableTimeData.tableTimeData[section[0] - 1].starttime;
                     String endTime = TableTimeData.tableTimeData[section[section.length - 1] - 1].endtime;
                     if ((time.compareTo(startTime) >= 0 && time.compareTo(endTime) <= 0 || startTime.compareTo(time) > 0)
-                           ) {
+                    ) {
                         View viewByPosition = Objects.requireNonNull(recyclerViews.get(i).getLayoutManager()).findViewByPosition(y);
                         if (viewByPosition != null) {
                             if (NextItemBinding == null) {
@@ -258,17 +261,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                         }
                     }
                 }
-//                for (List<List<Curriculum.Course>> list : TableList) {
-//                    for (int i = 0; i < list.size(); i++) {
-//                        Curriculum.Course s = list.get(i).get(0);
-//                        for (int j = 1; j < s.height; j++) {
-//                            list.remove(i + 1);
-//                        }
-//                    }
-//                }
             }
-
-
             for (int i = 0; i < TableList.size(); i++) {
                 List<List<Curriculum.Course>> row = TableList.get(i);
                 for (int index = 0; index < row.size(); index++) {
@@ -293,10 +286,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                     }
                 }
             }
-
         }
-
-//        gj.sc(new Gson().toJson(TableList));
         return TableList;
 
     }

@@ -115,21 +115,18 @@ public class KcApi {
 
     public static boolean Load() {
         try {
-            Gson gson = new Gson();
             int length = teachingWeek();
             if (length > 0) {
                 Curriculum curriculum = new Curriculum();
                 for (int i = 1; i <= length; i++) {
                     String value = GetCurriculum(String.valueOf(i), "");
-//                gj.sc(""+value);
                     if (value == null) {
                         return false;
                     }
                     Curriculum.JieXi(value, curriculum);
-//                    curriculum.data.get(0).week = i;
 
                 }
-                putjsonkc(curriculum, gson);
+                wj.xrwb(MainActivity.fileTabList, new Gson().toJson(curriculum));
             }
             return true;
         } catch (Exception e) {
@@ -138,26 +135,17 @@ public class KcApi {
         return false;
     }
 
-    public static void putjsonkc(Curriculum curriculum, Gson gson) {
-//        int length = curriculum.data.get(0).date.size();
-//        String zc = curriculum.data.get(0).date.get(length - 1).mxrq;
-//        String semesterId = curriculum.data.get(0).topInfo.get(0).semesterId;
-//        File file = new File(wj.data, "TabList/" + semesterId);
-//        gj.sc(file.toString());
-        wj.xrwb(MainActivity.fileTabList, new Gson().toJson(curriculum));
+    public static void putjsonkc(Curriculum curriculum) {
     }
 
-    public static boolean Load(int week) throws Exception {
-        Gson gson = new Gson();
-        String value = GetCurriculum(String.valueOf(week), "");
-        if (value == null) {
-            return false;
-        }
-        Curriculum curriculum = gson.fromJson(value, Curriculum.class);
-//        curriculum.data.get(0).week = week;
-        putjsonkc(curriculum, gson);
-        return true;
-    }
+//    public static boolean Load(int week) throws Exception {
+//        String value = GetCurriculum(String.valueOf(week), "");
+//        if (value == null) {
+//            return false;
+//        }
+//        putjsonkc(curriculum, gson);
+//        return true;
+//    }
 
     public static Curriculum GetCurriculumFile(String path) {
         String dqwb = wj.dqwb(path);

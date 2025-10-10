@@ -70,12 +70,13 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
     public String account;
 
 
+    SharedPreferences userData;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView();
         setBackToolsBar(binding.toolbar);
-        SharedPreferences userData = getSharedPreferences("userData", MODE_PRIVATE);
+        userData = getSharedPreferences("userData", MODE_PRIVATE);
         binding.account.setText(account = userData.getString("account", ""));
         binding.password.setText(userData.getString("password", ""));
         binding.loginButton.setOnClickListener(v -> {
@@ -249,6 +250,7 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                         }
                     }
                     MainActivity.curriculum = curriculum;
+                    MainActivity.fileTabList = new File(wj.data, account + ".json");
                     wj.xrwb(new File(wj.data, account + ".json"), new Gson().toJson(curriculum));
                     EndToken();
                 }
@@ -290,20 +292,21 @@ public class LoginActivity extends AppCompatActivity<ActivityLoginBinding> {
                     throw new Exception("登陆失败Token为空");
                 }
                 if (zhouList.isEmpty()) {
+                    MainActivity.fileTabList = new File(wj.data, account + ".json");
                     boolean load = KcApi.Load();
                     if (!load) {
                         throw new Exception("加载失败ALL");
                     }
-                    yes();
                 } else {
-                    for (int i = 0; i < zhouList.size(); i++) {
-                        boolean load = KcApi.Load(zhouList.get(i));
-                        if (!load) {
-                            throw new Exception("加载失败 课程" + i + 1);
-                        }
-                    }
-                    yes();
+//                    for (int i = 0; i < zhouList.size(); i++) {
+//                        boolean load = KcApi.Load(zhouList.get(i));
+//                        if (!load) {
+//                            throw new Exception("加载失败 课程" + i + 1);
+//                        }
+//                    }
                 }
+                userData.edit().putString("account", account).apply();
+                yes();
             } catch (Exception e) {
                 error("加载失败:" + e);
             }

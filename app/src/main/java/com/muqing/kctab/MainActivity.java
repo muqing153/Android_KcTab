@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
 
     public static File fileTabList = new File(wj.data);
     public static int ThisColor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
                 MainActivity.curriculum = new Gson().fromJson(wj.dqwb(fileTabList), Curriculum.class);
             }
         }
-        if (MainActivity.curriculum == null){
+        if (MainActivity.curriculum == null) {
             MainActivity.curriculum = new Curriculum();
         }
         gj.sc(gson.toJson(MainActivity.curriculum));
@@ -139,11 +140,13 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         if (MainActivity.curriculum.zhouInt == null) {
             MainActivity.curriculum.zhouInt = 20;
         }
-        MainActivity.MaxZhou= MainActivity.curriculum.zhouInt;
+        MainActivity.MaxZhou = MainActivity.curriculum.zhouInt;
         pageAdapter = new KeChengPageAdapter(getSupportFragmentManager(), getLifecycle());
         for (int i = 1; i <= MaxZhou; i++) {
             pageAdapter.addPage(kecheng.newInstance(i));
         }
+        gj.sc(gson
+                .toJson(MainActivity.curriculum));
         binding.viewpage.setSaveEnabled(false);
         binding.viewpage.setAdapter(pageAdapter);
         int week = KcApi.getWeek(MainActivity.curriculum.startDate, Curriculum.getToday());
