@@ -35,7 +35,7 @@ public class AutoTableAdapter extends BaseAdapter<ItemTableAutoBinding, TableSty
     @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onBindView(TableStyleData data, ItemTableAutoBinding viewBinding, ViewHolder<ItemTableAutoBinding> viewHolder, int position) {
-        bindView(data, viewBinding.getRoot(), true);
+        bindView(data, viewBinding.getRoot());
         if (MainActivity.TableStyle == null && position == 0) {
             viewBinding.useButton.setEnabled(false);
         } else {
@@ -57,7 +57,7 @@ public class AutoTableAdapter extends BaseAdapter<ItemTableAutoBinding, TableSty
     }
 
     @SuppressLint("SetTextI18n")
-    public static void bindView(Object data, View root, boolean zidyi) {
+    public static void bindView(Object data, View root) {
         if (data == null) return;
         Field[] fields = data.getClass().getFields();
         for (Field field : fields) {
@@ -94,10 +94,10 @@ public class AutoTableAdapter extends BaseAdapter<ItemTableAutoBinding, TableSty
                         }
                     }
                     // 递归绑定子对象
-                    bindView(value, root, zidyi);
+                    bindView(value, root);
                 } else {
                     // 递归绑定子对象
-                    bindView(value, root, zidyi);
+                    bindView(value, root);
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();

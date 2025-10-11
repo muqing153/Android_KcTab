@@ -19,7 +19,9 @@ public class TableTimeData {
             new TableTimeData("7", "15:30", "16:15"),
             new TableTimeData("8", "16:25", "17:10"),
             new TableTimeData("9", "18:30", "19:15"),
-            new TableTimeData("10", "19:25", "20:10")
+            new TableTimeData("10", "19:25", "20:10"),
+            new TableTimeData("11", "20:15", "21:00"),
+            new TableTimeData("12", "21:05", "22:40"),
     };
 //    public static final MainActivity.ScheduleItem[] schedule = {
 //            new MainActivity.ScheduleItem("1.2", "08:20-09:05", "09:15-10:00"),

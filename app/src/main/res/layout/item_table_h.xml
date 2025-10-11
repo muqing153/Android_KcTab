@@ -8,6 +8,7 @@
     android:layout_height="wrap_content"
     app:cardBackgroundColor="@android:color/transparent"
     app:cardCornerRadius="0dp"
+    android:layout_weight="1"
     app:cardElevation="0dp">
 
     <LinearLayout
@@ -24,7 +25,7 @@
             style="@style/TextAppearance.Material3.BodyLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="星期一" />
+            android:text="一" />
 
         <TextView
             android:id="@+id/title_ri_2"

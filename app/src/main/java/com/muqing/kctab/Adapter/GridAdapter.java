@@ -30,7 +30,7 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     protected GridItemBinding getViewBindingObject(LayoutInflater inflater, ViewGroup parent, int viewType) {
         GridItemBinding inflate = GridItemBinding.inflate(inflater, parent, false);
         if (MainActivity.TableStyle != null) {
-            AutoTableAdapter.bindView(MainActivity.TableStyle, inflate.getRoot(), true);
+            AutoTableAdapter.bindView(MainActivity.TableStyle, inflate.getRoot());
         }
         return inflate;
     }
@@ -39,18 +39,18 @@ public class GridAdapter extends BaseAdapter<GridItemBinding, List<Curriculum.Co
     protected void onBindView(List<Curriculum.Course> data, GridItemBinding viewBinding, ViewHolder<GridItemBinding> viewHolder, int position) {
         Curriculum.Course course = data.get(0);
         int[] section = kecheng.getSection(course.weekNoteDetail);
-        int maxLines = viewBinding.title.getMaxLines();
+        int maxLines = viewBinding.tabletitle.getMaxLines();
         viewBinding.getRoot().getLayoutParams().height = (MainActivity.TableStyle == null ? gj.dp2px(context, 70) :
                 MainActivity.TableStyle.table.getHeight(context)) * section.length;
         viewBinding.getRoot().requestLayout();
         maxLines *= section.length;
-        viewBinding.title.setMaxLines(maxLines);
-        viewBinding.message.setMaxLines(maxLines);
-        viewBinding.message.setVisibility(View.GONE);
-        viewBinding.title.setText(course.courseName);
+        viewBinding.tabletitle.setMaxLines(maxLines);
+        viewBinding.tablemessage.setMaxLines(maxLines);
+        viewBinding.tablemessage.setVisibility(View.GONE);
+        viewBinding.tabletitle.setText(course.courseName);
         if (!TextUtils.isEmpty(course.courseName) && showInfo) {
-            viewBinding.message.setVisibility(View.VISIBLE);
-            viewBinding.message.setText(course.getClassroomName());
+            viewBinding.tablemessage.setVisibility(View.VISIBLE);
+            viewBinding.tablemessage.setText(course.getClassroomName());
         }
         CharSequence text = viewBinding.listSize.getText();
         if (data.size() > 1) {

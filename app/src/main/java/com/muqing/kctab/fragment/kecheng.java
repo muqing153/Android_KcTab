@@ -54,7 +54,6 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             ValueZhou = getArguments().getInt("zhou");
-
         }
     }
 
@@ -70,40 +69,17 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
     public void onStart() {
         super.onStart();
         if (isAdded() && isVisible()) {
-            binding.recyclerviewH.removeAllViews();
-            binding.tablelayout.removeAllViews();
-            recyclerViews.clear();
-            recyclerHViews.clear();
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
             layoutParams.weight = 1;
-            {
-                ItemTableHBinding tableHBinding = ItemTableHBinding.inflate(getLayoutInflater(), binding.recyclerviewH, false);
-                LocalDate now = LocalDate.now();
-                if (MainActivity.TableStyle != null) {
-                    AutoTableAdapter.bindView(MainActivity.TableStyle, tableHBinding.getRoot(), true);
-                }
-                tableHBinding.tableHtitle.setText(String.valueOf(now.getDayOfMonth()));
-                tableHBinding.titleRi2.setText("Day");
-                binding.recyclerviewH.addView(tableHBinding.getRoot(),
-                        new LinearLayout.LayoutParams(gj.dp2px(requireActivity(), 35), ViewGroup.LayoutParams.MATCH_PARENT));
-            }
             String[] weekDates = Curriculum.getWeekDates("2025-09-01", ValueZhou);
-            for (int i = 0; i < 7; i++) {
-                RecyclerView recyclerView = new RecyclerView(requireActivity());
-                recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false));
-//            recyclerView 禁止滚动
-                recyclerView.setNestedScrollingEnabled(false);
-                ItemTableHBinding tableHBinding = ItemTableHBinding.inflate(getLayoutInflater(), binding.recyclerviewH, false);
-                if (MainActivity.TableStyle != null) {
-                    AutoTableAdapter.bindView(MainActivity.TableStyle, tableHBinding.getRoot(), true);
-                }
-                tableHBinding.tableHtitle.setText(HList[i]);
-                tableHBinding.titleRi2.setText(weekDates[i].split("-")[2]);
-                recyclerHViews.add(tableHBinding);
-                recyclerViews.add(recyclerView);
-                binding.recyclerviewH.addView(tableHBinding.getRoot(), layoutParams);
-                binding.tablelayout.addView(recyclerView, layoutParams);
+            int childCount = binding.recyclerviewH.getChildCount();
+            String[] HList = new String[]{"一", "二", "三", "四", "五", "六", "日"};
+            for (int i = 1; i < childCount; i++) {
+                ItemTableHBinding child = ItemTableHBinding.bind(binding.recyclerviewH.getChildAt(i));
+                child.tableHtitle.setText(HList[i - 1]);
+                child.titleRi2.setText(weekDates[i - 1].split("-")[2]);
             }
+            childCount = binding.tablelayout.getChildCount();
             Load();
         }
     }
@@ -113,24 +89,32 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
         if (handler == null && ValueZhou == MainActivity.benzhou) {
             handler = new Handler(Looper.getMainLooper());
         }
-        GetKcLei(TableList, MainActivity.curriculum);
-        for (int i = 0; i < TableList.size(); i++) {
-            RecyclerView recyclerView = recyclerViews.get(i);
-            if (recyclerView != null) {
-                GridAdapter adapter = new GridAdapter(getContext(), TableList.get(i)) {
-                    @SuppressLint("NotifyDataSetChanged")
-                    @Override
-                    public boolean update(List<Curriculum.Course> list, Curriculum.Course course, int position) {
-                        return false;
+        new Thread(() -> {
+
+            GetKcLei(TableList, MainActivity.curriculum, ValueZhou);
+            if (isAdded()&&isVisible()) {
+                requireActivity().runOnUiThread(() -> {
+                    int childCount = binding.tablelayout.getChildCount();
+                    for (int i = 0; i < childCount; i++) {
+                        RecyclerView recyclerView = (RecyclerView) binding.tablelayout.getChildAt(i);
+                        if (recyclerView != null) {
+                            GridAdapter adapter = new GridAdapter(getContext(), TableList.get(i)) {
+                                @SuppressLint("NotifyDataSetChanged")
+                                @Override
+                                public boolean update(List<Curriculum.Course> list, Curriculum.Course course, int position) {
+                                    return false;
+                                }
+                            };
+                            adapter.showInfo = true;
+                            recyclerView.setAdapter(adapter);
+                        }
                     }
-                };
-                adapter.showInfo = true;
-                recyclerView.setAdapter(adapter);
+                    if (handler != null) {
+                        handler.post(kecheng.this::LoadHander);
+                    }
+                });
             }
-        }
-        if (handler != null) {
-            handler.post(this::LoadHander);
-        }
+        }).start();
     }
 
     @Override
@@ -163,7 +147,8 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                     String endTime = TableTimeData.tableTimeData[section[section.length - 1] - 1].endtime;
                     if ((time.compareTo(startTime) >= 0 && time.compareTo(endTime) <= 0 || startTime.compareTo(time) > 0)
                     ) {
-                        View viewByPosition = Objects.requireNonNull(recyclerViews.get(i).getLayoutManager()).findViewByPosition(y);
+
+                        View viewByPosition = Objects.requireNonNull(((RecyclerView) binding.tablelayout.getChildAt(i)).getLayoutManager()).findViewByPosition(y);
                         if (viewByPosition != null) {
                             if (NextItemBinding == null) {
                                 NextItemBinding = GridItemBinding.bind(viewByPosition);
@@ -189,12 +174,6 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
 
     public Curriculum curriculum;
 
-
-    List<RecyclerView> recyclerViews = new ArrayList<>();
-    List<ItemTableHBinding> recyclerHViews = new ArrayList<>();
-
-    private final String[] HList = new String[]{"一", "二", "三", "四", "五", "六", "日"};
-
     @SuppressLint("SetTextI18n")
     @Override
     public void setUI(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -218,6 +197,10 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
     }
 
     public static List<List<List<Curriculum.Course>>> GetKcLei(List<List<List<Curriculum.Course>>> TableList, Curriculum curriculum) {
+        return GetKcLei(TableList, curriculum, MainActivity.benzhou);
+    }
+
+    public static List<List<List<Curriculum.Course>>> GetKcLei(List<List<List<Curriculum.Course>>> TableList, Curriculum curriculum, int ValueZhou) {
         TableList.clear();
         for (int L = 0; L < 7; L++) {
             TableList.add(new ArrayList<>());
@@ -234,7 +217,7 @@ public class kecheng extends Fragment<FragmentKebiaoBinding> {
                     for (Curriculum.classWeekDetails section : details) {
                         // 判断当前周是否在范围内
 //                        gj.sc(section.weeks);
-                        if (isWeekInRange(section.weeks, MainActivity.ValueZhou)) {
+                        if (isWeekInRange(section.weeks, ValueZhou)) {
                             List<Curriculum.Weekday> weekdays = section.weekdays;
                             if (weekdays != null) {
                                 for (Curriculum.Weekday weekday : weekdays) {

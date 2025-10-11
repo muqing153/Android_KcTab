@@ -2,41 +2,30 @@ package com.muqing.kctab;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.Gson;
 import com.muqing.AppCompatActivity;
-import com.muqing.BaseAdapter;
 import com.muqing.gj;
 import com.muqing.kctab.Adapter.AutoTableAdapter;
 import com.muqing.kctab.Adapter.GridAdapter;
-import com.muqing.kctab.Adapter.TableHAdapter;
 import com.muqing.kctab.Adapter.TableTimeAdapter;
 import com.muqing.kctab.DataType.TableTimeData;
 import com.muqing.kctab.databinding.ActivityJietuBinding;
-import com.muqing.kctab.databinding.GridItemBinding;
 import com.muqing.kctab.databinding.ItemTableHBinding;
 import com.muqing.kctab.fragment.kecheng;
 
@@ -54,7 +43,6 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
     public static void start(Activity activity, Curriculum data) {
 // 创建 Intent 并传递 Bitmap 数据
         Intent intent = new Intent(activity, jietuActivity.class);
-        intent.putExtra("data", new Gson().toJson(data));
         activity.startActivity(intent);
     }
 
@@ -63,11 +51,8 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
         super.onCreate(savedInstanceState);
         setContentView();
         setBackToolsBar(binding.toolbar);
-        Intent intent = getIntent();
-        String data = intent.getStringExtra("data");
-        Curriculum curriculum = new Gson().fromJson(data, Curriculum.class);
         new Thread(() -> {
-            bitmap = recyclerViewToBitmapGrid(curriculum);
+            bitmap = recyclerViewToBitmapGrid(MainActivity.curriculum);
             runOnUiThread(() -> binding.imageView.setImageBitmap(bitmap));
         }).start();
     }
@@ -142,7 +127,7 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
         {
             ItemTableHBinding tvBinding = ItemTableHBinding.inflate(LayoutInflater.from(this));
             if (MainActivity.TableStyle != null) {
-                AutoTableAdapter.bindView(MainActivity.TableStyle, tvBinding.getRoot(), true);
+                AutoTableAdapter.bindView(MainActivity.TableStyle, tvBinding.getRoot());
             }
             tvBinding.tableHtitle.setText("Day");
             headerRow.addView(tvBinding.getRoot(), new LinearLayout.LayoutParams(gj.dp2px(this, 35), ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -150,7 +135,7 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
         for (String h : HList) {
             ItemTableHBinding tvBinding = ItemTableHBinding.inflate(LayoutInflater.from(this));
             if (MainActivity.TableStyle != null) {
-                AutoTableAdapter.bindView(MainActivity.TableStyle, tvBinding.getRoot(), true);
+                AutoTableAdapter.bindView(MainActivity.TableStyle, tvBinding.getRoot());
             }
             tvBinding.tableHtitle.setText(h);
             headerRow.addView(tvBinding.getRoot(), new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
@@ -187,5 +172,4 @@ public class jietuActivity extends AppCompatActivity<ActivityJietuBinding> {
         root.draw(canvas);
         return bitmap;
     }
-
 }

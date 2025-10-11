@@ -23,7 +23,7 @@ public class TableTimeAdapter extends BaseAdapter<ItemTableTimeBinding, TableTim
     protected ItemTableTimeBinding getViewBindingObject(LayoutInflater inflater, ViewGroup parent, int viewType) {
         ItemTableTimeBinding inflate = ItemTableTimeBinding.inflate(inflater, parent, false);
         if (MainActivity.TableStyle != null) {
-            AutoTableAdapter.bindView(MainActivity.TableStyle, inflate.getRoot(), true);
+            AutoTableAdapter.bindView(MainActivity.TableStyle, inflate.getRoot());
         }
         return inflate;
     }

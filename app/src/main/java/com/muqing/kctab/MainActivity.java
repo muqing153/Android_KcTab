@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
 
     private void Login() {
         Intent intent = new Intent(this, LoginActivity.class);
-        LoginStart.launch(intent);
+        SyncKc.launch(intent);
     }
 
     public static File fileTabList = new File(wj.data);
@@ -61,23 +61,18 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MainActivity.ThisColor = gj.getThemeColor(this, com.google.android.material.R.attr.colorPrimaryFixedDim);
-//        gj.sc(new Gson().toJson(MainActivity.curriculum));
-//        String schoolYearTerm = main.getSchoolYearTerm(LocalDate.now());
-//        String xuenian = kebiao.getString("xuenian", null);
-//        if (xuenian == null) {
-//            kebiao.edit().putString("xuenian", schoolYearTerm).apply();
-//            fileTabList = new File(fileTabList, schoolYearTerm);
-//        } else {
-//            fileTabList = new File(fileTabList, xuenian);
-//        }
-//        {
-//            if (!fileTabList.isDirectory() || Objects.requireNonNull(fileTabList.list()).length == 0) {
-//                //noinspection ResultOfMethodCallIgnored
-//                fileTabList.mkdirs();
-//                Login();
-//                return;
-//            }
-//        }
+        SharedPreferences kebiao = getSharedPreferences("userData", MODE_PRIVATE);
+        String account = kebiao.getString("account", null);
+        if (account != null) {
+            File file = new File(wj.data, account + ".json");
+            if (file.exists()) {
+                String dqwb = wj.dqwb(file);
+                curriculum = new Gson().fromJson(dqwb, Curriculum.class);
+                fileTabList = file;
+            }
+        } else {
+            Login();
+        }
         new GXThread(this);
         LoadUI();
     }
@@ -118,19 +113,19 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         Gson gson = new Gson();
         SharedPreferences a = getSharedPreferences("tablestyle", Context.MODE_PRIVATE);
 //        TableStyle = gson.fromJson(a.getString("tablestyle", gson.toJson(null)), TableStyleData.class);
-        SharedPreferences kebiao = getSharedPreferences("userData", MODE_PRIVATE);
-        String account = kebiao.getString("account", null);
-        if (account != null) {
-            File file = new File(wj.data, account + ".json");
-            if (file.exists()) {
-                fileTabList = file;
-                MainActivity.curriculum = new Gson().fromJson(wj.dqwb(fileTabList), Curriculum.class);
-            }
-        }
+//        SharedPreferences kebiao = getSharedPreferences("userData", MODE_PRIVATE);
+//        String account = kebiao.getString("account", null);
+//        if (account != null && (MainActivity.curriculum.course == null || MainActivity.curriculum.course.isEmpty())) {
+//            File file = new File(wj.data, account + ".json");
+//            if (file.exists()) {
+//                fileTabList = file;
+//                MainActivity.curriculum = new Gson().fromJson(wj.dqwb(fileTabList), Curriculum.class);
+//            }
+//        }
         if (MainActivity.curriculum == null) {
             MainActivity.curriculum = new Curriculum();
         }
-        gj.sc(gson.toJson(MainActivity.curriculum));
+//        gj.sc(gson.toJson(MainActivity.curriculum));
         if (MainActivity.curriculum.startDate == null) {
             MainActivity.curriculum.startDate = Curriculum.getSemesterStartDate();
         }
@@ -145,8 +140,6 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
         for (int i = 1; i <= MaxZhou; i++) {
             pageAdapter.addPage(kecheng.newInstance(i));
         }
-        gj.sc(gson
-                .toJson(MainActivity.curriculum));
         binding.viewpage.setSaveEnabled(false);
         binding.viewpage.setAdapter(pageAdapter);
         int week = KcApi.getWeek(MainActivity.curriculum.startDate, Curriculum.getToday());
@@ -191,19 +184,11 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.share) {
-            int currentItem = binding.viewpage.getCurrentItem();
-            Fragment fragment = getSupportFragmentManager().findFragmentByTag("f" + currentItem);
-            if (fragment instanceof kecheng) {
-                kecheng k = (kecheng) fragment;
-//                jietuActivity.start(MainActivity.this, k.curriculum);
-            }
+            jietuActivity.start(this, curriculum);
         } else if (id == R.id.settings) {
             startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.sync) {
             Intent intent = new Intent(this, LoginActivity.class);
-            int currentItem = binding.viewpage.getCurrentItem();
-            kecheng kecheng = pageAdapter.data.get(currentItem);
-//            intent.putExtra("sync", kecheng.curriculum == null ? "ALL" : String.valueOf(kecheng.curriculum.data.get(0).week));
             SyncKc.launch(intent);
         } else {
             startActivity(new Intent(this, AutoTableActivity.class));
@@ -214,20 +199,7 @@ public class MainActivity extends AppCompatActivity<ActivityMainBinding> {
     ActivityResultLauncher<Intent> SyncKc = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
             Intent data = result.getData();
-            //                LoadUI();
+            LoadUI();
         }
-    });
-    ActivityResultLauncher<Intent> LoginStart = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK) {
-            Intent data = result.getData();
-            if (data != null) {
-                boolean kc = data.getBooleanExtra("kc", false);
-                if (kc) {
-                    LoadUI();
-                    return;
-                }
-            }
-        }
-        finish();
     });
 }

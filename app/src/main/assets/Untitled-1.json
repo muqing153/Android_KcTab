@@ -13,8 +13,7 @@
             "cardBackgroundColor": "#00FFFFFF",
             "cardElevation": 0,
             "cardCornerRadius": 0
-        },
-        "height": 120
+        }
     },
     "tableH": {
         "tableHtitle": {
@@ -42,7 +41,6 @@
             "cardCornerRadius": 0,
             "strokeWidth": 1,
             "strokeColor": "#80646464"
-        },
-        "height": 120
+        }
     }
 }
